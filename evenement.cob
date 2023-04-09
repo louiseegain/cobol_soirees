@@ -1,6 +1,6 @@
       ******************************************************************
-      * Author:
-      * Date:
+      * Author: Louise EGAIN - Mathias LORET - Thomas MERLET - Camille LEAU
+      * Date:Mai 2023
       * Purpose:
       * Tectonics: cobc
       ******************************************************************
@@ -107,6 +107,7 @@
        77 cr_fevent PIC 9(2).
        77 cr_fpart PIC 9(2).
        77 cr_fhisto PIC 9(2).
+       77 choix PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -147,15 +148,17 @@
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
       *-----------------------------------------------------------------
+           DISPLAY "---------------------------------------------------"
+           DISPLAY "Bienvenue sur l'application de gestion d'évènements"
+           DISPLAY "---------------------------------------------------"
 
-
-
+            STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
 
 
 
-            STOP RUN.
+
       ** add other procedures here
        END PROGRAM Evenements.
