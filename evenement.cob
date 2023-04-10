@@ -225,3 +225,33 @@
                    END-EVALUATE
            END-EVALUATE
            .
+
+
+      *-----------------------------------------------------------------
+      * Procédure permettant de rechercher un évènement en fonction de
+      *                        son nom
+      *-----------------------------------------------------------------
+
+
+       rechercherNom.
+           OPEN INPUT fevenement
+               DISPLAY "Quel évènement voulez-vous rechercher ?"
+               DISPLAY "(saisir le nom)"
+               ACCEPT fevent_nom
+               READ fevenement
+                   INVALID KEY
+                       DISPLAY "Evènement non trouvé."
+                       DISPLAY "Veuillez réessayer votre recherche."
+                   NOT INVALID KEY
+                       DISPLAY "Voici les informations de l'évènement :"
+                       DISPLAY "Nom : " fevent_nom
+                       DISPLAY "Type : "fevent_type
+                       DISPLAY "Date : "fevent_date
+                       DISPLAY "Heure de début : " fevent_heure
+                       DISPLAY "Description : " fevent_description
+                       DISPLAY "Adresse : " fevent_adresse
+                       DISPLAY "Seuil : "fevent_seuil
+                       DISPLAY "Login organisateur : " fevent_loginOrga
+               END-READ
+           CLOSE fevenement.
+       END PROGRAM Evenements.
