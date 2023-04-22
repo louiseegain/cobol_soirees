@@ -107,7 +107,7 @@
        77 cr_fevent PIC 9(2).
        77 cr_fpart PIC 9(2).
        77 cr_fhisto PIC 9(2).
-       77 choix PIC 9(1).
+       77 choix PIC S9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -148,15 +148,39 @@
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
       *-----------------------------------------------------------------
-           DISPLAY "---------------------------------------------------"
-           DISPLAY "Bienvenue sur l'application de gestion d'évènements"
-           DISPLAY "---------------------------------------------------"
 
+           PERFORM accueil
             STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
 
+
+
+      *accueil
+       accueil.
+
+           PERFORM WITH TEST AFTER UNTIL choix = 0
+
+               DISPLAY "-----------------------------------------------"
+               DISPLAY "|         BIENVENUE SUR L'APPLICATION         |"
+               DISPLAY "-----------------------------------------------"
+               DISPLAY "|  1 - Me connecter à mon compte              |"
+               DISPLAY "|  2 - Créer mon compte                       |"
+               DISPLAY "|  0 - quitter                                |"
+               DISPLAY "-----------------------------------------------"
+               DISPLAY "Taper votre choix :"
+               ACCEPT choix
+
+
+               IF choix = 1 THEN
+                   DISPLAY "connexion à un compte"
+               ELSE IF choix = 2 THEN
+                   DISPLAY "création d'un compte"
+               ELSE  IF choix = 0 THEN
+                   DISPLAY "au revoir !"
+               END-IF
+           END-PERFORM.
 
 
 
