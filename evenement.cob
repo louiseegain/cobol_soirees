@@ -227,8 +227,6 @@
            MOVE futil_mail TO chaine
 
            STRING chaine ' ' INTO chaine
-           DISPLAY 'mail = ' chaine
-
 
            PERFORM UNTIL chaine(I:1) EQUAL SPACE OR EQUAL '@'
                ADD 1 TO I
@@ -262,9 +260,7 @@
                        MOVE 0 TO verif_mail_ok
                    END-IF
                END-IF
-           END-IF
-
-           .
+           END-IF.
 
       ** add other procedures here
        END PROGRAM Evenements.
