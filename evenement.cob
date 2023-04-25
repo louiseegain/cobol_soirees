@@ -108,6 +108,14 @@
        77 cr_fpart PIC 9(2).
        77 cr_fhisto PIC 9(2).
        77 choix PIC S9(1).
+
+       77 verif_login pic X(30).
+
+       77 chaine PIC X(30).
+       77 lettre PIC A(1).
+       77 I PIC 9(2).
+       77 verif_arobase PIC 9(1).
+       77 verif_mail_ok PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -175,14 +183,55 @@
 
                IF choix = 1 THEN
                    DISPLAY "connexion à un compte"
+                   PERFORM verif_mail
                ELSE IF choix = 2 THEN
                    DISPLAY "création d'un compte"
+                   PERFORM creation_compte
                ELSE  IF choix = 0 THEN
                    DISPLAY "au revoir !"
                END-IF
            END-PERFORM.
 
+      *creation_compte
+       creation_compte.
+           DISPLAY "Entrer votre nom :"
+           ACCEPT futil_nom
+           DISPLAY "Entrer votre prénom :"
+           ACCEPT futil_nom
+           DISPLAY "Entrer votre adresse mail:"
+           ACCEPT futil_mail
+           DISPLAY "Entrer votre numéros de téléphone :"
+           ACCEPT futil_tel
+           DISPLAY "Entrer le nom de votre formation:"
+           ACCEPT futil_formation
+           DISPLAY "Entrer votre date de naissance :"
+           ACCEPT futil_naissance
+           DISPLAY "Entrer votre login :"
+           ACCEPT futil_login
+           DISPLAY "Entrer votre mot de passe :"
+           ACCEPT futil_mdp
 
+           DISPLAY"compté créé".
+
+       verif_mail.
+           MOVE 0 TO verif_arobase
+           MOVE 0 TO verif_mail_ok
+
+           MOVE 'TAR@TATA' TO chaine
+           STRING chaine ' ' INTO chaine
+           DISPLAY chaine
+
+           MOVE 1 TO I
+           PERFORM UNTIL chaine(I:1) EQUAL SPACE OR EQUAL '@'
+               DISPLAY chaine(I:1)
+               ADD 1 TO I
+           END-PERFORM
+
+
+
+
+
+           DISPLAY 'resulat :' verif_arobase .
 
       ** add other procedures here
        END PROGRAM Evenements.
