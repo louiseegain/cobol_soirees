@@ -74,7 +74,7 @@
 
        FD fevenement.
        01 tamp_fevent.
-           02 fevent_nom PIC A(20).
+           02 fevent_nom PIC A(30).
            02 fevent_type PIC A(20).
            02 fevent_date PIC X(10).
            02 fevent_loginOrga PIC X(30).
@@ -110,6 +110,17 @@
        77 choix PIC 9(1).
        77 nom PIC A(30).
        77 vretour PIC 9(1).
+       77 estValideEvenementResultat PIC 9(1).
+       77 loginSaved PIC X(30).
+       77 adresseEvent PIC X(30).
+       77 descriptionEvent PIC X(50).
+       77 loginOrga PIC X(30).
+       77 dateEvent PIC X(10).
+       77 typeEvent PIC A(20).
+       77 nomEvent PIC A(30).
+       77 etatEvent PIC A(8).
+       77 seuilEvent PIC 9(3).
+       77 heureEvent PIC X(5).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -512,7 +523,7 @@
                ACCEPT choix
 
             EVALUATE choix
-      *          WHEN 1 PERFORM creerEvent
+                WHEN 1 PERFORM creerEvent
       *          WHEN 2 PERFORM modifierEvent
       *          WHEN 3 PERFORM supprimerEvent
                 WHEN 0 PERFORM menuUtilisateur
@@ -576,6 +587,86 @@
                END-READ
            CLOSE fevenement.
 
+
+
+      *-----------------------------------------------------------------
+      *          Procédures permettant de créer un évènement
+      *-----------------------------------------------------------------
+
+      ******************************************************************
+      *    Fonction parallèle :
+      *    Fonction qui vérifie que le nom de l'évènement n'est pas déjà
+      *    présent
+      ******************************************************************
+           existeEvent.
+           OPEN INPUT fevenement
+           READ fevenement KEY IS fevent_nom
+           INVALID KEY
+               MOVE 0 TO estValideEvenementResultat
+           NOT INVALID KEY
+               MOVE 1 TO estValideEvenementResultat
+           END-READ
+
+           IF cr_fevent = 00
+           THEN DISPLAY "Evènement trouve"
+           ELSE DISPLAY "Evènement non trouve"
+           END-IF
+           CLOSE fevenement
+           .
+      ******************************************************************
+      *    Fonction principale :
+      *    Fonction qui permet de créer l'évènement
+      ******************************************************************
+           creerEvent.
+           PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 0
+               DISPLAY "Saisir le nom de l'évènement"
+               DISPLAY"(maximum 30 caractères)"
+               ACCEPT nomEvent
+               PERFORM existeEvent
+           END-PERFORM
+           DISPLAY "Saisir le type d'évènement"
+           ACCEPT typeEvent
+           DISPLAY "Saisir la date de l'évènement"
+           DISPLAY "Format : JJ/MM/AAAA"
+           ACCEPT dateEvent
+      *     PERFORM UNTIL loginOrga EQUALS loginSaved
+               DISPLAY "Saisir votre identifiant de connexion"
+               DISPLAY "(correspondant à votre login de connexion)"
+               ACCEPT loginOrga
+      *     END-PERFORM
+           DISPLAY "Veuillez décrire votre évènement"
+           DISPLAY "Format : maximum 50 caractères"
+           ACCEPT descriptionEvent
+           DISPLAY "Veuillez saisir l'adresse de l'évènement"
+           ACCEPT adresseEvent
+           PERFORM UNTIL seuilEvent > 0
+               DISPLAY "Veuillez saisir le nombre maximal de personne"
+               ACCEPT seuilEvent
+           END-PERFORM
+           DISPLAY "Veuillez saisir l'heure de début de l'évènement"
+           DISPLAY " Format : xxHxx, avec x un chiffre"
+           ACCEPT heureEvent
+
+           MOVE nomEvent TO fevent_nom
+           MOVE typeEvent TO fevent_type
+           MOVE dateEvent TO fevent_date
+           MOVE loginOrga TO fevent_loginOrga
+           MOVE descriptionEvent TO fevent_description
+           MOVE adresseEvent TO fevent_adresse
+           MOVE seuilEvent TO fevent_seuil
+           MOVE heureEvent TO fevent_heure
+           MOVE "En cours" TO fevent_etat
+
+           OPEN I-O fevenement
+           WRITE tamp_fevent
+           IF cr_fevent=35
+               DISPLAY "Echec d'insertion, veuillez réessayer"
+           ELSE
+               DISPLAY "Insertion réussie"
+               DISPLAY cr_fevent
+           END-IF
+           CLOSE fevenement
+           .
 
 
       *-----------------------------------------------------------------
