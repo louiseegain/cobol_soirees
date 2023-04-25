@@ -198,8 +198,15 @@
            ACCEPT futil_nom
            DISPLAY "Entrer votre prénom :"
            ACCEPT futil_nom
-           DISPLAY "Entrer votre adresse mail:"
-           ACCEPT futil_mail
+
+
+
+           PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
+               DISPLAY "Entrer votre adresse mail:"
+               ACCEPT futil_mail
+               PERFORM verif_mail
+           END-PERFORM
+
            DISPLAY "Entrer votre numéros de téléphone :"
            ACCEPT futil_tel
            DISPLAY "Entrer le nom de votre formation:"
@@ -215,23 +222,49 @@
 
        verif_mail.
            MOVE 0 TO verif_arobase
-           MOVE 0 TO verif_mail_ok
-
-           MOVE 'TAR@TATA' TO chaine
-           STRING chaine ' ' INTO chaine
-           DISPLAY chaine
-
+           MOVE 1 TO verif_mail_ok
            MOVE 1 TO I
+           MOVE futil_mail TO chaine
+
+           STRING chaine ' ' INTO chaine
+           DISPLAY 'mail = ' chaine
+
+
            PERFORM UNTIL chaine(I:1) EQUAL SPACE OR EQUAL '@'
-               DISPLAY chaine(I:1)
                ADD 1 TO I
            END-PERFORM
 
+           IF chaine(I:1) EQUAL '@' THEN
 
+               ADD 1 TO I
+               PERFORM UNTIL chaine(I:1) EQUAL SPACE
+                   OR EQUAL '.'
+                   OR EQUAL '@'
+                       ADD 1 TO I
+               END-PERFORM
 
+               IF chaine(I:1) EQUAL '@' OR chaine(I:1) EQUAL SPACE THEN
+                   MOVE 0 TO verif_mail_ok
+               END-IF
 
+               ADD 1 TO I
 
-           DISPLAY 'resulat :' verif_arobase .
+               IF chaine(I:3) NOT EQUAL 'fr'
+                   AND chaine(I:3) NOT EQUAL 'com' THEN
+                       MOVE 0 TO verif_mail_ok
+               ELSE
+                   IF chaine(I:3) EQUAL 'fr' THEN
+                       ADD 2 TO I
+                   ELSE IF chaine(I:3) EQUAL 'com' THEN
+                       ADD 3 TO I
+                   END-IF
+                   IF chaine(I:1) NOT EQUAL SPACE THEN
+                       MOVE 0 TO verif_mail_ok
+                   END-IF
+               END-IF
+           END-IF
+
+           .
 
       ** add other procedures here
        END PROGRAM Evenements.
