@@ -121,6 +121,19 @@
        77 etatEvent PIC A(8).
        77 seuilEvent PIC 9(3).
        77 heureEvent PIC X(5).
+       77 Fin PIC 9(1).
+       01 WS-CURRENT-DATE-DATA.
+          05  WS-CURRENT-DATE.
+              10  WS-CURRENT-YEAR         PIC 9(04).
+              10  WS-CURRENT-MONTH        PIC 9(02).
+              10  WS-CURRENT-DAY          PIC 9(02).
+          05  WS-CURRENT-TIME.
+              10  WS-CURRENT-HOURS        PIC 9(02).
+              10  WS-CURRENT-MINUTE       PIC 9(02).
+              10  WS-CURRENT-SECOND       PIC 9(02).
+              10  WS-CURRENT-MILLISECONDS PIC 9(02).
+       77 cpt PIC 9(3).
+       77 nom_saved PIC A(30).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -172,6 +185,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -192,6 +206,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -212,6 +227,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -233,6 +249,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -249,10 +266,11 @@
            MOVE "swann.ledourner@gmail.com" TO futil_mail
            MOVE "membre" TO futil_type
            MOVE "MIAGE" TO futil_formation
-           MOVE "26/12/1996" TO futil_naissance
+           MOVE "21/12/1996" TO futil_naissance
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -273,6 +291,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -293,6 +312,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -314,6 +334,7 @@
 
            OPEN I-O futilisateur
            WRITE tamp_futi
+           END-WRITE
            IF cr_futil = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -335,6 +356,7 @@
 
         OPEN I-O fevenement
            WRITE tamp_fevent
+           END-WRITE
            IF cr_fevent = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -357,6 +379,7 @@
 
         OPEN I-O fevenement
            WRITE tamp_fevent
+           END-WRITE
            IF cr_fevent = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -378,6 +401,7 @@
 
         OPEN I-O fevenement
            WRITE tamp_fevent
+           END-WRITE
            IF cr_fevent = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -399,6 +423,7 @@
 
         OPEN I-O fevenement
            WRITE tamp_fevent
+           END-WRITE
            IF cr_fevent = 35
                DISPLAY "Echec d'insertion"
            ELSE
@@ -526,6 +551,7 @@
                 WHEN 1 PERFORM creerEvent
       *          WHEN 2 PERFORM modifierEvent
       *          WHEN 3 PERFORM supprimerEvent
+                WHEN 4 PERFORM afficheEvent
                 WHEN 0 PERFORM menuUtilisateur
            END-EVALUATE
 
@@ -566,6 +592,7 @@
 
 
            rechercherNom.
+           PERFORM afficheEvent
            OPEN INPUT fevenement
                DISPLAY "Quel évènement voulez-vous rechercher ?"
                DISPLAY "(saisir le nom)"
@@ -600,17 +627,17 @@
       ******************************************************************
            existeEvent.
            OPEN INPUT fevenement
-           READ fevenement KEY IS fevent_nom
+           READ fevenement NEXT
            INVALID KEY
                MOVE 0 TO estValideEvenementResultat
            NOT INVALID KEY
                MOVE 1 TO estValideEvenementResultat
            END-READ
 
-           IF cr_fevent = 00
-           THEN DISPLAY "Evènement trouve"
-           ELSE DISPLAY "Evènement non trouve"
-           END-IF
+      *     IF cr_fevent = 00
+      *     THEN DISPLAY "Evènement trouve"
+      *     ELSE DISPLAY "Evènement non trouve"
+      *     END-IF
            CLOSE fevenement
            .
       ******************************************************************
@@ -618,6 +645,9 @@
       *    Fonction qui permet de créer l'évènement
       ******************************************************************
            creerEvent.
+           DISPLAY"-------------------------------------------"
+           DISPLAY"|          CREATION EVENEMENT             |"
+           DISPLAY"-------------------------------------------"
            PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 0
                DISPLAY "Saisir le nom de l'évènement"
                DISPLAY"(maximum 30 caractères)"
@@ -659,16 +689,86 @@
 
            OPEN I-O fevenement
            WRITE tamp_fevent
+           END-WRITE
            IF cr_fevent=35
                DISPLAY "Echec d'insertion, veuillez réessayer"
            ELSE
                DISPLAY "Insertion réussie"
                DISPLAY cr_fevent
            END-IF
+
            CLOSE fevenement
            .
 
 
       *-----------------------------------------------------------------
-      *          Procédures permettant de créer un évènement
+      *          Procédures permettant d'afficher les évènements
       *-----------------------------------------------------------------
+           afficheEvent.
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|          AFFICHAGE EVENEMENT             |"
+           DISPLAY"--------------------------------------------"
+           OPEN INPUT fevenement
+               MOVE 0 TO Fin
+               PERFORM WITH TEST AFTER UNTIL Fin = 1
+               READ fevenement
+               AT END MOVE 1 TO Fin
+               NOT AT END
+                   IF fevent_date>=WS-CURRENT-DATE
+                   DISPLAY "Nom : "fevent_nom
+                   DISPLAY "Type : "fevent_type
+                   DISPLAY"----------"
+               END-READ
+               END-PERFORM
+               CLOSE fevenement.
+           .
+
+      *-----------------------------------------------------------------
+      *          Procédures permettant de rechercher un utilisateur par
+      *          son nom
+      *-----------------------------------------------------------------
+      *     inscriptionEvent.
+      *     PERFORM afficheEvent
+      *     DISPLAY "A quel évènement voulez vous vous inscrire?"
+      *     ACCEPT nomEvent
+      *     MOVE nomEvent TO nom_saved
+      *     OPEN I-O fparticipant
+      *         MOVE "En attente" TO fpart_etat
+      *         MOVE 0 TO Fin
+      *         MOVE 1 TO cpt
+      *         PERFORM WITH TEST AFTER UNTIL Fin = 1
+      *             READ fparticipant
+      *                 AT END
+      *                     MOVE 1 TO Fin
+      *                 NOT AT END
+      *                     MOVE cpt+1 TO cpt
+      *             END-READ
+      *         END-PERFORM
+      *         MOVE login_saved TO fpart_login
+      *         MOVE nom_saved TO fpart_nomEvent
+      *     CLOSE fparticipant
+      *    .
+
+      *-----------------------------------------------------------------
+      *          Procédures permettant de s'inscrire à un évènement
+      *-----------------------------------------------------------------
+           rechercherUtilisateurNom.
+           DISPLAY "Veuillez saisir le nom de la personne souhaitée : "
+           ACCEPT nom
+           OPEN INPUT futilisateur
+           PERFORM WITH TEST AFTER UNTIL Fin = 1
+               READ futilisateur
+               AT END
+                   MOVE 1 TO Fin
+               NOT AT END
+                   IF nom = futil_nom THEN
+                       DISPLAY "Nom : " futil_nom
+                       DISPLAY "Prénom : " futil_prenom
+                       DISPLAY "Mail : " futil_mail
+                       DISPLAY "Téléphone : " futil_tel
+                       DISPLAY "Login : "futil_login
+                       DISPLAY "Type d'utilisateur : "futil_type
+                   END-IF
+           END-PERFORM
+           CLOSE futilisateur
+           .
