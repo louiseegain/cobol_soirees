@@ -5,5 +5,3 @@ Créer une application qui gérera des évènements d'une association
 /!\CHACUN SE CREE SA PROPRE BRANCHE DE TRAVAIL/!\
 
 Avant de merger dans la branche main, une relecture des collègues est également obligatoire afin d'éviter tout problème
-
-Quand vous faites un commit, merci de préciser le numéro du ticket JIRA. Cela permettra de s'y retrouver plus facilement.
