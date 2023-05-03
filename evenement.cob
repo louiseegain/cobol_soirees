@@ -134,6 +134,7 @@
               10  WS-CURRENT-MILLISECONDS PIC 9(02).
        77 cpt PIC 9(3).
        77 nom_saved PIC A(30).
+       77 login PIC X(30).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -449,7 +450,7 @@
       *      organisateur d'un ou plusieurs évènements s'il en crée
       *-----------------------------------------------------------------
            menuUtilisateur.
-            DISPLAY"--------------------------------------------"
+           DISPLAY"--------------------------------------------"
            DISPLAY"|             MENU PRINCIPAL                |"
            DISPLAY"--------------------------------------------"
            PERFORM  UNTIL choix < 0 OR choix >=7
@@ -724,8 +725,7 @@
            .
 
       *-----------------------------------------------------------------
-      *          Procédures permettant de rechercher un utilisateur par
-      *          son nom
+      *          Procédures permettant de s'inscrire à un évènement
       *-----------------------------------------------------------------
       *     inscriptionEvent.
       *     PERFORM afficheEvent
@@ -750,7 +750,8 @@
       *    .
 
       *-----------------------------------------------------------------
-      *          Procédures permettant de s'inscrire à un évènement
+      *          Procédures permettant de rechercher un utilisateur par
+      *          son nom
       *-----------------------------------------------------------------
            rechercherUtilisateurNom.
            DISPLAY "Veuillez saisir le nom de la personne souhaitée : "
@@ -770,5 +771,28 @@
                        DISPLAY "Type d'utilisateur : "futil_type
                    END-IF
            END-PERFORM
+           CLOSE futilisateur
+           .
+
+      *-----------------------------------------------------------------
+      *          Procédures permettant de rechercher un utilisateur par
+      *          son login
+      *-----------------------------------------------------------------
+           rechercherUtilisateurLogin.
+           DISPLAY "Veuillez saisir le login de la personne souhaitée :"
+           ACCEPT login
+           OPEN INPUT futilisateur
+           READ futilisateur
+               INVALID KEY
+                   DISPLAY "Utilisateur non trouvé"
+               NOT INVALID KEY
+                   IF login = futil_login THEN
+                       DISPLAY "Nom : "futil_nom
+                       DISPLAY "Prénom :" futil_prenom
+                       DISPLAY   "Mail :  " futil_mail
+                       DISPLAY   "Téléphone :  " futil_tel
+                       DISPLAY   "Login :  " futil_login
+                       DISPLAY   "Type utilisateur :  " futil_type
+                   END-IF
            CLOSE futilisateur
            .
