@@ -789,10 +789,10 @@
                    IF login = futil_login THEN
                        DISPLAY "Nom : "futil_nom
                        DISPLAY "Prénom :" futil_prenom
-                       DISPLAY   "Mail :  " futil_mail
-                       DISPLAY   "Téléphone :  " futil_tel
-                       DISPLAY   "Login :  " futil_login
-                       DISPLAY   "Type utilisateur :  " futil_type
+                       DISPLAY "Mail :  " futil_mail
+                       DISPLAY "Téléphone :  " futil_tel
+                       DISPLAY "Login :  " futil_login
+                       DISPLAY "Type utilisateur :  " futil_type
                    END-IF
            CLOSE futilisateur
            .
