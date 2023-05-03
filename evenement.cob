@@ -575,10 +575,61 @@
            END-PERFORM
            .
 
+      *-----------------------------------------------------------------
+      * Procédure permettant de modifier un utilisateur
+      *-----------------------------------------------------------------
            modifierUtilisateur.
            DISPLAY"--------------------------------------------"
            DISPLAY"|          MODIFIER UTILISATEUR            |"
            DISPLAY"--------------------------------------------"
+           PERFORM WITH TEST AFTER UNTIL
+               DISPLAY "Que voulez-vous modifier ?"
+               DISPLAY "1 - Nom "
+               DISPLAY "2 - Prénom "
+               DISPLAY "3 - Mail "
+               DISPLAY "4 - Téléphone "
+               DISPLAY "5 - Formation"
+               IF futil_type='admin'
+                   DISPLAY "6 - Type d'utilisateur : "futil_type
+               END-IF
+               ACCEPT choix
+               EVALUATE choix
+               WHEN 1
+                   DISPLAY "Entrer votre nouveau nom :"
+                   ACCEPT futil_nom
+               WHEN 2
+                   DISPLAY "Entrer votre nouveau prénom :"
+                   ACCEPT futil_prenom
+               WHEN 3
+                   PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
+                       DISPLAY "Entrer votre nouvelle adresse mail:"
+                       ACCEPT futil_mail
+                       PERFORM verif_mail
+                   END-PERFORM
+               WHEN 4
+                   PERFORM WITH TEST AFTER UNTIL verif_tel_ok EQUAL 1
+                       DISPLAY "Entrer votre numeros de telephone:"
+                       ACCEPT futil_tel
+                       PERFORM verif_tel
+                   END-PERFORM
+               WHEN 5
+                   DISPLAY "Entrer votre nouvelle formation :"
+                   ACCEPT futil_formation
+               WHEN 6
+                   IF futil_type='admin' THEN
+                       DISPLAY "Veuillez entrer le nouveau type d'utilisateur"
+                       ACCEPT futil_type
+                   END-IF
+           OPEN I-O futilisateur
+               REWRITE tamp_futi
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification réussie"
+                       ELSE
+                           DISPLAY "Modification en échec"
+                   END-IF
+           CLOSE futilisateur
+
            .
 
            supprimerEventPasse.
