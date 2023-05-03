@@ -453,7 +453,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|             MENU PRINCIPAL                |"
            DISPLAY"--------------------------------------------"
-           PERFORM  UNTIL choix < 0 OR choix >=7
+           PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY "Que souhaitez-vous faire ?"
                DISPLAY "1 - Gérer votre profil"
                DISPLAY "2 - Rechercher un évènement"
@@ -477,18 +477,18 @@
                        ELSE DISPLAY "Non autorisé"
                            PERFORM menuUtilisateur
                        END-IF
-      *             WHEN 5
-      *                IF futil_type = 'admin'
-      *                     THEN PERFORM modifierUtilisateur
-      *                ELSE DISPLAY "Non autorisé"
-      *                     PERFORM menuUtilisateur
-      *                 END-IF
-      *             WHEN 6
-      *                 IF futil_type = 'admin'
-      *                     THEN PERFORM supprimerEventPasse
-      *                 ELSE DISPLAY "Non autorisé"
-      *                     PERFORM menuUtilisateur
-      *                END-IF
+                   WHEN 5
+                      IF futil_type = 'admin'
+                           THEN PERFORM modifierUtilisateur
+                      ELSE DISPLAY "Non autorisé"
+                           PERFORM menuUtilisateur
+                       END-IF
+                   WHEN 6
+                       IF futil_type = 'admin'
+                           THEN PERFORM supprimerEventPasse
+                       ELSE DISPLAY "Non autorisé"
+                           PERFORM menuUtilisateur
+                      END-IF
                END-EVALUATE
            END-PERFORM
            .
@@ -497,7 +497,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|           GESTION DU PROFIL              |"
            DISPLAY"--------------------------------------------"
-           PERFORM UNTIL choix < 0 OR choix >= 3
+           PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY "Que souhaitez-vous faire dans votre
                    profil"
                DISPLAY "1 - Modifier votre profil "
@@ -519,7 +519,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|           RECHERCHER UN EVENEMENT        |"
            DISPLAY"--------------------------------------------"
-           PERFORM UNTIL choix < 0 or choix >=3
+           PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY "1 - Rechercher avec le nom de l'évènement"
                DISPLAY "2 - Rechercher sur le type d'évènement"
                DISPLAY "3 - Rechercher par organisateur"
@@ -540,7 +540,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|           GESTION D'EVENEMENT            |"
            DISPLAY"--------------------------------------------"
-           PERFORM UNTIL choix < 0 OR choix>=4
+           PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY "1 - Créer un évènement"
                DISPLAY "2 - Modifier un évènement"
                DISPLAY "3 - Supprimer un évènement"
@@ -563,7 +563,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|       AFFICHAGE DES STATISTIQUES         |"
            DISPLAY"--------------------------------------------"
-           PERFORM UNTIL choix<0 OR choix >=2
+           PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY "1 - Afficher statistique"
                DISPLAY "0 - Revenir au menu précédent"
                ACCEPT choix
@@ -575,7 +575,7 @@
            END-PERFORM
            .
 
-           modifierUtilAdmin.
+           modifierUtilisateur.
            DISPLAY"--------------------------------------------"
            DISPLAY"|          MODIFIER UTILISATEUR            |"
            DISPLAY"--------------------------------------------"
