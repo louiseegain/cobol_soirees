@@ -110,12 +110,17 @@
        77 choix PIC S9(1).
 
        77 verif_login pic X(30).
-
        77 chaine PIC X(30).
        77 lettre PIC A(1).
        77 I PIC 9(2).
        77 verif_arobase PIC 9(1).
        77 verif_mail_ok PIC 9(1).
+       77 verif_tel_ok PIC 9(1).
+       77 verif_login_ok PIC 9(1).
+       77 verif PIC 9(1).
+
+       77 login PIC X(30).
+       77 mdp PIC X(30).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -183,7 +188,7 @@
 
                IF choix = 1 THEN
                    DISPLAY "connexion à un compte"
-                   PERFORM verif_mail
+                   PERFORM connexion
                ELSE IF choix = 2 THEN
                    DISPLAY "création d'un compte"
                    PERFORM creation_compte
@@ -192,33 +197,76 @@
                END-IF
            END-PERFORM.
 
-      *creation_compte
+      *creation_comptes
        creation_compte.
+
+      ** ouverture du fichier
+           OPEN I-O futilisateur
+
+      **enregistrement des informations dans ke tampon
            DISPLAY "Entrer votre nom :"
            ACCEPT futil_nom
            DISPLAY "Entrer votre prénom :"
-           ACCEPT futil_nom
+           ACCEPT futil_prenom
 
-
-
+      **verification du format xxxxx@xxxx.fr ou xxxxx@xxxx.com
            PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
                DISPLAY "Entrer votre adresse mail:"
                ACCEPT futil_mail
                PERFORM verif_mail
            END-PERFORM
 
-           DISPLAY "Entrer votre numéros de téléphone :"
-           ACCEPT futil_tel
+      ** verification du format d'un nombre de 10 chiffres pour le tel
+           PERFORM WITH TEST AFTER UNTIL verif_tel_ok EQUAL 1
+               DISPLAY "Entrer votre numeros de telephone:"
+               ACCEPT futil_tel
+               PERFORM verif_tel
+           END-PERFORM
+
            DISPLAY "Entrer le nom de votre formation:"
            ACCEPT futil_formation
            DISPLAY "Entrer votre date de naissance :"
            ACCEPT futil_naissance
-           DISPLAY "Entrer votre login :"
-           ACCEPT futil_login
-           DISPLAY "Entrer votre mot de passe :"
-           ACCEPT futil_mdp
 
-           DISPLAY"compté créé".
+      **verification que le login n'existe pas déjà
+           MOVE 0 TO verif_login_ok
+           PERFORM UNTIL verif_login_ok EQUAL 1
+               DISPLAY "Entrer votre login :"
+               ACCEPT futil_login
+               IF futil_login NOT EQUAL SPACE THEN
+                   READ futilisateur
+                       INVALID KEY
+                           MOVE 1 TO verif_login_ok
+                       NOT INVALID KEY
+                           DISPLAY 'ce login existe déjà!'
+                   ENd-READ
+               ELSE
+                   DISPLAY 'le login ne peut pas etre vide'
+               END-IF
+           END-PERFORM
+
+
+
+           MOVE 0 TO verif
+           PERFORM UNTIL verif EQUAL 1
+               DISPLAY "Entrer votre mot de passe :"
+               ACCEPT futil_mdp
+               IF futil_mdp NOT EQUAL SPACE THEN
+                   MOVE 1 TO verif
+               ELSE
+                   DISPLAY 'le mot de passe ne peut pas etre vide'
+               END-IF
+           END-PERFORM
+
+      **on insere les informations dans le fichier
+           WRITE tamp_futi
+               INVALID KEY
+                   DISPLAY 'compte non créé : un problème est survenu'
+               NOT INVALID KEY
+                   DISPLAY 'compte créé'
+           END-WRITE.
+               DISPLAY cr_futil
+           CLOSE futilisateur.
 
        verif_mail.
            MOVE 0 TO verif_arobase
@@ -233,7 +281,6 @@
            END-PERFORM
 
            IF chaine(I:1) EQUAL '@' THEN
-
                ADD 1 TO I
                PERFORM UNTIL chaine(I:1) EQUAL SPACE
                    OR EQUAL '.'
@@ -261,6 +308,67 @@
                    END-IF
                END-IF
            END-IF.
+
+
+       verif_tel.
+           MOVE 1 TO I
+           MOVE 1 TO verif_tel_ok
+           DISPLAY 'futil_tel test'
+           PERFORM UNTIL futil_tel(I:1) EQUAL SPACE OR I EQUAL 11
+                   DISPLAY 'letttre =' futil_tel(I:1)
+                   IF futil_tel(I:1)
+                   NOT EQUAL 0
+                   AND NOT EQUAL 1
+                   AND NOT EQUAL 2
+                   AND NOT EQUAL 3
+                   AND NOT EQUAL 4
+                   AND NOT EQUAL 5
+                   AND NOT EQUAL 6
+                   AND NOT EQUAL 7
+                   AND NOT EQUAL 8
+                   AND NOT EQUAL 9 THEN
+                   MOVE 0 TO verif_tel_ok
+                END-IF
+                ADD 1 TO I
+           END-PERFORM
+           ADD 1 TO I
+           DISPLAY 'letttre suivante =' futil_tel(I:1)
+           IF futil_tel(I:1) NOT EQUAL SPACE THEN
+               MOVE 0 TO verif_tel_ok
+           END-IF.
+
+       connexion.
+           MOVE SPACE TO futil_mdp
+           MOVE SPACE TO futil_login
+           MOVE 0 TO verif
+           PERFORM UNTIL verif EQUAL 1
+               DISPLAY 'entrer votre login:'
+               ACCEPT login
+               DISPLAY 'entrer votre mot de passe:'
+               ACCEPT mdp
+
+               IF mdp NOT EQUAL SPACE AND login NOT EQUAL SPACE THEN
+                   MOVE login TO futil_login
+                   MOVE mdp TO futil_mdp
+                   OPEN INPUT futilisateur
+                   READ futilisateur
+                       INVALID KEY
+                           DISPLAY "erreur dans la saisie du login"
+                       NOT INVALID KEY
+                           DISPLAY tamp_futi
+                           IF futil_mdp EQUAL mdp THEN
+                               MOVE 1 TO verif
+                           ELSE
+                               DISPLAY 'erreur de mot de passe'
+                           END-IF
+                   ENd-READ
+                   CLOSE futilisateur
+
+               ELSE
+                   DISPLAY 'mot de passe et login ne peuvent etre vide '
+               END-IF
+
+           END-PERFORM.
 
       ** add other procedures here
        END PROGRAM Evenements.
