@@ -121,6 +121,9 @@
 
        77 login PIC X(30).
        77 mdp PIC X(30).
+
+       77 verif_event PIC 9(1).
+       77 fin_boucle PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -369,6 +372,55 @@
                END-IF
 
            END-PERFORM.
+
+       accepter_refuser_demandes.
+           afficheEvent.
+           MOVE 0 TO verif_event
+           PERFORM UNTIL verif_event EQUAL 1
+               DISPLAY "Saisissez le nom de l'evenement dont vous"
+               DISPLAY "voulez voir les demandes :"
+               ACCEPT fevent_nom
+               OPEN INPUT fevenement
+               READ fevenement
+                   INVALID KEY
+                       DISPLAY "Saisie invalide"
+                   NOT INVALID KEY
+                       IF fevent_loginOrga = login THEN
+                           MOVE 1 TO verif_event
+                       END-IF
+
+                       OPEN INPUT futilisateur
+                       MOVE login TO futil_login
+                       READ futilisateur
+                           INVALID KEY
+                               DISPLAY "Erreur lecture futilisateur"
+                           NOT INVALID KEY
+      ** utilisateur admin ou organisateur
+                               IF futil_type = 'admin' THEN
+                                   MOVE 1 TO verif_event
+                               END-IF
+                        END-READ
+                        CLOSE futilisateur
+               CLOSE fevenement
+           END-PERFORM
+
+           OPEN INPUT fparticipant
+           MOVE 0 TO fin_boucle
+           MOVE fevent_nom TO fpart_nomEvent
+           START fparticipant, KEY IS = fpart_nomEvent
+           INVALID KEY
+               DISPLAY "Pas de participants"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 0
+                   READ fparticipant NEXT
+                   AT END
+                       MOVE 0 TO fin_boucle
+                   NOT AT END
+                       IF fpart_etat = 'attente' THEN
+                           DISPLAY "KIWIZ you are here"
+                       END-IF
+               END-PERFORM
+
 
       ** add other procedures here
        END PROGRAM Evenements.
