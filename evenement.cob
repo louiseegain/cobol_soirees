@@ -121,6 +121,10 @@
 
        77 login PIC X(30).
        77 mdp PIC X(30).
+
+      **fonction supprimer futilisateur
+       77 fdf pic 9(1).
+       77 suppression_ok pic 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -369,6 +373,47 @@
                END-IF
 
            END-PERFORM.
+
+       suppression_utilisateur.
+      **pour cette fonction nous avons besoin de verifier que
+      ** l'utilisateur n'est inscrit à aucun evenement et n'en organise
+      ** aucun.
+      ** le login de l'utilisateur à supprimer doit etre dans futil_login
+           open input fevenement
+           move 1 to fdf
+           move 0 to suppression_ok
+
+      ** on verifie s'il organise un evenement
+           move futil_login to fevent_loginOrga
+           start fevenement , key is = fevent_loginOrga
+               not invalid key
+                   move 1 to suppression_ok
+                   display 'impossible de supprimer cet utilisateur'
+                   display 'il organise un evenement'
+           END-START
+           close fevenement
+
+      ** s'il n'organise aucun evenement, alors on va verifier qu'il
+      ** n'est pas inscrit à un evenement
+           if suppression_ok is equal 0 then
+               move futil_login to fpart_login
+               open input fparticipant
+               start fparticipant , key is = fpart_login
+                  not invalid key
+                   move 1 to suppression_ok
+                   display 'impossible de supprimer cet utilisateur'
+                   display 'il est inscrit a un evenement'
+               END-START
+               close fparticipant
+           end-if
+
+           if suppression_ok is equal 0 then
+              open i-o futilisateur
+      ** faire la suppression de l'utilisateur
+
+              close futilisateur
+           end-if.
+
 
       ** add other procedures here
        END PROGRAM Evenements.
