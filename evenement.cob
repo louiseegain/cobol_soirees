@@ -411,15 +411,38 @@
            INVALID KEY
                DISPLAY "Pas de participants"
            NOT INVALID KEY
-               PERFORM WITH TEST AFTER UNTIL fin_boucle = 0
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
                    READ fparticipant NEXT
                    AT END
                        MOVE 0 TO fin_boucle
                    NOT AT END
                        IF fpart_etat = 'attente' THEN
-                           DISPLAY "KIWIZ you are here"
+                           DISPLAY "---"
+                           DISPLAY "login utilisateur : " fpart_login
+                           DISPLAY "---"
                        END-IF
                END-PERFORM
+           CLOSE fparticipant
+
+           OPEN I-O fparticipant*
+           MOVE fevent_nom TO fpart_nomEvent
+      ** selection des demandes
+           MOVE 0 TO fin_boucle
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               DISPLAY "Saisissez le login de la personne dont vous voulez"
+               DISPLAY "traiter la demande :"
+               ACCEPT fpart_login
+
+               READ fparticipant
+                   INVALID KEY
+                       DISPLAY "login incorrect"
+                   NOT INVALID KEY
+                       fpart_etat = "acceptee"
+                       REWRITE tamp_fpart
+               END-READ
+               DISPLAY "Quitter ? (0 pour non, 1 pour oui)"
+           END-PERFORM
+           .
 
 
       ** add other procedures here
