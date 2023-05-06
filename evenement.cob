@@ -372,8 +372,32 @@
                END-IF
 
            END-PERFORM.
+      *-----------------------------------------------------------------
+      *          Procedure prise sur br Louise (temporaire)
+      *-----------------------------------------------------------------
+           afficheEvent.
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|          AFFICHAGE EVENEMENT             |"
+           DISPLAY"--------------------------------------------"
+           OPEN INPUT fevenement
+               MOVE 0 TO Fin
+               PERFORM WITH TEST AFTER UNTIL Fin = 1
+               READ fevenement NEXT
+               AT END
+                   PERFORM gestionEvenement
+                   MOVE 1 TO Fin
+               NOT AT END
+                   IF fevent_date>=WS-CURRENT-DATE
+                       DISPLAY "Nom : "fevent_nom
+                       DISPLAY "Type : "fevent_type
+                       DISPLAY"----------"
+                    END-IF
+               END-READ
+               END-PERFORM
+               CLOSE fevenement
+           .
 
-       accepter_refuser_demandes.
+       gestion_demandes.
            afficheEvent.
            MOVE 0 TO verif_event
            PERFORM UNTIL verif_event EQUAL 1
