@@ -121,9 +121,10 @@
 
        77 login PIC X(30).
        77 mdp PIC X(30).
-
+       77 Fin PIC 9(1).
        77 verif_event PIC 9(1).
        77 fin_boucle PIC 9(1).
+       77 choix_gestion_demande PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -159,13 +160,157 @@
                OPEN OUTPUT fhistorique
            END-IF
            CLOSE fhistorique
+      *-----------------------------------------------------------------
+      *                  CREATION JDD bis
+      *-----------------------------------------------------------------
+      * Creation des utilisateurs
+      * Compte admin temp (KIWIZ)
+       MOVE "tmerlet" to futil_login
+       MOVE "mdp" to futil_mdp
+       MOVE "MERLET" to futil_nom
+       MOVE "Thomas" to futil_prenom
+       MOVE "thomas.merlet@gmail.tom" TO futil_mail
+       MOVE "admin" TO futil_type
+       MOVE "sociologie chomage" TO futil_formation
+       MOVE "31/02/1999" TO futil_naissance
+
+       OPEN I-O futilisateur
+       WRITE tamp_futi
+       END-WRITE
+       IF cr_futil = 35 THEN
+           DISPLAY "Echec d'insertion"
+       ELSE
+           DISPLAY "Insertion reussie"
+           DISPLAY cr_futil
+       END-IF
+       CLOSE futilisateur
+
+      * Utilisateur lambda 1
+       MOVE "lambda1" to futil_login
+       MOVE "mdp" to futil_mdp
+       MOVE "LAMBDA" to futil_nom
+       MOVE "Pierre" to futil_prenom
+       MOVE "lambda.lambda@gmail.gom" TO futil_mail
+       MOVE "membre" TO futil_type
+       MOVE "Commerce" TO futil_formation
+       MOVE "13/05/1973" TO futil_naissance
+
+       OPEN OUTPUT futilisateur
+       WRITE tamp_futi
+       END-WRITE
+       IF cr_futil = 35 THEN
+           DISPLAY "Echec d'insertion"
+       ELSE
+           DISPLAY "Insertion reussie"
+           DISPLAY cr_futil
+       END-IF
+       CLOSE futilisateur
+
+      * Utilisateur lambda 2
+       MOVE "lambda2" to futil_login
+       MOVE "mdp" to futil_mdp
+       MOVE "LAMBDA" to futil_nom
+       MOVE "Steven" to futil_prenom
+       MOVE "lambda2.lambda@gmail.mom" TO futil_mail
+       MOVE "membre" TO futil_type
+       MOVE "Geographie" TO futil_formation
+       MOVE "26/11/1992" TO futil_naissance
+
+       OPEN I-O futilisateur
+       WRITE tamp_futi
+       END-WRITE
+       IF cr_futil = 35 THEN
+           DISPLAY "Echec d'insertion"
+       ELSE
+           DISPLAY "Insertion reussie"
+           DISPLAY cr_futil
+       END-IF
+       CLOSE futilisateur
+
+      * Creation des events
+
+       MOVE "Soiree kapplas" TO fevent_nom
+       MOVE "Soiree" TO fevent_type
+       MOVE "31/02/2024" TO fevent_date
+       MOVE "tmerlet" TO fevent_loginOrga
+       MOVE "Soiree gros fun" TO fevent_description
+       MOVE "2 rue de l'atlantide, Rennes" TO fevent_adresse
+       MOVE "a venir" TO fevent_etat
+       MOVE 15 TO fevent_seuil
+       MOVE "20h00" TO fevent_heure
+
+       OPEN I-O fevenement
+           WRITE tamp_fevent
+           END-WRITE
+           IF cr_fevent = 35 THEN
+               DISPLAY "Echec d'insertion"
+           ELSE
+               DISPLAY "Insertion reussie"
+               DISPLAY cr_fevent
+           END-IF
+           CLOSE fevenement
+
+       MOVE "Tripe marathon" TO fevent_nom
+       MOVE "Course" TO fevent_type
+       MOVE "02/07/2023" TO fevent_date
+       MOVE "tmerlet" TO fevent_loginOrga
+       MOVE "Petite course du matin" TO fevent_description
+       MOVE "9 rue soldat inconnu, Nantes" TO fevent_adresse
+       MOVE "a venir" TO fevent_etat
+       MOVE 150 TO fevent_seuil
+       MOVE "09h00" TO fevent_heure
+
+       OPEN I-O fevenement
+           WRITE tamp_fevent
+           END-WRITE
+           IF cr_fevent = 35 THEN
+               DISPLAY "Echec d'insertion"
+           ELSE
+               DISPLAY "Insertion reussie"
+               DISPLAY cr_fevent
+           END-IF
+       CLOSE fevenement.
+      * Creation participations
+      * participation 1
+       MOVE "lambda1" TO fpart_login
+       MOVE "Soiree kapplas" TO fpart_nomEvent
+       MOVE "attente" TO fpart_etat
+
+       OPEN I-O fparticipant
+           WRITE tamp_fpart
+           END-WRITE
+           IF cr_fpart = 35 THEN
+               DISPLAY "Echec d'insertion"
+           ELSE
+               DISPLAY "Insertion reussie"
+               DISPLAY cr_fpart
+           END-IF
+       CLOSE fparticipant
+
+      * participation 2
+       MOVE "lambda2" TO fpart_login
+       MOVE "Soiree kapplas" TO fpart_nomEvent
+       MOVE "acceptee" TO fpart_etat
+       OPEN I-O fparticipant
+           WRITE tamp_fpart
+           END-WRITE
+           IF cr_fpart = 35 THEN
+               DISPLAY "Echec d'insertion"
+           ELSE
+               DISPLAY "Insertion reussie"
+               DISPLAY cr_fpart
+           END-IF
+       CLOSE fparticipant
+
 
 
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
       *-----------------------------------------------------------------
 
-           PERFORM accueil
+      *    PERFORM accueil
+           DISPLAY "KIWIZ"
+           PERFORM gestion_demandes
             STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
@@ -221,7 +366,7 @@
 
       ** verification du format d'un nombre de 10 chiffres pour le tel
            PERFORM WITH TEST AFTER UNTIL verif_tel_ok EQUAL 1
-               DISPLAY "Entrer votre numeros de telephone:"
+               DISPLAY "Entrer votre numero de telephone:"
                ACCEPT futil_tel
                PERFORM verif_tel
            END-PERFORM
@@ -384,21 +529,52 @@
                PERFORM WITH TEST AFTER UNTIL Fin = 1
                READ fevenement NEXT
                AT END
-                   PERFORM gestionEvenement
                    MOVE 1 TO Fin
                NOT AT END
-                   IF fevent_date>=WS-CURRENT-DATE
+      **           IF fevent_date>=WS-CURRENT-DATE
                        DISPLAY "Nom : "fevent_nom
                        DISPLAY "Type : "fevent_type
                        DISPLAY"----------"
-                    END-IF
+      **             END-IF
                END-READ
                END-PERFORM
                CLOSE fevenement
            .
 
+      **----------------------------------------------------------------
+      *            Procedure prise sur br Louise (modifiee/temporaire)
+      **----------------------------------------------------------------
+           gestionEvenement.
+
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|           GESTION D'EVENEMENT            |"
+           DISPLAY"--------------------------------------------"
+           MOVE 0 TO choix
+           PERFORM WITH TEST AFTER UNTIL choix =0
+               DISPLAY "1 - Creer un evenement"
+               DISPLAY "2 - Modifier un evenement"
+               DISPLAY "3 - Supprimer un evenement"
+               DISPLAY "4 - Afficher evenement"
+               DISPLAY "5 - Gerer demandes participation"
+               DISPLAY "0 - Revenir au menu precedent"
+               ACCEPT choix
+
+            EVALUATE choix
+      *         WHEN 1 PERFORM creerEvent
+      *          WHEN 2 PERFORM modifierEvent
+      *          WHEN 3 PERFORM supprimerEvent
+      *         WHEN 4 PERFORM afficheEvent
+      *         WHEN 0 PERFORM menuUtilisateur
+                WHEN 5 PERFORM gestion_demandes
+           END-EVALUATE
+
+           END-PERFORM
+           .
+
        gestion_demandes.
-           afficheEvent.
+      *> KIWIZ delete next line when connection fixed
+           MOVE "tmerlet" TO login
+           PERFORM afficheEvent
            MOVE 0 TO verif_event
            PERFORM UNTIL verif_event EQUAL 1
                DISPLAY "Saisissez le nom de l'evenement dont vous"
@@ -411,20 +587,21 @@
                    NOT INVALID KEY
                        IF fevent_loginOrga = login THEN
                            MOVE 1 TO verif_event
+                       ELSE
+                           OPEN INPUT futilisateur
+                           MOVE login TO futil_login
+                           READ futilisateur
+                               INVALID KEY
+                                   DISPLAY "Erreur lecture futilisateur"
+                               NOT INVALID KEY
+      ** utilisateur admin ou organisateur
+                                   IF futil_type = 'admin' THEN
+                                       MOVE 1 TO verif_event
+                                   END-IF
+                           END-READ
+                           CLOSE futilisateur
                        END-IF
 
-                       OPEN INPUT futilisateur
-                       MOVE login TO futil_login
-                       READ futilisateur
-                           INVALID KEY
-                               DISPLAY "Erreur lecture futilisateur"
-                           NOT INVALID KEY
-      ** utilisateur admin ou organisateur
-                               IF futil_type = 'admin' THEN
-                                   MOVE 1 TO verif_event
-                               END-IF
-                        END-READ
-                        CLOSE futilisateur
                CLOSE fevenement
            END-PERFORM
 
@@ -438,33 +615,45 @@
                PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
                    READ fparticipant NEXT
                    AT END
-                       MOVE 0 TO fin_boucle
+                       MOVE 1 TO fin_boucle
                    NOT AT END
                        IF fpart_etat = 'attente' THEN
                            DISPLAY "---"
-                           DISPLAY "login utilisateur : " fpart_login
+                           DISPLAY "demande de : " fpart_login
                            DISPLAY "---"
                        END-IF
                END-PERFORM
            CLOSE fparticipant
 
-           OPEN I-O fparticipant*
+           OPEN I-O fparticipant
            MOVE fevent_nom TO fpart_nomEvent
       ** selection des demandes
            MOVE 0 TO fin_boucle
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
-               DISPLAY "Saisissez le login de la personne dont vous voulez"
-               DISPLAY "traiter la demande :"
+               DISPLAY "Saisissez le login de la personne dont vous"
+               DISPLAY "souhaitez traiter la demande :"
                ACCEPT fpart_login
 
                READ fparticipant
                    INVALID KEY
                        DISPLAY "login incorrect"
                    NOT INVALID KEY
-                       fpart_etat = "acceptee"
+                       DISPLAY "Que souhaitez vous faire ?"
+                       DISPLAY "0 - refuser la demande"
+                       DISPLAY "1 - accepter la demande"
+                       ACCEPT choix_gestion_demande
+                       IF choix_gestion_demande = 0 THEN
+                           MOVE "refusee" TO fpart_etat
+                       ELSE
+                           MOVE "acceptee" TO fpart_etat
+                       END-IF
                        REWRITE tamp_fpart
+                       DISPLAY "Demande traitee"
                END-READ
                DISPLAY "Quitter ? (0 pour non, 1 pour oui)"
+               ACCEPT fin_boucle
+               CLOSE fparticipant
+      ** KIWIZ renvoyer ici au menu quand il sera operationnel
            END-PERFORM
            .
 
