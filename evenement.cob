@@ -667,10 +667,9 @@
            .
        supprimer_evenement.
            MOVE 0 TO verif_event
-
            PERFORM afficheEvent
-      * Selection de l'evenement a supprimer
 
+      * Selection de l'evenement a supprimer
       * KIWIZ la verif des droits peut être synthetisée (presente aussi dans gestion gestion_demandes
            PERFORM WITH TEST AFTER UNTIL verif_event = 1
                DISPLAY "Saisissez le nom de l'evenement a supprimer"
@@ -702,24 +701,6 @@
       * l'évènement existe, on peut le supprimer mais on supprime ses participations avant
       * KIWIZ verif de suppression des participants
 
-           MOVE fevent_nom TO fpart_nomEvent
-           OPEN INPUT fparticipant
-           START fparticipant, KEY IS = fpart_nomEvent
-           INVALID KEY
-               DISPLAY "Pas de participants"
-           NOT INVALID KEY
-               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
-                   READ fparticipant NEXT
-                   AT END
-                       DISPLAY "KIWIZ 5"
-                       MOVE 1 TO fin_boucle
-                   NOT AT END
-                           DISPLAY "---"
-                           DISPLAY "demande de : " fpart_login
-                           DISPLAY "---"
-               END-PERFORM
-           END-START
-           CLOSE fparticipant
            DISPLAY "Suppression des participations liees a l'evenement"
            OPEN INPUT fparticipant
            MOVE 0 TO fin_boucle
@@ -745,25 +726,6 @@
            OPEN INPUT fparticipant
            MOVE 0 TO fin_boucle
            MOVE fevent_nom TO fpart_nomEvent
-
-      * KIWIZ verif de suppression des participants
-           OPEN INPUT fparticipant
-           START fparticipant, KEY IS = fpart_nomEvent
-           INVALID KEY
-               DISPLAY "Pas de participants"
-           NOT INVALID KEY
-               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
-                   READ fparticipant NEXT
-                   AT END
-                       DISPLAY "KIWIZ 6"
-                       MOVE 1 TO fin_boucle
-                   NOT AT END
-                       DISPLAY "---"
-                       DISPLAY "demande de : " fpart_login
-                       DISPLAY "---"
-               END-PERFORM
-           END-START
-           CLOSE fparticipant
            .
 
       ** add other procedures here
