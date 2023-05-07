@@ -250,7 +250,7 @@
            END-IF
            CLOSE fevenement
 
-       MOVE "Tripe marathon" TO fevent_nom
+       MOVE "Triple marathon" TO fevent_nom
        MOVE "Course" TO fevent_type
        MOVE "02/07/2023" TO fevent_date
        MOVE "tmerlet" TO fevent_loginOrga
@@ -310,8 +310,9 @@
 
       *    PERFORM accueil
            DISPLAY "KIWIZ"
-           PERFORM gestion_demandes
-            STOP RUN.
+      *     PERFORM gestion_demandes
+           PERFORM supprimer_evenement
+           STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
@@ -666,10 +667,12 @@
            .
        supprimer_evenement.
            MOVE 0 TO verif_event
+
            PERFORM afficheEvent
       * Selection de l'evenement a supprimer
+
       * KIWIZ la verif des droits peut être synthetisée (presente aussi dans gestion gestion_demandes
-           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+           PERFORM WITH TEST AFTER UNTIL verif_event = 1
                DISPLAY "Saisissez le nom de l'evenement a supprimer"
                ACCEPT fevent_nom
                OPEN I-O fevenement
@@ -697,6 +700,26 @@
                        END-IF
            END-PERFORM
       * l'évènement existe, on peut le supprimer mais on supprime ses participations avant
+      * KIWIZ verif de suppression des participants
+
+           MOVE fevent_nom TO fpart_nomEvent
+           OPEN INPUT fparticipant
+           START fparticipant, KEY IS = fpart_nomEvent
+           INVALID KEY
+               DISPLAY "Pas de participants"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                   READ fparticipant NEXT
+                   AT END
+                       DISPLAY "KIWIZ 5"
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                           DISPLAY "---"
+                           DISPLAY "demande de : " fpart_login
+                           DISPLAY "---"
+               END-PERFORM
+           END-START
+           CLOSE fparticipant
            DISPLAY "Suppression des participations liees a l'evenement"
            OPEN INPUT fparticipant
            MOVE 0 TO fin_boucle
@@ -716,7 +739,31 @@
            CLOSE fparticipant
 
            DELETE fevenement RECORD
+           DISPLAY "Suppression effectuee"
+           PERFORM afficheEvent
            CLOSE fevenement
+           OPEN INPUT fparticipant
+           MOVE 0 TO fin_boucle
+           MOVE fevent_nom TO fpart_nomEvent
+
+      * KIWIZ verif de suppression des participants
+           OPEN INPUT fparticipant
+           START fparticipant, KEY IS = fpart_nomEvent
+           INVALID KEY
+               DISPLAY "Pas de participants"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                   READ fparticipant NEXT
+                   AT END
+                       DISPLAY "KIWIZ 6"
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       DISPLAY "---"
+                       DISPLAY "demande de : " fpart_login
+                       DISPLAY "---"
+               END-PERFORM
+           END-START
+           CLOSE fparticipant
            .
 
       ** add other procedures here
