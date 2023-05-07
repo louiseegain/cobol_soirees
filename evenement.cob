@@ -309,9 +309,8 @@
       *-----------------------------------------------------------------
 
       *    PERFORM accueil
-           DISPLAY "KIWIZ"
       *     PERFORM gestion_demandes
-           PERFORM supprimer_evenement
+           PERFORM afficher_events_organisateur
            STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
@@ -726,6 +725,35 @@
            OPEN INPUT fparticipant
            MOVE 0 TO fin_boucle
            MOVE fevent_nom TO fpart_nomEvent
+           .
+
+       afficher_events_organisateur.
+           DISPLAY "Affichage de vos evenements : "
+           OPEN INPUT fevenement
+           MOVE 0 TO fin_boucle
+      * KIWIZ temporaire avant implementation connexion
+           MOVE "tmerlet" TO login
+      * END-KIWIZ
+           MOVE login TO fevent_loginOrga
+           START fevenement, KEY IS = fevent_loginOrga
+           INVALID KEY
+               DISPLAY "Erreur lecture fevenement"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                   READ fevenement NEXT
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       DISPLAY "---------------------------------------"
+                       DISPLAY "nom : ",fevent_nom
+                       DISPLAY "date : ",fevent_date
+                       DISPLAY "type : ", fevent_type
+                       DISPLAY "description : ", fevent_description
+                       DISPLAY "Adresse : ", fevent_adresse
+                       DISPLAY "---------------------------------------"
+               END-PERFORM
+           END-START
+           CLOSE fevenement
            .
 
       ** add other procedures here
