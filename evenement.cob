@@ -572,6 +572,7 @@
            .
 
        gestion_demandes.
+      *> Permet d'accepter ou refuser des demandes de participation.
       *> KIWIZ delete next line when connection fixed
            MOVE "tmerlet" TO login
            PERFORM afficheEvent
@@ -623,6 +624,7 @@
                            DISPLAY "---"
                        END-IF
                END-PERFORM
+           END-START
            CLOSE fparticipant
 
            OPEN I-O fparticipant
@@ -638,11 +640,17 @@
                    INVALID KEY
                        DISPLAY "login incorrect"
                    NOT INVALID KEY
+                       IF fpart_etat <> "attente" THEN
+                           DISPLAY "Attention vous agissez"
+                           DISPLAY "sur une demande qui n'est"
+                           DISPLAY "pas en attente."
+
                        DISPLAY "Que souhaitez vous faire ?"
                        DISPLAY "0 - refuser la demande"
                        DISPLAY "1 - accepter la demande"
                        ACCEPT choix_gestion_demande
                        IF choix_gestion_demande = 0 THEN
+                           IF fpart_etat <> "attente"
                            MOVE "refusee" TO fpart_etat
                        ELSE
                            MOVE "acceptee" TO fpart_etat
@@ -656,7 +664,60 @@
       ** KIWIZ renvoyer ici au menu quand il sera operationnel
            END-PERFORM
            .
+       supprimer_evenement.
+           MOVE 0 TO verif_event
+           PERFORM afficheEvent
+      * Selection de l'evenement a supprimer
+      * KIWIZ la verif des droits peut être synthetisée (presente aussi dans gestion gestion_demandes
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               DISPLAY "Saisissez le nom de l'evenement a supprimer"
+               ACCEPT fevent_nom
+               OPEN I-O fevenement
+               READ fevenement
+                   INVALID KEY
+                       DISPLAY "Saisie invalide"
+                   NOT INVALID KEY
+      * KIWIZ supprimmer ligne suivante apres implementation connexion valide
+                       MOVE "tmerlet" TO login
+                       IF fevent_loginOrga = login THEN
+                           MOVE 1 TO verif_event
+                       ELSE
+                           OPEN INPUT futilisateur
+                           MOVE login TO futil_login
+                           READ futilisateur
+                               INVALID KEY
+                                   DISPLAY "Erreur lecture futilisateur"
+                               NOT INVALID KEY
+      ** utilisateur admin ou organisateur
+                                   IF futil_type = 'admin' THEN
+                                       MOVE 1 TO verif_event
+                                   END-IF
+                           END-READ
+                           CLOSE futilisateur
+                       END-IF
+           END-PERFORM
+      * l'évènement existe, on peut le supprimer mais on supprime ses participations avant
+           DISPLAY "Suppression des participations liees a l'evenement"
+           OPEN INPUT fparticipant
+           MOVE 0 TO fin_boucle
+           MOVE fevent_nom TO fpart_nomEvent
+           START fparticipant, KEY IS = fpart_nomEvent
+           INVALID KEY
+               DISPLAY "Erreur suppression participants"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                   READ fparticipant NEXT
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       DELETE fparticipant RECORD
+               END-PERFORM
+           END-START
+           CLOSE fparticipant
 
+           DELETE fevenement RECORD
+           CLOSE fevenement
+           .
 
       ** add other procedures here
        END PROGRAM Evenements.
