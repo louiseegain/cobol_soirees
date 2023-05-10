@@ -119,12 +119,26 @@
        77 verif_login_ok PIC 9(1).
        77 verif PIC 9(1).
 
+           01 WS-CURRENT-DATE-DATA.
+          05  WS-CURRENT-DATE.
+              10  WS-CURRENT-YEAR         PIC 9(04).
+              10  WS-CURRENT-MONTH        PIC 9(02).
+              10  WS-CURRENT-DAY          PIC 9(02).
+          05  WS-CURRENT-TIME.
+              10  WS-CURRENT-HOURS        PIC 9(02).
+              10  WS-CURRENT-MINUTE       PIC 9(02).
+              10  WS-CURRENT-SECOND       PIC 9(02).
+              10  WS-CURRENT-MILLISECONDS PIC 9(02).
+
        77 login PIC X(30).
        77 mdp PIC X(30).
        77 Fin PIC 9(1).
        77 verif_event PIC 9(1).
        77 fin_boucle PIC 9(1).
        77 choix_gestion_demande PIC 9(1).
+       77 nb_events PIC 9(4).
+       77 event_archivable PIC 9(4).
+       77 nb_utilisateurs PIC 9(4).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -746,6 +760,7 @@
                    NOT AT END
                        DISPLAY "---------------------------------------"
                        DISPLAY "nom : ",fevent_nom
+                       DISPLAY "places : ", fevent_seuil
                        DISPLAY "date : ",fevent_date
                        DISPLAY "type : ", fevent_type
                        DISPLAY "description : ", fevent_description
@@ -754,6 +769,44 @@
                END-PERFORM
            END-START
            CLOSE fevenement
+           .
+
+       stats_events.
+      * Affiche le nombre d'évènements présents sur toute la plateforme
+           MOVE 0 TO nb_events
+           MOVE 0 TO event_archivable
+           MOVE 0 TO fin_boucle
+           OPEN INPUT fevenement
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       ADD 1 TO nb_events
+                       MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-
+      -                DATE-DATA
+                       IF fevent_date<=WS-CURRENT-DATE THEN
+                           ADD 1 TO event_archivable
+                       END-IF
+               END-READ
+           END-PERFORM
+           CLOSE fevenement
+
+           MOVE 0 TO fin_boucle
+           OPEN INPUT futilisateur
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ futilisateur
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       ADD 1 TO nb_utilisateurs
+               END-READ
+           END-PERFORM
+           CLOSE futilisateur
+           DISPLAY "---------------------------------------------------"
+           DISPLAY "Nombre d'evenements : ", nb_events
+           DISPLAY "Archivables : ", event_archivable
+           DISPLAY "Nombre d'utilisateurs : ", nb_utilisateurs
            .
 
       ** add other procedures here
