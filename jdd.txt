@@ -1,4 +1,4 @@
-      *-----------------------------------------------------------------
+*-----------------------------------------------------------------
       *                  CREATION JDD
       *-----------------------------------------------------------------
       * Utilisateur 1 : administrateur
@@ -24,262 +24,262 @@
            END-IF
            CLOSE futilisateur
 
-      *> * Utilisateur 2 : administrateur
-           *> MOVE "l.egain" TO futil_login
-           *> MOVE "louise" TO futil_mdp
-           *> MOVE "EGAIN" TO futil_nom
-           *> MOVE "Louise" TO futil_prenom
-           *> MOVE "louise.egain@gmail.com" TO futil_mail
-           *> MOVE "admin" TO futil_type
-           *> MOVE "IFSI" TO futil_formation
-           *> MOVE 26 TO futil_naissanceJour
-           *> MOVE 09 TO futil_naissanceMois
-           *> MOVE 2001 TO futil_naissanceAnnee
+      * Utilisateur 2 : administrateur
+            MOVE "l.egain" TO futil_login
+            MOVE "louise" TO futil_mdp
+            MOVE "EGAIN" TO futil_nom
+            MOVE "Louise" TO futil_prenom
+            MOVE "louise.egain@gmail.com" TO futil_mail
+            MOVE "admin" TO futil_type
+            MOVE "IFSI" TO futil_formation
+            MOVE 26 TO futil_naissanceJour
+            MOVE 09 TO futil_naissanceMois
+            MOVE 2001 TO futil_naissanceAnnee
 
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
 
-      *> * Utilisateur 3 : administrateur
-           *> MOVE "t.merlet" TO futil_login
-           *> MOVE "thomas" TO futil_mdp
-           *> MOVE "MERLET" TO futil_nom
-           *> MOVE "Thomas" TO futil_prenom
-           *> MOVE "thomas.merlet@gmail.com" TO futil_mail
-           *> MOVE "admin" TO futil_type
-           *> MOVE "Commerce" TO futil_formation
-           *> MOVE 25 TO futil_naissanceJour
-           *> MOVE 12 TO futil_naissanceMois
-           *> MOVE 1997 TO futil_naissanceAnnee
+      * Utilisateur 3 : administrateur
+            MOVE "t.merlet" TO futil_login
+            MOVE "thomas" TO futil_mdp
+            MOVE "MERLET" TO futil_nom
+            MOVE "Thomas" TO futil_prenom
+            MOVE "thomas.merlet@gmail.com" TO futil_mail
+            MOVE "admin" TO futil_type
+            MOVE "Commerce" TO futil_formation
+            MOVE 25 TO futil_naissanceJour
+            MOVE 12 TO futil_naissanceMois
+            MOVE 1997 TO futil_naissanceAnnee
 
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
-
-
-      *> * Utilisateur 4 : administrateur
-           *> MOVE "c.leau" TO futil_login
-           *> MOVE "camille" TO futil_mdp
-           *> MOVE "LEAU" TO futil_nom
-           *> MOVE "Camille" TO futil_prenom
-           *> MOVE "camille.leau@gmail.com" TO futil_mail
-           *> MOVE "admin" TO futil_type
-           *> MOVE "art" TO futil_formation
-           *> MOVE 02 TO futil_naissanceJour
-           *> MOVE 10 TO futil_naissanceMois
-           *> MOVE 2000 TO futil_naissanceAnnee
-
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
-
-      *> * Utilisateur 5 : membre
-           *> MOVE "s.ledourner" TO futil_login
-           *> MOVE "swann" TO futil_mdp
-           *> MOVE "LE DOURNER" TO futil_nom
-           *> MOVE "Swann" TO futil_prenom
-           *> MOVE "swann.ledourner@gmail.com" TO futil_mail
-           *> MOVE "membre" TO futil_type
-           *> MOVE "MIAGE" TO futil_formation
-           *> MOVE 21 TO futil_naissanceJour
-           *> MOVE 12 TO futil_naissanceMois
-           *> MOVE 1996 TO futil_naissanceAnnee
-
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
-
-      *> * Utilisateur 6 : membre
-           *> MOVE "k.cosquer" TO futil_login
-           *> MOVE "kevin" TO futil_mdp
-           *> MOVE "COSQUER" TO futil_nom
-           *> MOVE "Kevin" TO futil_prenom
-           *> MOVE "kevin.cosquer@gmail.com" TO futil_mail
-           *> MOVE "membre" TO futil_type
-           *> MOVE "IFSI" TO futil_formation
-           *> MOVE 23 TO futil_naissanceJour
-           *> MOVE 04 TO futil_naissanceMois
-           *> MOVE 2001 TO futil_naissanceAnnee
-
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
-
-      *> * Utilisateur 7 : membre
-           *> MOVE "g.koc" TO futil_login
-           *> MOVE "gamze" TO futil_mdp
-           *> MOVE "KOC" TO futil_nom
-           *> MOVE "Gamze" TO futil_prenom
-           *> MOVE "gamze.koc@gmail.com" TO futil_mail
-           *> MOVE "membre" TO futil_type
-           *> MOVE "Commerce" TO futil_formation
-           *> MOVE 28 TO futil_naissanceJour
-           *> MOVE 03 TO futil_naissanceMois
-           *> MOVE 2002 TO futil_naissanceAnnee
-
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
 
 
-      *> * Utilisateur 8 : membre
-           *> MOVE "t.leberre" TO futil_login
-           *> MOVE "thibault" TO futil_mdp
-           *> MOVE "LE BERRE" TO futil_nom
-           *> MOVE "Thibault" TO futil_prenom
-           *> MOVE "thibault.leberre@gmail.com" TO futil_mail
-           *> MOVE "membre" TO futil_type
-           *> MOVE "art" TO futil_formation
-           *> MOVE 08 TO futil_naissanceJour
-           *> MOVE 08 TO futil_naissanceMois
-           *> MOVE 2001 TO futil_naissanceAnnee
+      * Utilisateur 4 : administrateur
+            MOVE "c.leau" TO futil_login
+            MOVE "camille" TO futil_mdp
+            MOVE "LEAU" TO futil_nom
+            MOVE "Camille" TO futil_prenom
+            MOVE "camille.leau@gmail.com" TO futil_mail
+            MOVE "admin" TO futil_type
+            MOVE "art" TO futil_formation
+            MOVE 02 TO futil_naissanceJour
+            MOVE 10 TO futil_naissanceMois
+            MOVE 2000 TO futil_naissanceAnnee
 
-           *> OPEN I-O futilisateur
-           *> WRITE tamp_futi
-           *> END-WRITE
-           *> IF cr_futil = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_futil
-           *> END-IF
-           *> CLOSE futilisateur
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
 
-      *> * Evenement 1
-        *> MOVE "Gala 2023" TO fevent_nom
-        *> MOVE "Soiree" TO fevent_type
-        *> MOVE 21 TO fevent_dateJour
-        *> MOVE 06 TO fevent_dateMois
-        *> MOVE 2023 TO fevent_dateAnnee
-        *> MOVE "m.loret" TO fevent_loginOrga
-        *> MOVE "Soiree de fin d'annee" TO fevent_description
-        *> MOVE "2 rue de la liberte, 35000 Rennes" TO fevent_adresse
-        *> MOVE "En cours" TO fevent_etat
-        *> MOVE 150 TO fevent_seuil
-        *> MOVE "20h00" TO fevent_heure
+      * Utilisateur 5 : membre
+            MOVE "s.ledourner" TO futil_login
+            MOVE "swann" TO futil_mdp
+            MOVE "LE DOURNER" TO futil_nom
+            MOVE "Swann" TO futil_prenom
+            MOVE "swann.ledourner@gmail.com" TO futil_mail
+            MOVE "membre" TO futil_type
+            MOVE "MIAGE" TO futil_formation
+            MOVE 21 TO futil_naissanceJour
+            MOVE 12 TO futil_naissanceMois
+            MOVE 1996 TO futil_naissanceAnnee
 
-        *> OPEN I-O fevenement
-           *> WRITE tamp_fevent
-           *> END-WRITE
-           *> IF cr_fevent = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_fevent
-           *> END-IF
-           *> CLOSE fevenement
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
 
-      *> * Evenement 2
-        *> MOVE "Escape game de l'horreur" TO fevent_nom
-        *> MOVE "Escape Game" TO fevent_type
-        *> MOVE 15 TO fevent_dateJour
-        *> MOVE 07 TO fevent_dateMois
-        *> MOVE 2023 TO fevent_dateAnnee
-        *> MOVE "l.egain" TO fevent_loginOrga
-        *> MOVE "Pour se terrifier en cette
-        *> belle periode" TO fevent_description
-        *> MOVE "Les loges, 44140 Montbert" TO fevent_adresse
-        *> MOVE "En cours" TO fevent_etat
-        *> MOVE 6 TO fevent_seuil
-        *> MOVE "21h00" TO fevent_heure
+      * Utilisateur 6 : membre
+            MOVE "k.cosquer" TO futil_login
+            MOVE "kevin" TO futil_mdp
+            MOVE "COSQUER" TO futil_nom
+            MOVE "Kevin" TO futil_prenom
+            MOVE "kevin.cosquer@gmail.com" TO futil_mail
+            MOVE "membre" TO futil_type
+            MOVE "IFSI" TO futil_formation
+            MOVE 23 TO futil_naissanceJour
+            MOVE 04 TO futil_naissanceMois
+            MOVE 2001 TO futil_naissanceAnnee
 
-        *> OPEN I-O fevenement
-           *> WRITE tamp_fevent
-           *> END-WRITE
-           *> IF cr_fevent = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_fevent
-           *> END-IF
-           *> CLOSE fevenement
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
 
-      *> * Evenement 3
-        *> MOVE "Afterwork" TO fevent_nom
-        *> MOVE "Soiree" TO fevent_type
-        *> MOVE 02 TO fevent_dateJour
-        *> MOVE 06 TO fevent_dateMois
-        *> MOVE 2023 TO fevent_dateAnnee
-        *> MOVE "t.merlet" TO fevent_loginOrga
-        *> MOVE "Afterwork de fin d'annee" TO fevent_description
-        *> MOVE "9 Rue Bon Secours, 44000 Nantes" TO fevent_adresse
-        *> MOVE "En cours" TO fevent_etat
-        *> MOVE 150 TO fevent_seuil
-        *> MOVE "18h15" TO fevent_heure
+      * Utilisateur 7 : membre
+            MOVE "g.koc" TO futil_login
+            MOVE "gamze" TO futil_mdp
+            MOVE "KOC" TO futil_nom
+            MOVE "Gamze" TO futil_prenom
+            MOVE "gamze.koc@gmail.com" TO futil_mail
+            MOVE "membre" TO futil_type
+            MOVE "Commerce" TO futil_formation
+            MOVE 28 TO futil_naissanceJour
+            MOVE 03 TO futil_naissanceMois
+            MOVE 2002 TO futil_naissanceAnnee
 
-        *> OPEN I-O fevenement
-           *> WRITE tamp_fevent
-           *> END-WRITE
-           *> IF cr_fevent = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_fevent
-           *> END-IF
-           *> CLOSE fevenement
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
 
-      *> * Evenement 4
-        *> MOVE "Karting exterieur" TO fevent_nom
-        *> MOVE "Karting" TO fevent_type
-        *> MOVE 21 TO fevent_dateJour
-        *> MOVE 09 TO fevent_dateMois
-        *> MOVE 2023 TO fevent_dateAnnee
-        *> MOVE "c.leau" TO fevent_loginOrga
-        *> MOVE "Karting de rentree" TO fevent_description
-        *> MOVE "19 Rte des Naudieres, 44880 Sautron" TO fevent_adresse
-        *> MOVE "En cours" TO fevent_etat
-        *> MOVE 150 TO fevent_seuil
-        *> MOVE "20h00" TO fevent_heure
 
-        *> OPEN I-O fevenement
-           *> WRITE tamp_fevent
-           *> END-WRITE
-           *> IF cr_fevent = 35
-               *> DISPLAY "Echec d'insertion"
-           *> ELSE
-               *> DISPLAY "Insertion reussie"
-               *> DISPLAY cr_fevent
-           *> END-IF
-           *> CLOSE fevenement
+      * Utilisateur 8 : membre
+            MOVE "t.leberre" TO futil_login
+            MOVE "thibault" TO futil_mdp
+            MOVE "LE BERRE" TO futil_nom
+            MOVE "Thibault" TO futil_prenom
+            MOVE "thibault.leberre@gmail.com" TO futil_mail
+            MOVE "membre" TO futil_type
+            MOVE "art" TO futil_formation
+            MOVE 08 TO futil_naissanceJour
+            MOVE 08 TO futil_naissanceMois
+            MOVE 2001 TO futil_naissanceAnnee
+
+            OPEN I-O futilisateur
+            WRITE tamp_futi
+            END-WRITE
+            IF cr_futil = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_futil
+            END-IF
+            CLOSE futilisateur
+
+      * Evenement 1
+         MOVE "Gala 2023" TO fevent_nom
+         MOVE "Soiree" TO fevent_type
+         MOVE 21 TO fevent_dateJour
+         MOVE 06 TO fevent_dateMois
+         MOVE 2023 TO fevent_dateAnnee
+         MOVE "m.loret" TO fevent_loginOrga
+         MOVE "Soiree de fin d'annee" TO fevent_description
+         MOVE "2 rue de la liberte, 35000 Rennes" TO fevent_adresse
+         MOVE "En cours" TO fevent_etat
+         MOVE 150 TO fevent_seuil
+         MOVE "20h00" TO fevent_heure
+
+         OPEN I-O fevenement
+            WRITE tamp_fevent
+            END-WRITE
+            IF cr_fevent = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_fevent
+            END-IF
+            CLOSE fevenement
+
+      * Evenement 2
+         MOVE "Escape game de l'horreur" TO fevent_nom
+         MOVE "Escape Game" TO fevent_type
+         MOVE 15 TO fevent_dateJour
+         MOVE 07 TO fevent_dateMois
+         MOVE 2023 TO fevent_dateAnnee
+         MOVE "l.egain" TO fevent_loginOrga
+         MOVE "Pour se terrifier en cette
+         belle periode" TO fevent_description
+         MOVE "Les loges, 44140 Montbert" TO fevent_adresse
+         MOVE "En cours" TO fevent_etat
+         MOVE 6 TO fevent_seuil
+         MOVE "21h00" TO fevent_heure
+
+         OPEN I-O fevenement
+            WRITE tamp_fevent
+            END-WRITE
+            IF cr_fevent = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_fevent
+            END-IF
+            CLOSE fevenement
+
+      * Evenement 3
+         MOVE "Afterwork" TO fevent_nom
+         MOVE "Soiree" TO fevent_type
+         MOVE 02 TO fevent_dateJour
+         MOVE 06 TO fevent_dateMois
+         MOVE 2023 TO fevent_dateAnnee
+         MOVE "t.merlet" TO fevent_loginOrga
+         MOVE "Afterwork de fin d'annee" TO fevent_description
+         MOVE "9 Rue Bon Secours, 44000 Nantes" TO fevent_adresse
+         MOVE "En cours" TO fevent_etat
+         MOVE 150 TO fevent_seuil
+         MOVE "18h15" TO fevent_heure
+
+         OPEN I-O fevenement
+            WRITE tamp_fevent
+            END-WRITE
+            IF cr_fevent = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_fevent
+            END-IF
+            CLOSE fevenement
+
+      * Evenement 4
+         MOVE "Karting exterieur" TO fevent_nom
+         MOVE "Karting" TO fevent_type
+         MOVE 21 TO fevent_dateJour
+         MOVE 09 TO fevent_dateMois
+         MOVE 2023 TO fevent_dateAnnee
+         MOVE "c.leau" TO fevent_loginOrga
+         MOVE "Karting de rentree" TO fevent_description
+         MOVE "19 Rte des Naudieres, 44880 Sautron" TO fevent_adresse
+         MOVE "En cours" TO fevent_etat
+         MOVE 150 TO fevent_seuil
+         MOVE "20h00" TO fevent_heure
+
+         OPEN I-O fevenement
+            WRITE tamp_fevent
+            END-WRITE
+            IF cr_fevent = 35
+                DISPLAY "Echec d'insertion"
+            ELSE
+                DISPLAY "Insertion reussie"
+                DISPLAY cr_fevent
+            END-IF
+            CLOSE fevenement
