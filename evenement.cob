@@ -121,6 +121,10 @@
 
        77 login PIC X(30).
        77 mdp PIC X(30).
+
+      **fonction supprimer futilisateur
+       77 fdf pic 9(1).
+       77 suppression_ok pic 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -238,10 +242,10 @@
                        INVALID KEY
                            MOVE 1 TO verif_login_ok
                        NOT INVALID KEY
-                           DISPLAY 'ce login existe déjà!'
+                           DISPLAY "ce login existe déjà!"
                    ENd-READ
                ELSE
-                   DISPLAY 'le login ne peut pas etre vide'
+                   DISPLAY "le login ne peut pas etre vide"
                END-IF
            END-PERFORM
 
@@ -254,16 +258,16 @@
                IF futil_mdp NOT EQUAL SPACE THEN
                    MOVE 1 TO verif
                ELSE
-                   DISPLAY 'le mot de passe ne peut pas etre vide'
+                   DISPLAY "le mot de passe ne peut pas etre vide"
                END-IF
            END-PERFORM
 
       **on insere les informations dans le fichier
            WRITE tamp_futi
                INVALID KEY
-                   DISPLAY 'compte non créé : un problème est survenu'
+                   DISPLAY "compte non créé : un problème est survenu"
                NOT INVALID KEY
-                   DISPLAY 'compte créé'
+                   DISPLAY "compte créé"
            END-WRITE.
                DISPLAY cr_futil
            CLOSE futilisateur.
@@ -295,12 +299,12 @@
                ADD 1 TO I
 
                IF chaine(I:3) NOT EQUAL 'fr'
-                   AND chaine(I:3) NOT EQUAL 'com' THEN
+                   AND chaine(I:3) NOT EQUAL "com" THEN
                        MOVE 0 TO verif_mail_ok
                ELSE
-                   IF chaine(I:3) EQUAL 'fr' THEN
+                   IF chaine(I:3) EQUAL "fr" THEN
                        ADD 2 TO I
-                   ELSE IF chaine(I:3) EQUAL 'com' THEN
+                   ELSE IF chaine(I:3) EQUAL "com" THEN
                        ADD 3 TO I
                    END-IF
                    IF chaine(I:1) NOT EQUAL SPACE THEN
@@ -313,9 +317,9 @@
        verif_tel.
            MOVE 1 TO I
            MOVE 1 TO verif_tel_ok
-           DISPLAY 'futil_tel test'
+           DISPLAY "futil_tel test"
            PERFORM UNTIL futil_tel(I:1) EQUAL SPACE OR I EQUAL 11
-                   DISPLAY 'letttre =' futil_tel(I:1)
+                   DISPLAY "letttre =" futil_tel(I:1)
                    IF futil_tel(I:1)
                    NOT EQUAL 0
                    AND NOT EQUAL 1
@@ -342,9 +346,9 @@
            MOVE SPACE TO futil_login
            MOVE 0 TO verif
            PERFORM UNTIL verif EQUAL 1
-               DISPLAY 'entrer votre login:'
+               DISPLAY "entrer votre login:"
                ACCEPT login
-               DISPLAY 'entrer votre mot de passe:'
+               DISPLAY "entrer votre mot de passe:"
                ACCEPT mdp
 
                IF mdp NOT EQUAL SPACE AND login NOT EQUAL SPACE THEN
@@ -359,16 +363,84 @@
                            IF futil_mdp EQUAL mdp THEN
                                MOVE 1 TO verif
                            ELSE
-                               DISPLAY 'erreur de mot de passe'
+                               DISPLAY "erreur de mot de passe"
                            END-IF
                    ENd-READ
                    CLOSE futilisateur
 
                ELSE
-                   DISPLAY 'mot de passe et login ne peuvent etre vide '
+                   DISPLAY "mot de passe et login ne peuvent etre vide"
                END-IF
 
            END-PERFORM.
 
+       suppression_utilisateur.
+      **pour cette fonction nous avons besoin de verifier que
+      ** l'utilisateur n'est inscrit à aucun evenement et n'en organise
+      ** aucun.
+      ** le login de l'utilisateur à supprimer doit etre dans futil_login
+           open input fevenement
+           move 1 to fdf
+           move 0 to suppression_ok
+
+      ** on verifie s'il organise un evenement
+           move futil_login to fevent_loginOrga
+           start fevenement , key is = fevent_loginOrga
+               not invalid key
+                   move 1 to suppression_ok
+                   display "impossible de supprimer cet utilisateur"
+                   display "il organise un evenement"
+           END-START
+           close fevenement
+
+      ** s'il n'organise aucun evenement, alors on va verifier qu'il
+      ** n'est pas inscrit à un evenement
+           if suppression_ok is equal 0 then
+               move futil_login to fpart_login
+               open input fparticipant
+               start fparticipant , key is = fpart_login
+                  not invalid key
+                   move 1 to suppression_ok
+                   display "impossible de supprimer cet utilisateur"
+                   display "il est inscrit a un evenement"
+               END-START
+               close fparticipant
+           end-if
+
+           if suppression_ok is equal 0 then
+              open i-o futilisateur
+      ** faire la suppression de l'utilisateur
+               read futilisateur
+               INVALID key
+                   display"Impossible de supprimé ce compte"
+                   display "sdfsfdgs"
+               not invalid KEY
+                   delete futilisateur record
+                   display 'utilisateur supprimé'
+               END-READ
+              close futilisateur
+           end-if.
+
+      ** fonction d'affichage de tout les organisateurs d'évenement
+           affichage_organisateur.
+               open input futilisateur
+               open input fevenement
+
+               move 1 to fdf
+
+               perform with test after until fdf=0
+                   read futilisateur
+                   at end move 0 to fdf
+                   not at end
+                       move futil_login to fevent_loginOrga
+                       start fevenement , key is = fevent_loginOrga
+                           not invalid key
+                               display futil_login
+                       END-START
+                   END-READ
+               end-perform
+
+               close futilisateur
+               close fevenement.
       ** add other procedures here
        END PROGRAM Evenements.
