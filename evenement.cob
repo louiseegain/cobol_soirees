@@ -130,7 +130,7 @@
        77 Fin PIC 9(1).
        01 WS-CURRENT-DATE-DATA.
           05  WS-CURRENT-DATE.
-              10  WS-CURRENT-YEAR         PIC 9(6).
+              10  WS-CURRENT-YEAR         PIC 9(2).
               10  WS-CURRENT-MONTH        PIC 9(2).
               10  WS-CURRENT-DAY          PIC 9(2).
           05  WS-CURRENT-TIME.
@@ -764,7 +764,7 @@
                DISPLAY "1 - Gerer votre profil"
                DISPLAY "2 - Rechercher un evenement ou un utilisateur"
                DISPLAY "3 - Gestion d'evenement (creation, modif, etc)"
-               IF futil_type='admin' THEN
+               IF futil_type=1 THEN
                    DISPLAY "4 - Afficher les statistiques"
                    DISPLAY "5 - Modifier le type d'utilisateur"
                    DISPLAY "6 - Supprimer evenement passe"
@@ -778,19 +778,19 @@
                    WHEN 2 PERFORM rechercherEvent
                    WHEN 3 PERFORM gestionEvenement
                    WHEN 4
-                       IF futil_type='admin'
+                       IF futil_type=1
                        THEN PERFORM afficheStatistique
                        ELSE DISPLAY "Non autorise"
                            PERFORM menuUtilisateur
                        END-IF
                    WHEN 5
-                      IF futil_type = 'admin'
+                      IF futil_type = 1
                            THEN PERFORM modifierUtilisateur
                       ELSE DISPLAY "Non autorise"
                            PERFORM menuUtilisateur
                        END-IF
                    WHEN 6
-                       IF futil_type = 'admin'
+                       IF futil_type = 1
                            THEN PERFORM supprimerEventPasse
                        ELSE DISPLAY "Non autorise"
                            PERFORM menuUtilisateur
@@ -813,7 +813,7 @@
                ACCEPT choix
 
            EVALUATE choix
-      *         WHEN 1 PERFORM modifierProfil
+               WHEN 1 PERFORM modifierUtilisateur
       *         WHEN 2 PERFORM supprimerProfil
       *         WHEN 3 PERFORM consulterProfil
                 WHEN 0 PERFORM menuUtilisateur
@@ -890,6 +890,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|          MODIFIER UTILISATEUR            |"
            DISPLAY"--------------------------------------------"
+           OPEN I-O futilisateur
            PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY "Que voulez-vous modifier ?"
                DISPLAY "1 - Nom "
@@ -897,47 +898,92 @@
                DISPLAY "3 - Mail "
                DISPLAY "4 - Telephone "
                DISPLAY "5 - Formation"
-               IF futil_type='admin'
+               IF futil_type=1
                    DISPLAY "6 - Type d'utilisateur : "futil_type
                END-IF
+               DISPLAY "0 - Revenir au menu précédent"
                ACCEPT choix
                EVALUATE choix
                WHEN 1
+                   DISPLAY "Votre ancien nom : "futil_nom
                    DISPLAY "Entrer votre nouveau nom :"
                    ACCEPT futil_nom
-               WHEN 2
-                   DISPLAY "Entrer votre nouveau prenom :"
-                   ACCEPT futil_prenom
-               WHEN 3
-                   PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
-                       DISPLAY "Entrer votre nouvelle adresse mail:"
-                       ACCEPT futil_mail
-                       PERFORM verif_mail
-                   END-PERFORM
-               WHEN 4
-                   PERFORM WITH TEST AFTER UNTIL verif_tel_ok EQUAL 1
-                       DISPLAY "Entrer votre numero de telephone:"
-                       ACCEPT futil_tel
-                       PERFORM verif_tel
-                   END-PERFORM
-               WHEN 5
-                   DISPLAY "Entrer votre nouvelle formation :"
-                   ACCEPT futil_formation
-               WHEN 6
-                   IF futil_type='admin' THEN
-                       DISPLAY "Veuillez entrer le nouveau type
-                       d'utilisateur"
-                       ACCEPT futil_type
-                   END-IF
-               END-PERFORM
-           OPEN I-O futilisateur
-               REWRITE tamp_futi
+                   REWRITE tamp_futi
                    IF cr_futil = 00
                        THEN
                            DISPLAY "Modification reussie"
                        ELSE
                            DISPLAY "Modification en echec"
                    END-IF
+               WHEN 2
+                   DISPLAY "Votre ancien prenom : "futil_prenom
+                   DISPLAY "Entrer votre nouveau prenom :"
+                   ACCEPT futil_prenom
+                   REWRITE tamp_futi
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                   END-IF
+               WHEN 3
+                   PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
+                       DISPLAY "Votre ancienne adresse mail: "futil_mail
+                       DISPLAY "Entrer votre nouvelle adresse mail:"
+                       ACCEPT futil_mail
+                       PERFORM verif_mail
+                       REWRITE tamp_futi
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                   END-IF
+                   END-PERFORM
+               WHEN 4
+                   PERFORM WITH TEST AFTER UNTIL verif_tel_ok EQUAL 1
+                   DISPLAY "Votre ancien numero de telephone :"futil_tel
+                       DISPLAY "Entrer votre numero de telephone:"
+                       ACCEPT futil_tel
+                       PERFORM verif_tel
+                       REWRITE tamp_futi
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                   END-IF
+                   END-PERFORM
+               WHEN 5
+                   DISPLAY "Votre ancienne formation : "futil_formation
+                   DISPLAY "Entrer votre nouvelle formation :"
+                   ACCEPT futil_formation
+                   REWRITE tamp_futi
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                   END-IF
+               WHEN 6
+                   IF futil_type=1 THEN
+                       DISPLAY "Veuillez entrer le nouveau type"
+                       DISPLAY "d'utilisateur"
+                       DISPLAY "1 = admin, 0 = membre simple"
+                       ACCEPT futil_type
+                       REWRITE tamp_futi
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                   END-IF
+                   END-IF
+               WHEN 0 PERFORM gererProfil
+
+               END-PERFORM
+
+
            CLOSE futilisateur
 
            .
@@ -968,7 +1014,7 @@
                        DISPLAY "Nom : " fevent_nom
                        DISPLAY "Type : "fevent_type
                        DISPLAY "Date : "fevent_dateJour"/"
-                       fevent_dateMois"/"fevent_dateAnnee
+                       DISPLAY fevent_dateMois"/"fevent_dateAnnee
                        DISPLAY "Heure de debut : " fevent_heure
                        DISPLAY "Description : " fevent_description
                        DISPLAY "Adresse : " fevent_adresse
