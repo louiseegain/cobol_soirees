@@ -509,7 +509,7 @@
            DISPLAY WS-CURRENT-DATE.
 
       *-----------------------------------------------------------------
-      *          Procedure de connexion à l'application
+      *          Procedure de connexion ï¿½ l'application
       *-----------------------------------------------------------------
 
        accueil.
@@ -544,7 +544,7 @@
            END-PERFORM
            .
       *-----------------------------------------------------------------
-      *          Procedure permettant de créer son compte utilisateur
+      *          Procedure permettant de crï¿½er son compte utilisateur
       *-----------------------------------------------------------------
        creation_compte.
 
@@ -659,12 +659,12 @@
                ADD 1 TO I
 
                IF chaine(I:3) NOT EQUAL 'fr'
-                   AND chaine(I:3) NOT EQUAL 'com' THEN
+                   AND chaine(I:3) NOT EQUAL "com" THEN
                        MOVE 0 TO verif_mail_ok
                ELSE
-                   IF chaine(I:3) EQUAL 'fr' THEN
+                   IF chaine(I:3) EQUAL "fr" THEN
                        ADD 2 TO I
-                   ELSE IF chaine(I:3) EQUAL 'com' THEN
+                   ELSE IF chaine(I:3) EQUAL "com" THEN
                        ADD 3 TO I
                    END-IF
                    IF chaine(I:1) NOT EQUAL SPACE THEN
@@ -731,7 +731,7 @@
                            DISPLAY "| /!\ ATTENTION /!\ |"
                            DISPLAY "| Compte inexistant |"
                            DISPLAY "---------------------"
-                           DISPLAY "Veuillez créer votre compte : "
+                           DISPLAY "Veuillez crï¿½er votre compte : "
                            PERFORM creation_compte
                        NOT INVALID KEY
                            IF futil_mdp EQUAL mdp THEN
@@ -901,7 +901,7 @@
                IF futil_type=1
                    DISPLAY "6 - Type d'utilisateur : "futil_type
                END-IF
-               DISPLAY "0 - Revenir au menu précédent"
+               DISPLAY "0 - Revenir au menu prï¿½cï¿½dent"
                ACCEPT choix
                EVALUATE choix
                WHEN 1
@@ -1212,7 +1212,7 @@
                       AT    END
                            MOVE 1 TO Fin
                       NOT AT END
-                           DISPLAY "Nom trouvé, a present"
+                           DISPLAY "Nom trouvï¿½, a present"
                            DISPLAY "Veuillez saisir son prenom"
                            ACCEPT prenom
                            IF prenom = futil_prenom THEN
@@ -1251,4 +1251,73 @@
            CLOSE futilisateur
            .
 
+       suppression_utilisateur.
+      **pour cette fonction nous avons besoin de verifier que
+      ** l'utilisateur n'est inscrit ï¿½ aucun evenement et n'en organise
+      ** aucun.
+      ** le login de l'utilisateur ï¿½ supprimer doit etre dans futil_login
+           open input fevenement
+           move 1 to fdf
+           move 0 to suppression_ok
+
+      ** on verifie s'il organise un evenement
+           move futil_login to fevent_loginOrga
+           start fevenement , key is = fevent_loginOrga
+               not invalid key
+                   move 1 to suppression_ok
+                   display "impossible de supprimer cet utilisateur"
+                   display "il organise un evenement"
+           END-START
+           close fevenement
+
+      ** s'il n'organise aucun evenement, alors on va verifier qu'il
+      ** n'est pas inscrit ï¿½ un evenement
+           if suppression_ok is equal 0 then
+               move futil_login to fpart_login
+               open input fparticipant
+               start fparticipant , key is = fpart_login
+                  not invalid key
+                   move 1 to suppression_ok
+                   display "impossible de supprimer cet utilisateur"
+                   display "il est inscrit a un evenement"
+               END-START
+               close fparticipant
+           end-if
+
+           if suppression_ok is equal 0 then
+              open i-o futilisateur
+      ** faire la suppression de l'utilisateur
+               read futilisateur
+               INVALID key
+                   display"Impossible de supprimï¿½ ce compte"
+                   display "sdfsfdgs"
+               not invalid KEY
+                   delete futilisateur record
+                   display 'utilisateur supprimï¿½'
+               END-READ
+              close futilisateur
+           end-if.
+
+      ** fonction d'affichage de tout les organisateurs d'ï¿½venement
+           affichage_organisateur.
+               open input futilisateur
+               open input fevenement
+
+               move 1 to fdf
+
+               perform with test after until fdf=0
+                   read futilisateur
+                   at end move 0 to fdf
+                   not at end
+                       move futil_login to fevent_loginOrga
+                       start fevenement , key is = fevent_loginOrga
+                           not invalid key
+                               display futil_login
+                       END-START
+                   END-READ
+               end-perform
+
+               close futilisateur
+               close fevenement.
+      ** add other procedures here
        END PROGRAM Evenements.
