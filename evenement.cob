@@ -68,7 +68,7 @@
            02 futil_mail PIC X(30).
            02 futil_tel PIC X(14).
       *     02 futil_genre PIC A(8).
-           02 futil_type PIC A(10).
+           02 futil_type PIC 9(1).
            02 futil_formation PIC A(20).
            02 futil_naissanceJour PIC 9(2).
            02 futil_naissanceMois PIC 9(2).
@@ -130,14 +130,14 @@
        77 Fin PIC 9(1).
        01 WS-CURRENT-DATE-DATA.
           05  WS-CURRENT-DATE.
-              10  WS-CURRENT-YEAR         PIC 9(04).
-              10  WS-CURRENT-MONTH        PIC 9(02).
-              10  WS-CURRENT-DAY          PIC 9(02).
+              10  WS-CURRENT-YEAR         PIC 9(6).
+              10  WS-CURRENT-MONTH        PIC 9(2).
+              10  WS-CURRENT-DAY          PIC 9(2).
           05  WS-CURRENT-TIME.
-              10  WS-CURRENT-HOURS        PIC 9(02).
-              10  WS-CURRENT-MINUTE       PIC 9(02).
-              10  WS-CURRENT-SECOND       PIC 9(02).
-              10  WS-CURRENT-MILLISECONDS PIC 9(02).
+              10  WS-CURRENT-HOURS        PIC 9(2).
+              10  WS-CURRENT-MINUTE       PIC 9(2).
+              10  WS-CURRENT-SECOND       PIC 9(2).
+              10  WS-CURRENT-MILLISECONDS PIC 9(2).
        77 cpt PIC 9(3).
        77 login PIC X(30).
       * 77 choix PIC S9(1).
@@ -205,7 +205,7 @@
            MOVE "Mathias" TO futil_prenom
            MOVE "mathias.loret@gmail.com" TO futil_mail
            MOVE 0635451225 TO futil_tel
-           MOVE "admin" TO futil_type
+           MOVE 1 TO futil_type
            MOVE "MIAGE" TO futil_formation
            MOVE 14 TO futil_naissanceJour
            MOVE 06 TO futil_naissanceMois
@@ -229,7 +229,7 @@
             MOVE "Louise" TO futil_prenom
             MOVE "louise.egain@gmail.com" TO futil_mail
             MOVE 0770029252 TO futil_tel
-            MOVE "admin" TO futil_type
+            MOVE 1 TO futil_type
             MOVE "IFSI" TO futil_formation
             MOVE 26 TO futil_naissanceJour
             MOVE 09 TO futil_naissanceMois
@@ -253,7 +253,7 @@
             MOVE "Thomas" TO futil_prenom
             MOVE "thomas.merlet@gmail.com" TO futil_mail
             MOVE 0789654111 TO futil_tel
-            MOVE "admin" TO futil_type
+            MOVE 1 TO futil_type
             MOVE "Commerce" TO futil_formation
             MOVE 25 TO futil_naissanceJour
             MOVE 12 TO futil_naissanceMois
@@ -278,7 +278,7 @@
             MOVE "Camille" TO futil_prenom
             MOVE "camille.leau@gmail.com" TO futil_mail
             MOVE 0632154569 TO futil_tel
-            MOVE "admin" TO futil_type
+            MOVE 1 TO futil_type
             MOVE "art" TO futil_formation
             MOVE 02 TO futil_naissanceJour
             MOVE 10 TO futil_naissanceMois
@@ -302,7 +302,7 @@
             MOVE "Swann" TO futil_prenom
             MOVE "swann.ledourner@gmail.com" TO futil_mail
             MOVE 0745197635 TO futil_tel
-            MOVE "membre" TO futil_type
+            MOVE 0 TO futil_type
             MOVE "MIAGE" TO futil_formation
             MOVE 21 TO futil_naissanceJour
             MOVE 12 TO futil_naissanceMois
@@ -326,7 +326,7 @@
             MOVE "Kevin" TO futil_prenom
             MOVE "kevin.cosquer@gmail.com" TO futil_mail
             MOVE 0645879311 TO futil_tel
-            MOVE "membre" TO futil_type
+            MOVE 0 TO futil_type
             MOVE "IFSI" TO futil_formation
             MOVE 23 TO futil_naissanceJour
             MOVE 04 TO futil_naissanceMois
@@ -350,7 +350,7 @@
             MOVE "Gamze" TO futil_prenom
             MOVE "gamze.koc@gmail.com" TO futil_mail
             MOVE 0785460116 TO futil_tel
-            MOVE "membre" TO futil_type
+            MOVE 0 TO futil_type
             MOVE "Commerce" TO futil_formation
             MOVE 28 TO futil_naissanceJour
             MOVE 03 TO futil_naissanceMois
@@ -375,7 +375,7 @@
             MOVE "Thibault" TO futil_prenom
             MOVE "thibault.leberre@gmail.com" TO futil_mail
             MOVE 0725242923 TO futil_tel
-            MOVE "membre" TO futil_type
+            MOVE 0 TO futil_type
             MOVE "art" TO futil_formation
             MOVE 08 TO futil_naissanceJour
             MOVE 08 TO futil_naissanceMois
@@ -492,6 +492,7 @@
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
       *-----------------------------------------------------------------
+           ACCEPT WS-CURRENT-DATE-DATA FROM DATE
            DISPLAY WS-CURRENT-DATE
            DISPLAY "-----------------------------------------------"
            DISPLAY "|         BIENVENUE SUR L'APPLICATION         |"
@@ -503,6 +504,10 @@
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
+
+           ACCEPT WS-CURRENT-DATE-DATA FROM DATE
+           DISPLAY WS-CURRENT-DATE.
+
       *-----------------------------------------------------------------
       *          Procedure de connexion à l'application
       *-----------------------------------------------------------------
@@ -510,9 +515,9 @@
        accueil.
 
            PERFORM WITH TEST AFTER UNTIL choix = 0
-               DISPLAY WS-CURRENT-YEAR
-               DISPLAY WS-CURRENT-MONTH
-               DISPLAY WS-CURRENT-DAY
+               DISPLAY "Annee : "WS-CURRENT-YEAR
+               DISPLAY "Mois : "WS-CURRENT-MONTH
+               DISPLAY "Jour : "WS-CURRENT-DAY
                DISPLAY "-----------------------------------------------"
                DISPLAY "|  1 - Me connecter a mon compte              |"
                DISPLAY "|  2 - Creer mon compte                       |"
@@ -570,20 +575,20 @@
            ACCEPT futil_formation
            DISPLAY "Entrer votre date de naissance :"
            DISPLAY "JOUR : "
-           PERFORM UNTIL futil_naissanceJour>0 AND
-               futil_naissanceJour<=31
+      *      PERFORM UNTIL futil_naissanceJour>0 AND
+      *         futil_naissanceJour<=31
                ACCEPT futil_naissanceJour
-           END-PERFORM
+      *     END-PERFORM
            DISPLAY "MOIS : "
-           PERFORM UNTIL futil_naissanceMois>0 AND
-               futil_naissanceMois<=12
+      *     PERFORM UNTIL futil_naissanceMois>0 AND
+      *         futil_naissanceMois<=12
                ACCEPT futil_naissanceMois
-           END-PERFORM
+      *     END-PERFORM
            DISPLAY "ANNEE : "
-           PERFORM UNTIL futil_naissanceAnnee>1950 AND
-               futil_naissanceJour<=2023
+      *     PERFORM UNTIL futil_naissanceAnnee>1950 AND
+      *         futil_naissanceJour<=WS-CURRENT-YEAR
                ACCEPT futil_naissanceAnnee
-           END-PERFORM
+      *     END-PERFORM
 
       **verification que le login n'existe pas deja
            MOVE 0 TO verif_login_ok
