@@ -154,6 +154,7 @@
        77 retour PIC 9(1).
        77 verif_event PIC 9(1).
        77 fin_boucle PIC 9(1).
+       77 fin_boucle2 PIC 9(1).
        77 choixProfil PIC 9(1).
        77 choixEvent PIC 9(1).
        77 choixUtil PIC 9(1).
@@ -171,6 +172,11 @@
        77 dateComparee PIC 9(1).
        77 choixModifEvent PIC 9(1).
        77 nbParticipants PIC 9(3).
+       77 estValideHeure PIC 9(1).
+       77 typeStat PIC A(20).
+       77 formaStat PIC A(20).
+       77 moisStat PIC 9(2).
+       77 nbPartStat PIC 9(3).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -903,7 +909,7 @@
 
             EVALUATE choix
                 WHEN 1 PERFORM creerEvent
-      *          WHEN 2 PERFORM modifierEvent
+                WHEN 2 PERFORM modifierEvent
                 WHEN 3 PERFORM supprimerEvent
                 WHEN 4 PERFORM afficheEvent
                 WHEN 0 PERFORM menuUtilisateur
@@ -922,12 +928,14 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"|       AFFICHAGE DES STATISTIQUES         |"
            DISPLAY"--------------------------------------------"
-               DISPLAY "1 - Afficher statistique"
+               DISPLAY "1 - Afficher statistiques generales"
+               DISPLAY "2 - Statistique selon formation et mois"
                DISPLAY "0 - Revenir au menu precedent"
                ACCEPT choixStat
 
                EVALUATE choixStat
-      *         WHEN 1 PERFORM afficherStat
+               WHEN 1 PERFORM afficherStats
+      *         WHEN 2 PERFORM statFormaMois
                 WHEN 0 PERFORM menuUtilisateur
                END-EVALUATE
            END-PERFORM
@@ -1777,7 +1785,7 @@
            CLOSE fevenement
            .
 
-       stats_events.
+       afficherStats.
       * Affiche le nombre d'évènements présents sur toute la plateforme
            MOVE 0 TO nbEvents
            MOVE 0 TO nbEventArchivables
@@ -1810,7 +1818,7 @@
            END-PERFORM
            CLOSE futilisateur
            DISPLAY"--------------------------------------------"
-           DISPLAY"|              STATISTIQUES                |"
+           DISPLAY"|          STATISTIQUES GLOBALES           |"
            DISPLAY"--------------------------------------------"
            DISPLAY "---------------------------------------------------"
            DISPLAY "Nombre d'evenements : ", nbEvents
@@ -1853,7 +1861,7 @@
                END-IF
            END-IF.
 
-       modifier_event.
+       modifierEvent.
       * Permet la modification d'un evenement
            PERFORM afficheEvent
            MOVE 0 TO fin_boucle
@@ -1949,6 +1957,7 @@
                            DISPLAY cr_fevent
                    END-IF
                WHEN 6
+                   PERFORM
                    DISPLAY "Entrez la nouvelle heure :"
                    DISPLAY "(format : xxHxx)"
                    ACCEPT fevent_heure
@@ -2146,11 +2155,132 @@
                    CLOSE fparticipant
            END-START
            .
-      * KIWIZ optionnel verif_heure
-      * KIWIZ fonction calcul_nb_participant
-      * KIWIZ supprimer fevent_etat sil est inutile.
-      * * = fonc annexe - = principal
-      * 1361 erreur date
+
+      ******************************************************************
+      *          Procedure verifiant le format horaire
+      ******************************************************************
+       verifHeure.
+           MOVE 1 TO estValideHeure
+           IF LENGTH(heureEvent) NOT EQUAL 5
+               MOVE 0 TO estValideHeure
+           ELSE
+               IF NOT NUMERIC(INPUT-STRING(1:2))
+                   MOVE 0 TO estValideHeure
+               ELSE
+                   IF INPUT-STRING(3:1) NOT EQUAL 'H' THEN
+                       MOVE 0 TO estValideHeure
+                   ELSE
+                       IF NOT NUMERIC(INPUT-STRING(4:2))
+                           MOVE 0 TO estValideHeure
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF.
+
+      *-----------------------------------------------------------------
+      *          Procedure calculant le nombre de participations
+      *           d'etudiants d'une formation F à  un evenement
+      *                            de type T
+      *-----------------------------------------------------------------
+       statFormaMois.
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|          STATISTIQUES SELON :            |"
+           DISPLAY"|         LE MOIS, LA FORMATION            |"
+           DISPLAY"|         ET LE TYPE D'EVENEMENT           |"
+           DISPLAY"--------------------------------------------"
+
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|        AFFICHAGE DES FORMATIONS          |"
+           DISPLAY"--------------------------------------------"
+
+           OPEN INPUT futilisateur
+           MOVE 0 TO fin_boucle
+
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ futilisateur
+               AT END MOVE 1 TO fin_boucle
+               NOT AT END
+                   DISPLAY "---"
+                   DISPLAY futil_formation
+                   DISPLAY "---"
+               END-READ
+           END-PERFORM
+
+
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|     AFFICHAGE DES TYPES D'EVENEMENTS     |"
+           DISPLAY"--------------------------------------------"
+
+           OPEN INPUT fevenement
+           MOVE 0 TO fin_boucle
+
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement
+               AT END MOVE 1 TO fin_boucle
+               NOT AT END
+                   DISPLAY "---"
+                   DISPLAY fevent_type
+                   DISPLAY "---"
+               END-READ
+           END-PERFORM
+
+
+           DISPLAY "Saisissez le type d'evenement :"
+           ACCEPT typeStat
+
+           DISPLAY "Saisissez la formation :"
+           ACCEPT formaStat
+
+           MOVE 0 TO fin_boucle
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               DISPLAY "Saisissez le numero du mois :"
+               ACCEPT moisStat
+               IF moisStat > 0 AND moisStat < 13 THEN
+                   MOVE 1 TO fin_boucle
+           END-PERFORM
+
+      * Debut du compte
+           MOVE moisStat TO fevent_dateMois
+           MOVE 0 TO fin_boucle
+           START fevenement, KEY IS =fevent_dateMois
+           INVALID KEY
+               DISPLAY "Erreur dans fevenement"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle =1
+                   READ fevenement NEXT
+                   AT END MOVE 1 TO fin_boucle
+                   NOT AT END
+                       IF fevent_type = typeStat THEN
+                           OPEN INPUT fparticipant
+                           MOVE fevent_nom TO fpart_nomEvent
+                           MOVE 0 TO fin_boucle2
+                           START fparticipant, KEY IS =fpart_nomEvent
+                           INVALID KEY
+                               DISPLAY "Erreur fparticipant"
+                           NOT INVALID KEY
+                           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                               READ fparticipant NEXT
+                               AT END MOVE 1 TO fin_boucle2
+                               NOT AT END
+                                   MOVE fpart_login TO futil_login
+                                   READ futilisateur
+                                   INVALID KEY DISPLAY "futilisateur KO"
+                                   NOT INVALID KEY
+                                       ADD 1 TO nbPartStat
+                                   END-READ
+                               END-READ
+                           END-PERFORM
+                       END-IF
+                   END-READ
+               END-PERFORM
+           END-START
+           CLOSE fevenement
+           CLOSE fparticipant
+           CLOSE futilisateur
+           DISPLAY "Nombre de participations repondant aux criteres :"
+           DISPLAY nbPartStat
            .
+
+      * KIWIZ supprimer fevent_etat sil est inutile.
       ** add other procedures here
        END PROGRAM Evenements.
