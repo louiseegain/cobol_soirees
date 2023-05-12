@@ -143,6 +143,9 @@
        77 temp_fevent_nom PIC A(20).
        77 choix_modif_event PIC 9(1).
        77 auto_suppr_event PIC 9(1).
+       77 event_a_archiver PIC 9(1).
+       77 nb_participants PIC 9(3).
+
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -790,6 +793,7 @@
            DISPLAY "Nombre d'evenements : ", nb_events
            DISPLAY "Archivables : ", event_archivable
            DISPLAY "Nombre d'utilisateurs : ", nb_utilisateurs
+      * KIWIZ faire une stat sur le nb d'element archives.
            .
 
        modifier_event.
@@ -819,6 +823,8 @@
            DISPLAY "0 - Revenir au menu precedent"
 
            ACCEPT choix_modif_event
+      * KIWIZ les modifs ne peuvent etre faites que par les organisateurs
+      * pas les admins
                EVALUATE choix_modif_event
                WHEN 1
                    DISPLAY "Ancien type : "fevent_type
@@ -962,4 +968,124 @@
                END-IF
            END-PERFORM
            .
+
+
+       archivage.
+      * Permets a l'utilisateur d'archiver les evenements passes.
+      * KIWIZ verif si admin ici ?
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|               ARCHIVAGE                   |"
+           DISPLAY"--------------------------------------------"
+
+           OPEN I-O fevenement
+           MOVE 0 TO fin_boucle
+
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+      * KIWIZ VERIF DATE
+                       IF fevent_date < WS-CURRENT-DATE-DATA THEN
+      * KIWIZ change date format
+                           DISPLAY "-----------------------------------"
+                           DISPLAY "Nom : "fevent_nom
+                           DISPLAY "Date : "fevent_date
+                           DISPLAY "-----------------------------------"
+                       END-IF
+               END-READ
+           END-PERFORM
+
+           MOVE 0 TO fin_boucle
+           MOVE 0 TO retour
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1 OR retour = 1
+               DISPLAY "Saissisez le nom de l'event a archiver"
+               ACCEPT fevent_nom
+               READ fevenement
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+      * KIWIZ CHANGE DATE EVALUATION
+                       IF fevent_date < WS-CURRENT-DATE-DATA THEN
+                           PERFORM archiver_event
+                       ELSE
+                           DISPLAY "L'evenement n'est pas passe !"
+                       END-IF
+                       DISPLAY "Retourner au menu precedent ?"
+                       DISPLAY "0 - Non 1 - Oui"
+                       ACCEPT retour
+               END-READ
+           END-PERFORM
+           IF retour = 1 THEN
+      *    KIWIZ FAIRE RETOUR EN ARRIERE
+           END-IF
+
+       archiver_event.
+      * Realise l'archivage d'un evenement
+           OPEN I-O fhistorique
+               MOVE fevent_nom TO fhisto_nom
+               MOVE fevent_type TO fhisto_type
+      * KIWIZ change to correct date format
+               MOVE fevent_date TO fhisto_date
+               MOVE fevent_loginOrga TO fhisto_loginOrga
+               MOVE fevent_description TO fhisto_description
+               MOVE fevent_adresse TO fhisto_adresse
+               MOVE "termine" TO fhisto_etat
+      *    KIWIZ utiliser valeur de nb_places disponibles pour fhisto_participants
+      *    KIWIZ remplacer prochaine ligne par fonction
+               MOVE 5 TO fhisto_participants
+      *    KIWIZ instructions d'archivage
+           WRITE tamp_fevent
+               INVALID KEY
+                   DISPLAY "Erreur lecture fhistorique"
+               NOT INVALID KEY
+                   DISPLAY "Archivage reussi"
+                   MOVE 1 TO auto_suppr_event
+                   PERFORM supprimer_evenement
+                   MOVE 0 TO auto_suppr_event
+           END-WRITE
+           CLOSE fhistorique
+           .
+
+           tout_archiver.
+           OPEN INPUT fevenement
+           MOVE 0 TO fin_boucle
+
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement
+               AT END
+                   MOVE 1 TO fin_boucle
+               NOT AT END
+                   PERFORM archiver_event
+               END-READ
+           END-PERFORM
+           CLOSE fevenement
+           .
+
+       compte_nb_part.
+      * Compte le nombre de participants pour un event
+      * fpart_nomEvent doit avoir sa valeur avant l'appel
+           MOVE 0 TO nb_participants
+           MOVE 0 TO fin_boucle
+           OPEN INPUT fparticipant
+           START fparticipant, KEY IS = fpart_nomEvent
+               INVALID KEY
+                   DISPLAY "Erreur comptage des participants"
+               NOT INVALID KEY
+                   PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                       READ fparticipant NEXT
+                       AT END
+                           MOVE 1 TO fin_boucle
+                       NOT AT END
+                           ADD 1 TO nb_participants
+                        END-READ
+                   END-PERFORM
+                   CLOSE fparticipant
+           END-START
+           .
+      * KIWIZ optionnel verif_heure
+      * KIWIZ fonction calcul_nb_participant
+      * KIWIZ supprimer fevent_etat sil est inutile.
+      * * = fonc annexe - = principal
+      * 1361 erreur date
        END PROGRAM Evenements.
