@@ -163,6 +163,14 @@
        77 dateMois PIC 9(2).
        77 dateAnnee PIC 9(2).
        77 valideInscription PIC 9(1).
+       77 choixGestionDemande PIC 9(1).
+       77 autoSupprEvent PIC 9(1).
+       77 nbEvents PIC 9(3).
+       77 nbEventArchivables PIC 9(3).
+       77 nbUtils PIC 9(4).
+       77 dateComparee PIC 9(1).
+       77 choixModifEvent PIC 9(1).
+       77 nbParticipants PIC 9(3).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -1358,7 +1366,8 @@
 
            IF valideInscription = 1 THEN
       * On vérifie dans un premier temps qu'il reste de la place dans l'evenment
-           IF fevent_placeRestante = 0 THEN
+           PERFORM compte_nb_part
+           IF fevent_seuil - nbParticipants <= 0 THEN
                DISPLAY "Evenement complet"
            ELSE
       * S'il reste de la place on saisie les valeurs pour inscrire l'utilisateur à l'évènement
@@ -1575,7 +1584,7 @@
       *          Procedure permettant d'afficher tous les organisateurs
       *           d'evenement
       *-----------------------------------------------------------------
-           affichage_organisateur.
+       affichage_organisateur.
 
            DISPLAY "--------------------------------------------------"
            DISPLAY "|           AFFICHER LES ORGANISATEURS           |"
@@ -1601,18 +1610,96 @@
                CLOSE fevenement.
 
       *-----------------------------------------------------------------
-      *          Procedure permettant de supprimer des evenements
+      *          Procedure permettant d'accepter ou refuser des demandes
+      *          de participation a un evenement
       *-----------------------------------------------------------------
-          supprimerEvent.
+       gestion_demandes.
+           DISPLAY "--------------------------------------------------"
+           DISPLAY "|                GESTION DEMANDES                |"
+           DISPLAY "--------------------------------------------------"
+
+           PERFORM afficheEvent
+           MOVE 0 TO verif_event
+           PERFORM UNTIL verif_event EQUAL 1 OR retour = 1
+               PERFORM verif_event
+           END-PERFORM
+           IF retour = 1 THEN
+               DISPLAY " KIWIZ PLACEHOLDER RETOUR"
+           ELSE
+               OPEN INPUT fparticipant
+                   MOVE 0 TO fin_boucle
+                   MOVE fevent_nom TO fpart_nomEvent
+                   START fparticipant, KEY IS = fpart_nomEvent
+                   INVALID KEY
+                       DISPLAY "Pas de participants"
+                   NOT INVALID KEY
+                       PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                           READ fparticipant NEXT
+                           AT END
+                               MOVE 1 TO fin_boucle
+                           NOT AT END
+                               IF fpart_etat = 'attente' THEN
+                                   DISPLAY "---"
+                                   DISPLAY "demande de : " fpart_login
+                                   DISPLAY "---"
+                               END-IF
+                       END-PERFORM
+                   END-START
+               CLOSE fparticipant
+
+           OPEN I-O fparticipant
+           MOVE fevent_nom TO fpart_nomEvent
+      ** selection des demandes
+           MOVE 0 TO fin_boucle
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               DISPLAY "Saisissez le login de la personne dont vous"
+               DISPLAY "souhaitez traiter la demande :"
+               ACCEPT fpart_login
+
+               READ fparticipant
+                   INVALID KEY
+                       DISPLAY "login incorrect"
+                   NOT INVALID KEY
+                       IF fpart_etat <> "attente" THEN
+                           DISPLAY "Cette demande n'est"
+                           DISPLAY "pas en attente !"
+                       ELSE
+                           DISPLAY "Que souhaitez vous faire ?"
+                           DISPLAY "0 - refuser la demande"
+                           DISPLAY "1 - accepter la demande"
+                           ACCEPT choixGestionDemande
+                               IF choixGestionDemande = 0 THEN
+                               MOVE "refusee" TO fpart_etat
+                           ELSE
+                               MOVE "acceptee" TO fpart_etat
+                           END-IF
+                           REWRITE tamp_fpart
+                           DISPLAY "Demande traitee"
+                       END-IF
+               END-READ
+               DISPLAY "Quitter ? (0 pour non, 1 pour oui)"
+               ACCEPT fin_boucle
+               CLOSE fparticipant
+           END-PERFORM
+           END-IF.
+
+      *-----------------------------------------------------------------
+      *          Procedure permettant de supprimer des evenements
+      *          automatiquement ou non en fonction de autoSupprEvent
+      *-----------------------------------------------------------------
+       supprimerEvent.
            MOVE 0 TO verif_event
            MOVE 0 TO retour
-           PERFORM afficheEvent
-
+           IF autoSupprEvent <> 1 THEN
+               DISPLAY"--------------------------------------------"
+               DISPLAY"|        SUPPRESSION EVENEMENT             |"
+               DISPLAY"--------------------------------------------"
+               PERFORM afficheEvent
       * Selection de l'evenement a supprimer
            PERFORM WITH TEST AFTER UNTIL verif_event = 1 OR retour = 1
-               DISPLAY "KIWIZ"
-               PERFORM verif_permission
+                PERFORM verif_permission
            END-PERFORM
+           END-IF
 
            IF retour = 1 THEN
       * KIWIZ mettre le retour en arriere ici
@@ -1623,7 +1710,7 @@
 
                DISPLAY "Suppression des participations liees a
        -   l'evenement"
-               OPEN INPUT fparticipant
+               OPEN I-O fparticipant
                MOVE 0 TO fin_boucle
                MOVE fevent_nom TO fpart_nomEvent
                START fparticipant, KEY IS = fpart_nomEvent
@@ -1639,15 +1726,266 @@
                    END-PERFORM
                END-START
                CLOSE fparticipant
-
-               DELETE fevenement RECORD
-               DISPLAY "Suppression effectuee"
-               PERFORM afficheEvent
+               OPEN I-O fevenement
+                   READ fevenement
+                       INVALID KEY
+                           DISPLAY "erreur dans lecture fevenement"
+                       NOT INVALID KEY
+                          DELETE fevenement RECORD
+                   END-READ
                CLOSE fevenement
+               DISPLAY "Suppression effectuee"
+               IF autoSupprEvent <> 1 THEN
+                   PERFORM afficheEvent
+               END-IF
            END-IF
            .
+      *-----------------------------------------------------------------
+      *          Affiche tous les evenements d'un organisateur
+      *-----------------------------------------------------------------
+       afficher_events_organisateur.
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|      AFFICHAGE DE VOS EVENEMENTS          |"
+           DISPLAY"--------------------------------------------"
 
-            verif_permission.
+           OPEN INPUT fevenement
+           MOVE 0 TO fin_boucle
+      * KIWIZ temporaire avant implementation connexion
+           MOVE "tmerlet" TO login
+      * END-KIWIZ
+           MOVE login TO fevent_loginOrga
+           START fevenement, KEY IS = fevent_loginOrga
+           INVALID KEY
+               DISPLAY "Erreur lecture fevenement"
+           NOT INVALID KEY
+               PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                   READ fevenement NEXT
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       DISPLAY "---------------------------------------"
+                       DISPLAY "Nom : ",fevent_nom
+                       DISPLAY "Places : ", fevent_seuil
+                       DISPLAY "Date : "fevent_dateJour"/"
+      -                fevent_dateMois"/"fevent_dateAnnee
+                       DISPLAY "Type : ", fevent_type
+                       DISPLAY "Description : ", fevent_description
+                       DISPLAY "Adresse : ", fevent_adresse
+                       DISPLAY "---------------------------------------"
+               END-PERFORM
+           END-START
+           CLOSE fevenement
+           .
+
+       stats_events.
+      * Affiche le nombre d'évènements présents sur toute la plateforme
+           MOVE 0 TO nbEvents
+           MOVE 0 TO nbEventArchivables
+           MOVE 0 TO nbUtils
+           MOVE 0 TO fin_boucle
+
+           OPEN INPUT fevenement
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement NEXT
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       ADD 1 TO nbEvents
+                       PERFORM comparer_date
+                       IF dateComparee = 1 THEN
+                           ADD 1 TO nbEventArchivables
+                       END-IF
+               END-READ
+           END-PERFORM
+           CLOSE fevenement
+           MOVE 0 TO fin_boucle
+           OPEN INPUT futilisateur
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ futilisateur NEXT
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                       ADD 1 TO nbUtils
+               END-READ
+           END-PERFORM
+           CLOSE futilisateur
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|              STATISTIQUES                |"
+           DISPLAY"--------------------------------------------"
+           DISPLAY "---------------------------------------------------"
+           DISPLAY "Nombre d'evenements : ", nbEvents
+           DISPLAY "Archivables : ", nbEventArchivables
+           DISPLAY "Nombre d'utilisateurs : ", nbUtils.
+      *    KIWIZ faire une stat sur le nb d'element archives
+
+
+      *-----------------------------------------------------------------
+      *          Compare la date d'un evenement avec la date actuelle
+      *           0 - meme date
+      *           1 - evenement passe
+      *           2 - evenement a venir
+      *-----------------------------------------------------------------
+       comparer_date.
+           MOVE 0 TO dateComparee
+           IF WS-CURRENT-YEAR > fevent_dateAnnee THEN
+               MOVE 1 TO dateComparee
+           ELSE
+               IF WS-CURRENT-YEAR < fevent_dateAnnee THEN
+                   MOVE 2 TO dateComparee
+               ELSE
+                   IF WS-CURRENT-MONTH > fevent_dateMois THEN
+                       MOVE 1 TO dateComparee
+                   ELSE
+                       IF WS-CURRENT-MONTH < fevent_dateMois THEN
+                           MOVE 2 TO dateComparee
+                       ELSE
+                           IF WS-CURRENT-DAY < fevent_dateJour THEN
+                               MOVE 1 TO dateComparee
+                           ELSE
+                               IF WS-CURRENT-DAY > fevent_dateJour THEN
+                                   MOVE 2 TO dateComparee
+                               ELSE
+                                   MOVE 0 TO dateComparee
+                               END-IF
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF.
+
+       modifier_event.
+      * Permet la modification d'un evenement
+           PERFORM afficheEvent
+           MOVE 0 TO fin_boucle
+           MOVE 0 TO verif_event
+           MOVE 0 TO retour
+
+           PERFORM WITH TEST AFTER UNTIL verif_event = 1 OR retour = 1
+               PERFORM verif_permission
+           END-PERFORM
+
+           OPEN I-O fevenement
+           MOVE 9 TO choixModifEvent
+           PERFORM WITH TEST AFTER UNTIL choixModifEvent =0
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|          MODIFIER EVENEMENT              |"
+           DISPLAY"--------------------------------------------"
+           DISPLAY "Que voulez-vous modifier ?"
+           DISPLAY "1 - Type"
+           DISPLAY "2 - date "
+           DISPLAY "3 - description "
+           DISPLAY "4 - adresse "
+           DISPLAY "5 - seuil"
+           DISPLAY "6 - heure"
+           DISPLAY "0 - Revenir au menu precedent"
+
+           ACCEPT choixModifEvent
+      * KIWIZ les modifs ne peuvent etre faites que par les organisateurs
+      * pas les admins
+               EVALUATE choixModifEvent
+               WHEN 1
+                   DISPLAY "Ancien type : "fevent_type
+                   DISPLAY "Entrez le nouveau type :"
+                   ACCEPT fevent_type
+                   REWRITE tamp_fevent
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                           DISPLAY cr_fevent
+                   END-IF
+               WHEN 2
+                   DISPLAY "Date precedente : "
+                   DISPLAY fevent_dateJour"/"fevent_dateMois"/"
+      -            fevent_dateAnnee
+                   PERFORM WITH TEST AFTER UNTIL
+           fevent_dateJour <= 1 AND fevent_dateJour <= 31
+                   DISPLAY "Entrer le nouveau jour :"
+                   ACCEPT fevent_dateJour
+                   END-PERFORM
+                   REWRITE tamp_fevent
+                   IF cr_futil = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                           DISPLAY cr_fevent
+                   END-IF
+               WHEN 3
+                   DISPLAY "Ancienne description : "fevent_description
+                   DISPLAY "Entrez la nouvelle description : "
+                   ACCEPT fevent_description
+                   REWRITE tamp_fevent
+               IF cr_futil = 00 THEN
+                   DISPLAY "Modification reussie"
+               ELSE
+                   DISPLAY "Modification en echec"
+                   DISPLAY cr_fevent
+               END-IF
+               WHEN 4
+               DISPLAY "Ancienne adresse :"fevent_adresse
+               DISPLAY "Entrez la nouvelle adresse :"
+               ACCEPT fevent_adresse
+               REWRITE tamp_fevent
+               IF cr_futil = 00
+                   THEN
+                       DISPLAY "Modification reussie"
+                   ELSE
+                       DISPLAY "Modification en echec"
+                       DISPLAY cr_fevent
+               END-IF
+               WHEN 5
+                   DISPLAY "Ancien seuil : "fevent_seuil
+                   DISPLAY "Entrez le nouveau seuil :"
+      * KIWIZ LE SEUIL DOIT ETRE SUP A 0 ET SUP AU NB DE PARTCIPANTS INSCRITS
+                   ACCEPT fevent_seuil
+                   REWRITE tamp_fevent
+                   IF cr_fevent = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                           DISPLAY cr_fevent
+                   END-IF
+               WHEN 6
+                   DISPLAY "Entrez la nouvelle heure :"
+                   DISPLAY "(format : xxHxx)"
+                   ACCEPT fevent_heure
+                   REWRITE tamp_fevent
+                   IF cr_fevent = 00
+                       THEN
+                           DISPLAY "Modification reussie"
+                       ELSE
+                           DISPLAY "Modification en echec"
+                           DISPLAY cr_fevent
+                   END-IF
+               WHEN 0 PERFORM gestionEvenement
+               END-PERFORM
+           CLOSE fevenement.
+
+       supprimer_event_passe.
+      * KIWIZ tres proche de ce que fait archivage non ?
+      * auto_suppr_event indique a supprimer_evenement de faire ses actions
+      * sans interaction avec l'utilisateur
+
+           MOVE 1 TO autoSupprEvent
+           OPEN I-O fevenement
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement NEXT
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+                   MOVE 0 TO autoSupprEvent
+                       PERFORM supprimerEvent
+               END-READ
+           END-PERFORM
+           CLOSE fevenement
+           MOVE 0 TO autoSupprEvent
+           .
+
+      ** add other procedures here
+       verif_permission.
       * verifie que l'utilisateur a les permissions pour l'action
            MOVE 0 TO verif_event
            MOVE 0 TO retour
@@ -1658,7 +1996,7 @@
                ACCEPT fevent_nom
 
                OPEN INPUT fevenement
-               READ fevenement
+               READ fevenement NEXT
                    INVALID KEY
                        DISPLAY "Saisie invalide"
                    NOT INVALID KEY
@@ -1667,6 +2005,7 @@
                        IF fevent_loginOrga = login THEN
                            MOVE 1 TO verif_event
                        ELSE
+
                            OPEN INPUT futilisateur
                            MOVE login TO futil_login
                            READ futilisateur
@@ -1686,6 +2025,132 @@
                    ACCEPT retour
                END-IF
            END-PERFORM
+           .
+
+       archiver_event.
+      * Realise l'archivage d'un evenement
+           OPEN I-O fhistorique
+               MOVE fevent_nom TO fhisto_nom
+               MOVE fevent_type TO fhisto_type
+      * KIWIZ change to correct date format
+               MOVE fevent_dateJour TO fhisto_dateJour
+               MOVE fevent_dateMois TO fhisto_dateMois
+               MOVE fevent_dateAnnee TO fhisto_dateAnnee
+               MOVE fevent_loginOrga TO fhisto_loginOrga
+               MOVE fevent_description TO fhisto_description
+               MOVE fevent_adresse TO fhisto_adresse
+               MOVE "termine" TO fhisto_etat
+      *    KIWIZ utiliser valeur de nb_places disponibles pour fhisto_participants
+      *    KIWIZ remplacer prochaine ligne par fonction
+               MOVE 5 TO fhisto_participants
+      *    KIWIZ instructions d'archivage
+           WRITE tamp_fevent
+               INVALID KEY
+                   DISPLAY "Erreur lecture fhistorique"
+               NOT INVALID KEY
+                   DISPLAY "Archivage reussi"
+                   MOVE 1 TO autoSupprEvent
+                   PERFORM supprimerEvent
+                   MOVE 0 TO autoSupprEvent
+           END-WRITE
+           CLOSE fhistorique
+           .
+       archivage.
+      * Permets a l'utilisateur d'archiver les evenements passes.
+      * KIWIZ verif si admin ici ?
+           DISPLAY"--------------------------------------------"
+           DISPLAY"|               ARCHIVAGE                   |"
+           DISPLAY"--------------------------------------------"
+
+           OPEN I-O fevenement
+           MOVE 0 TO fin_boucle
+
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+      * KIWIZ VERIF DATE
+                       PERFORM comparer_date
+                       IF dateComparee = 1 THEN
+      * KIWIZ change date format
+                           DISPLAY "-----------------------------------"
+                           DISPLAY "Nom : "fevent_nom
+                           DISPLAY "Date : "fevent_dateJour"/"
+      -                     fevent_dateMois"/"fevent_dateAnnee
+                           DISPLAY "-----------------------------------"
+                       END-IF
+               END-READ
+           END-PERFORM
+
+           MOVE 0 TO fin_boucle
+           MOVE 0 TO retour
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1 OR retour = 1
+               DISPLAY "Saissisez le nom de l'event a archiver"
+               ACCEPT fevent_nom
+               READ fevenement
+                   AT END
+                       MOVE 1 TO fin_boucle
+                   NOT AT END
+      * KIWIZ CHANGE DATE EVALUATION
+                       PERFORM comparer_date
+                       IF dateComparee = 1 THEN
+                           PERFORM archiver_event
+                       ELSE
+                           DISPLAY "L'evenement n'est pas passe !"
+                       END-IF
+                       DISPLAY "Retourner au menu precedent ?"
+                       DISPLAY "0 - Non 1 - Oui"
+                       ACCEPT retour
+               END-READ
+           END-PERFORM
+           IF retour = 1 THEN
+               DISPLAY "KIWIZ FAIRE RETOUR EN ARRIERE"
+           END-IF.
+
+           tout_archiver.
+           OPEN INPUT fevenement
+           MOVE 0 TO fin_boucle
+
+           PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+               READ fevenement
+               AT END
+                   MOVE 1 TO fin_boucle
+               NOT AT END
+                   PERFORM archiver_event
+               END-READ
+           END-PERFORM
+           CLOSE fevenement
+           .
+
+      ******************************************************************
+      *          Procedure comptant les participants a un evenement
+      *          fpart_nomEvent doit avoir sa valeur avant l'appel
+      ******************************************************************
+       compte_nb_part.
+           MOVE 0 TO nbParticipants
+           MOVE 0 TO fin_boucle
+           OPEN INPUT fparticipant
+           START fparticipant, KEY IS = fpart_nomEvent
+               INVALID KEY
+                   DISPLAY "Erreur comptage des participants"
+               NOT INVALID KEY
+                   PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
+                       READ fparticipant NEXT
+                       AT END
+                           MOVE 1 TO fin_boucle
+                       NOT AT END
+                           ADD 1 TO nbParticipants
+                        END-READ
+                   END-PERFORM
+                   CLOSE fparticipant
+           END-START
+           .
+      * KIWIZ optionnel verif_heure
+      * KIWIZ fonction calcul_nb_participant
+      * KIWIZ supprimer fevent_etat sil est inutile.
+      * * = fonc annexe - = principal
+      * 1361 erreur date
            .
       ** add other procedures here
        END PROGRAM Evenements.
