@@ -46,15 +46,15 @@
            ALTERNATE RECORD KEY IS fpart_etat WITH DUPLICATES
            FILE STATUS IS cr_fpart.
 
-           SELECT fhisTOrique ASSIGN TO "hisTOrique.dat"
+           SELECT fhistorique ASSIGN TO "hisTOrique.dat"
            ORGANIZATION INDEXED
            ACCESS MODE IS DYNAMIC
-           RECORD KEY fhisTO_nom
-           ALTERNATE RECORD KEY fhisTO_type WITH DUPLICATES
-           ALTERNATE RECORD KEY fhisTO_dateMois WITH DUPLICATES
-           ALTERNATE RECORD KEY fhisTO_etat WITH DUPLICATES
-           ALTERNATE RECORD KEY fhisTO_participants WITH DUPLICATES
-           FILE STATUS IS cr_fhisTO.
+           RECORD KEY fhisto_nom
+           ALTERNATE RECORD KEY fhisto_type WITH DUPLICATES
+           ALTERNATE RECORD KEY fhisto_dateMois WITH DUPLICATES
+           ALTERNATE RECORD KEY fhisto_etat WITH DUPLICATES
+           ALTERNATE RECORD KEY fhisto_participants WITH DUPLICATES
+           FILE STATUS IS cr_fhisto.
 
       *-----------------------
        DATA DIVISION.
@@ -87,6 +87,7 @@
            02 fevent_adresse PIC X(30).
            02 fevent_etat PIC A(8).
            02 fevent_seuil PIC 9(3).
+           02 fevent_placeRestante PIC 9(3).
            02 fevent_heure PIC X(5).
 
        FD fparticipant.
@@ -96,28 +97,29 @@
                03 fpart_nomEvent PIC A(20).
            02 fpart_etat PIC A(10).
 
-       FD fhisTOrique.
-       01 tamp_fhisTO.
-           02 fhisTO_nom PIC A(30).
-           02 fhisTO_type PIC A(20).
-           02 fhisTO_dateJour PIC 9(2).
-           02 fhisTO_dateMois PIC 9(2).
-           02 fhisTO_dateAnnee PIC 9(2).
-           02 fhisTO_loginOrga PIC X(30).
-           02 fhisTO_description PIC X(50).
-           02 fhisTO_adresse PIC X(50).
-           02 fhisTO_etat PIC A(8).
-           02 fhisTO_participants PIC 9(3).
+       FD fhistorique.
+       01 tamp_fhisto.
+           02 fhisto_nom PIC A(30).
+           02 fhisto_type PIC A(20).
+           02 fhisto_dateJour PIC 9(2).
+           02 fhisto_dateMois PIC 9(2).
+           02 fhisto_dateAnnee PIC 9(2).
+           02 fhisto_loginOrga PIC X(30).
+           02 fhisto_description PIC X(50).
+           02 fhisto_adresse PIC X(50).
+           02 fhisto_etat PIC A(8).
+           02 fhisto_participants PIC 9(3).
       *-----------------------
        WORKING-STORAGE SECTION.
        77 cr_futil PIC 9(2).
        77 cr_fevent PIC 9(2).
        77 cr_fpart PIC 9(2).
-       77 cr_fhisTO PIC 9(2).
+       77 cr_fhisto PIC 9(2).
        77 choix PIC 9(1).
        77 nom PIC A(30).
        77 vreTOur PIC 9(1).
        77 estValideEvenementResultat PIC 9(1).
+       77 estValideEvenementResultatHisto PIC 9(1).
        77 loginSaved PIC X(30).
        77 adresseEvent PIC X(30).
        77 descriptionEvent PIC X(50).
@@ -168,6 +170,7 @@
        77 choixEvent PIC 9(1).
        77 choixUtil PIC 9(1).
        77 choixStat PIC 9(1).
+       77 reponse PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -197,12 +200,12 @@
            CLOSE fparticipant
            DISPLAY "fpart : ", cr_fpart
 
-           OPEN I-O fhisTOrique
-           IF cr_fhisTO =35 THEN
-               OPEN OUTPUT fhisTOrique
+           OPEN I-O fhistorique
+           IF cr_fhisto =35 THEN
+               OPEN OUTPUT fhistorique
            END-IF
-           CLOSE fhisTOrique.
-           DISPLAY "fhisTO : ",cr_fhisTO
+           CLOSE fhistorique.
+           DISPLAY "fhisto : ",cr_fhisto
       *-----------------------------------------------------------------
       *                  CREATION JDD
       *-----------------------------------------------------------------
@@ -500,8 +503,8 @@
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
       *-----------------------------------------------------------------
-           ACCEPT WS-CURRENT-DATE-DATA FROM DATE
-           DISPLAY WS-CURRENT-DATE
+      *     ACCEPT WS-CURRENT-DATE-DATA FROM DATE
+      *     DISPLAY WS-CURRENT-DATE
            DISPLAY "-----------------------------------------------"
            DISPLAY "|         BIENVENUE SUR L'APPLICATION         |"
            DISPLAY "-----------------------------------------------"
@@ -521,20 +524,20 @@
       *-----------------------------------------------------------------
 
        accueil.
-           MOVE 9 TO choix
+      *     MOVE 9 TO choix
            PERFORM WITH TEST AFTER UNTIL choix = 0
-               DISPLAY "Annee : "WS-CURRENT-YEAR
-               DISPLAY "Mois : "WS-CURRENT-MONTH
-               DISPLAY "Jour : "WS-CURRENT-DAY
+      *         DISPLAY "Annee : "WS-CURRENT-YEAR
+      *         DISPLAY "Mois : "WS-CURRENT-MONTH
+      *         DISPLAY "Jour : "WS-CURRENT-DAY
                DISPLAY "-----------------------------------------------"
                DISPLAY "|  1 - Me connecter a mon compte              |"
                DISPLAY "|  2 - Creer mon compte                       |"
                DISPLAY "|  0 - Quitter                                |"
                DISPLAY "-----------------------------------------------"
-               DISPLAY "choix :" choix
+      *         DISPLAY "choix :" choix
                DISPLAY "Taper votre choix :"
                ACCEPT choix
-               DISPLAY "choix :" choix
+      *         DISPLAY "choix :" choix
 
                EVALUATE choix
                WHEN 1
@@ -596,7 +599,7 @@
            END-PERFORM
            DISPLAY "ANNEE (sur 2 chiffres,inferieur a l'annee courante:"
            PERFORM WITH TEST AFTER UNTIL
-               futil_naissanceAnnee<=WS-CURRENT-YEAR
+               futil_naissanceAnnee<=2023
                ACCEPT futil_naissanceAnnee
            END-PERFORM
 
@@ -684,10 +687,11 @@
            END-IF.
 
 
-      *-----------------------------------------------------------------
+      ******************************************************************
+      * Fonction annexe :
       *          Procedure permettant de verifier le numero de telephone
       *          saisi par l'utilisateur
-      *-----------------------------------------------------------------
+      ******************************************************************
        verif_tel.
            MOVE 1 TO I
            MOVE 1 TO verif_tel_ok
@@ -798,7 +802,7 @@
                        END-IF
                    WHEN 5
                       IF futil_type = 1
-                           THEN PERFORM modifierUtilisateur
+                           THEN PERFORM modifierProfilAdmin
                       ELSE DISPLAY "Non autorise"
                            PERFORM menuUtilisateur
                        END-IF
@@ -812,6 +816,11 @@
            END-PERFORM
            .
 
+
+      *-----------------------------------------------------------------
+      *      Procedure gerant le menu de gestion de son profil
+      *      Afficher / Modifier / Supprimer
+      *-----------------------------------------------------------------v
            gererProfil.
            MOVE 9 TO choixProfil
            PERFORM WITH TEST AFTER UNTIL choixProfil =0
@@ -819,11 +828,10 @@
            DISPLAY"|           GESTION DU PROFIL              |"
            DISPLAY"--------------------------------------------"
                DISPLAY "Que souhaitez-vous faire dans votre"
-               DISPLAY" profil"
+               DISPLAY" profil ?"
                DISPLAY "1 - Modifier votre profil "
                DISPLAY "2 - Supprimer votre profil "
                DISPLAY "3 - Consulter votre profil"
-               DISPLAY "4 - Afficher tous les profils"
                DISPLAY "0 - Revenir au menu precedent"
                DISPLAY "choix : "choixProfil
                ACCEPT choixProfil
@@ -833,22 +841,29 @@
                WHEN 1 PERFORM modifierUtilisateur
                WHEN 2 PERFORM suppression_utilisateur
                WHEN 3 PERFORM consulterProfil
-               WHEN 4 PERFORM consulterUtilisateurs
                WHEN 0 PERFORM menuUtilisateur
            END-EVALUATE
            END-PERFORM
            .
 
+
+      *-----------------------------------------------------------------
+      *      Procedure gerant le menu de recherche d'un evenement ou
+      *      d'un utilisateur
+      *-----------------------------------------------------------------
            rechercherEvent.
            PERFORM WITH TEST AFTER UNTIL choixEvent =0
            DISPLAY"--------------------------------------------"
            DISPLAY"| RECHERCHER UN EVENEMENT OU UN UTILISATEUR |"
            DISPLAY"--------------------------------------------"
-               DISPLAY "1 - Rechercher avec le nom de l'evenement"
-               DISPLAY "2 - Rechercher sur le type d'evenement"
-               DISPLAY "3 - Rechercher un utilisateur par son nom"
-               DISPLAY "4 - Rechercher un utilisateur par son login"
+               DISPLAY "Rechercher un évènement : "
+               DISPLAY "1 - Par son nom"
+               DISPLAY "2 - Par son organisateur"
+               DISPLAY "Recherche un utilisateur :"
+               DISPLAY "3 - Par son nom"
+               DISPLAY "4 - Par son login"
                DISPLAY "5 - Afficher tous les organisateurs"
+               DISPLAY "6 - Afficher tous les utilisateurs"
                DISPLAY "0 - Revenir au menu precedent"
                ACCEPT choixEvent
 
@@ -858,12 +873,18 @@
               WHEN 3 PERFORM rechercherUtilisateurNom
               WHEN 4 PERFORM rechercherUtilisateurLogin
               WHEN 5 PERFORM affichage_organisateur
+              WHEN 6 PERFORM consulterUtilisateurs
               WHEN 0 PERFORM menuUtilisateur
            END-EVALUATE
 
            END-PERFORM
            .
 
+
+      *-----------------------------------------------------------------
+      *      Procedure gerant le menu des evenements
+      *      creation / Modification / suppression / consultation
+      *-----------------------------------------------------------------
            gestionEvenement.
            PERFORM WITH TEST AFTER UNTIL choix =0
            DISPLAY"--------------------------------------------"
@@ -887,6 +908,11 @@
            END-PERFORM
            .
 
+
+      *-----------------------------------------------------------------
+      *      Procedure permettant d'afficher les statistiques de
+      *      l'application
+      *-----------------------------------------------------------------
            afficheStatistique.
            PERFORM WITH TEST AFTER UNTIL choixStat =0
            DISPLAY"--------------------------------------------"
@@ -904,7 +930,7 @@
            .
 
       *-----------------------------------------------------------------
-      * Procedure permettant de modifier un utilisateur
+      * Procedure permettant de modifier son profil utilisateur
       *-----------------------------------------------------------------
            modifierUtilisateur.
            OPEN I-O futilisateur
@@ -931,41 +957,19 @@
                    DISPLAY "Votre ancien nom : "futil_nom
                    DISPLAY "Entrer votre nouveau nom :"
                    ACCEPT futil_nom
-                   REWRITE tamp_futi
-                   IF cr_futil = 00
-                       THEN
-                           DISPLAY "Modification reussie"
-                       ELSE
-                           DISPLAY "Modification en echec"
-                           DISPLAY cr_futil
-                   END-IF
+                   PERFORM modifUtil
                WHEN 2
                    DISPLAY "Votre ancien prenom : "futil_prenom
                    DISPLAY "Entrer votre nouveau prenom :"
                    ACCEPT futil_prenom
-                   REWRITE tamp_futi
-                   IF cr_futil = 00
-                       THEN
-                           DISPLAY "Modification reussie"
-                       ELSE
-                           DISPLAY "Modification en echec"
-                           DISPLAY cr_futil
-                   END-IF
+                   PERFORM modifUtil
                WHEN 3
                    PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
                        DISPLAY "Votre ancienne adresse mail: "futil_mail
                        DISPLAY "Entrer votre nouvelle adresse mail:"
                        ACCEPT futil_mail
                        PERFORM verif_mail
-                       REWRITE tamp_futi
-                   IF cr_futil = 00
-                       THEN
-                           DISPLAY "Modification reussie"
-                           MOVE 1 TO verif_mail_ok
-                       ELSE
-                           DISPLAY "Modification en echec"
-                           DISPLAY cr_futil
-                   END-IF
+                       PERFORM modifUtil
                    END-PERFORM
                WHEN 4
                    PERFORM WITH TEST AFTER UNTIL verif_tel_ok EQUAL 1
@@ -973,49 +977,75 @@
                        DISPLAY "Entrer votre numero de telephone:"
                        ACCEPT futil_tel
                        PERFORM verif_tel
-                       REWRITE tamp_futi
-                   IF cr_futil = 00
-                       THEN
-                           DISPLAY "Modification reussie"
-                       ELSE
-                           DISPLAY "Modification en echec"
-                           DISPLAY cr_futil
-                   END-IF
+                       PERFORM modifUtil
                    END-PERFORM
                WHEN 5
                    DISPLAY "Votre ancienne formation : "futil_formation
                    DISPLAY "Entrer votre nouvelle formation :"
                    ACCEPT futil_formation
-                   REWRITE tamp_futi
-                   IF cr_futil = 00
-                       THEN
-                           DISPLAY "Modification reussie"
-                       ELSE
-                           DISPLAY "Modification en echec"
-                           DISPLAY cr_futil
-                   END-IF
+                   PERFORM modifUtil
                WHEN 6
                    IF futil_type=1 THEN
                        DISPLAY "Veuillez entrer le nouveau type"
                        DISPLAY "d'utilisateur"
                        DISPLAY "1 = admin, 0 = membre simple"
                        ACCEPT futil_type
-                       REWRITE tamp_futi
-                   IF cr_futil = 00
-                       THEN
-                           DISPLAY "Modification reussie"
-                       ELSE
-                           DISPLAY "Modification en echec"
-                           DISPLAY cr_futil
-                   END-IF
+                       PERFORM modifUtil
                    END-IF
                WHEN 0 PERFORM gererProfil
                END-PERFORM
            CLOSE futilisateur
            .
 
-
-
+      *-----------------------------------------------------------------
+      *      Procedure permettant à l'administrateur de rechercher un
+      *      utilisateur membre afin de lui donner ou enlever les droits admin
+      *-----------------------------------------------------------------
+       modifierProfilAdmin.
+           PERFORM consulterUtilisateurs
+           DISPLAY "----------------------------"
+           DISPLAY "|MODIFIER TYPE D'UTILISATEUR|"
+           DISPLAY "----------------------------"
+           DISPLAY "Quel utilisateur souhaitez-vous modifier ?"
+           DISPLAY "Veuillez saisir son login"
+           ACCEPT futil_login
+           READ futilisateur
+           INVALID KEY
+               DISPLAY "Erreur dans la saisie du login"
+               DISPLAY "Veuillez reessayer"
+           NOT INVALID KEY
+               DISPLAY "La seule modification possible sur le"
+               DISPLAY "profil est le type d'utilisateur"
+               DISPLAY "Etes-vous sur de vouloir le modifier ?"
+               DISPLAY "1 = Oui, 0 = Non"
+               ACCEPT reponse
+               IF reponse = 1 THEN
+                   DISPLAY "Veuillez saisir le nouveau type"
+                   DISPLAY "d'utilisateur"
+                   DISPLAY "1 = Admin, 0 = Membre"
+                   ACCEPT futil_type
+                   PERFORM modifUtil
+               ELSE
+                   PERFORM menuUtilisateur
+               END-IF
+           .
+      ******************************************************************
+      *    Fonction parallele :
+      *    Fonction qui permet d'eviter du doublon de code sur la modification
+      *    d'un element dans le fichier futilisateurs
+      ******************************************************************
+       modifUtil.
+       REWRITE tamp_futi
+               IF cr_futil = 00 THEN
+                   DISPLAY "Modification reussie"
+               ELSE
+                   DISPLAY "Echec de modification"
+                   DISPLAY "Reessayer ulterieurement"
+               END-IF.
+      *-----------------------------------------------------------------
+      *      Procedure permettant de consulter son profil utilisateur
+      *      Par mesure de securite le mot de passe n'est pas affiche
+      *-----------------------------------------------------------------
            consulterProfil.
            DISPLAY"--------------------------------------------"
            DISPLAY"|   CONSULTER MON PROFIL UTILISATEUR       |"
@@ -1061,7 +1091,10 @@
            CLOSE futilisateur.
 
 
-
+      *-----------------------------------------------------------------
+      *      Procedure permettant d'afficher tous les utilisateurs
+      *      presents dans l'application. Qu'ils soient membres ou admin
+      *-----------------------------------------------------------------
            consulterUtilisateurs.
            DISPLAY"--------------------------------------------"
            DISPLAY"|   CONSULTER TOUS LES UTILISATEURS        |"
@@ -1078,12 +1111,21 @@
                        DISPLAY "Mail : " futil_mail
                        DISPLAY "Formation : "futil_formation
                        DISPLAY "Login : "futil_login
+                       DISPLAY "Type d'utilisateur : "
+                       IF futil_type=1
+                           DISPLAY "Administrateur"
+                       ELSE
+                           DISPLAY "Membre"
+                       END-IF
                        DISPLAY "---------"
                END-READ
            END-PERFORM
            CLOSE futilisateur.
 
-
+      *-----------------------------------------------------------------
+      *      Procedure permettant de supprimer les evenements passes
+      *      et de les archiver dans le fichier fhistorique
+      *-----------------------------------------------------------------
            supprimerEventPasse.
            DISPLAY"--------------------------------------------"
            DISPLAY"|       SUPPRIMER EVENEMENT PASSE          |"
@@ -1096,7 +1138,7 @@
       *                        son nom
       *----------------------------------------------------------------
            rechercherNom.
-      *     PERFORM afficheEvent
+           PERFORM afficheEvent
            OPEN INPUT fevenement
                DISPLAY "Quel evenement voulez-vous rechercher ?"
                DISPLAY "(saisir le nom)"
@@ -1141,35 +1183,54 @@
       ******************************************************************
       *    Fonction parallele :
       *    Fonction qui verifie que le nom de l'evenement n'est pas deja
-      *    present
+      *    present dans fevenement
       ******************************************************************
            existeEvent.
-           DISPLAY"abricot"
            OPEN INPUT fevenement
-           DISPLAY "fraise"
            READ fevenement
            INVALID KEY
-           DISPLAY "raisin"
                MOVE 0 TO estValideEvenementResultat
            NOT INVALID KEY
-           DISPLAY "kiwi"
                IF nomEvent EQUALS fevent_nom THEN
                    MOVE 1 TO estValideEvenementResultat
                    DISPLAY fevent_nom
-                   DISPLAY "cerise"
                END-IF
            END-READ
 
-           IF cr_fevent = 00
-           THEN DISPLAY "Evenement trouve"
-           ELSE DISPLAY "Evenement non trouve"
-           END-IF
-           CLOSE fevenement
+      *     IF cr_fevent = 00
+      *     THEN DISPLAY "Evenement trouve"
+      *     ELSE DISPLAY "Evenement non trouve"
+      *     END-IF
+      *     CLOSE fevenement
            .
+
       ******************************************************************
-      *    Fonction principale :
-      *    Fonction qui permet de creer l'evenement
+      *    Fonction parallele :
+      *    Fonction qui verifie que le nom de l'evenement n'est pas deja
+      *    present dans fhistorique
       ******************************************************************
+           existeEventHisto.
+           OPEN INPUT fhistorique
+           READ fhistorique
+           INVALID KEY
+               MOVE 0 TO estValideEvenementResultatHisto
+           NOT INVALID KEY
+               IF nomEvent EQUALS fhisto_nom THEN
+                   MOVE 1 TO estValideEvenementResultatHisto
+                   DISPLAY fevent_nom
+               END-IF
+           END-READ
+
+      *     IF cr_fevent = 00
+      *     THEN DISPLAY "Evenement trouve"
+      *     ELSE DISPLAY "Evenement non trouve"
+      *     END-IF
+      *     CLOSE fevenement
+           .
+
+      *----------------------------------------------------------------
+      *    Fonction qui permet de creer un evenement
+      *----------------------------------------------------------------
            creerEvent.
            DISPLAY "-------------------------------------------"
            DISPLAY "|          CREATION EVENEMENT             |"
@@ -1208,7 +1269,7 @@
                ACCEPT seuilEvent
            END-PERFORM
            DISPLAY "Veuillez saisir l'heure de debut de l'evenement"
-           DISPLAY " Format : xxHxx, avec x un chiffre"
+           DISPLAY " Format : xxhxx, avec x un chiffre"
            ACCEPT heureEvent
 
            MOVE nomEvent TO fevent_nom
@@ -1267,33 +1328,35 @@
       *          Procedure permettant de s'inscrire a un evenement
       *-----------------------------------------------------------------
         inscriptionEvent.
-         *> PERFORM afficheEvent
-         *> DISPLAY "A quel evenement voulez vous vous inscrire?"
-         *> ACCEPT nomEvent
-         *> MOVE nomEvent TO nomSaved
-         *> OPEN I-O fparticipant
-             *> MOVE "En attente" TO fpart_etat
-             *> MOVE 0 TO Fin
-             *> MOVE 1 TO cpt
-             *> PERFORM WITH TEST AFTER UNTIL Fin = 1
-                 *> READ fparticipant
-                     *> AT END
-                         *> MOVE 1 TO Fin
-                     *> NOT AT END
-                         *> IF fpart_nomEvent = nomSaved THEN
-                             *> MOVE cpt+1 TO cpt
-                         *> END-IF
-                 *> END-READ
-             *> END-PERFORM
-             *> IF cpt > fevent_seuil THEN
-              *> DISPLAY "Desole, le nombre max de participants est atteint."
-             *> ELSE
-                 *> MOVE loginSaved TO fpart_login
-                 *> MOVE nomSaved TO fpart_nomEvent
-                 *> WRITE tamp_fpart
-                 *> END-WRITE
-             *> END-IF
-             *> CLOSE fparticipant.
+      *   PERFORM afficheEvent
+      *   DISPLAY "A quel evenement voulez vous vous inscrire?"
+      *   ACCEPT nomEvent
+      *   MOVE nomEvent TO nomSaved
+         OPEN I-O fparticipant
+             MOVE "En attente" TO fpart_etat
+             MOVE 0 TO Fin
+             MOVE 1 TO cpt
+             PERFORM WITH TEST AFTER UNTIL Fin = 1
+                 READ fparticipant NEXT
+                     AT END
+                         MOVE 1 TO Fin
+                     NOT AT END
+                         IF fpart_nomEvent = fevent_nom THEN
+                             MOVE cpt+1 TO cpt
+
+                         END-IF
+                 END-READ
+             END-PERFORM
+             IF cpt > fevent_seuil THEN
+               DISPLAY "Desole, le nombre max de participants"
+               DISPLAY "est atteint."
+             ELSE
+                 MOVE loginSaved TO fpart_login
+                 MOVE nomSaved TO fpart_nomEvent
+                 WRITE tamp_fpart
+                 END-WRITE
+             END-IF
+             CLOSE fparticipant.
 
 
 
@@ -1302,6 +1365,9 @@
       *          son nom
       *-----------------------------------------------------------------
            rechercherUtilisateurNom.
+           DISPLAY "--------------------------------------------------"
+           DISPLAY "|       RECHERCHER UTILISATEUR AVEC SON NOM      |"
+           DISPLAY "--------------------------------------------------"
            DISPLAY "Veuillez saisir le nom de la personne souhaitee :"
            ACCEPT nom
            OPEN INPUT futilisateur
@@ -1319,12 +1385,26 @@
                            DISPLAY "Veuillez saisir son prenom"
                            ACCEPT prenom
                            IF prenom = futil_prenom THEN
-                               DISPLAY "Nom : " futil_nom
-                               DISPLAY "Prenom : " futil_prenom
-                               DISPLAY "Mail : " futil_mail
-                               DISPLAY "Telephone : " futil_tel
-                               DISPLAY "Login : "futil_login
-                               DISPLAY "Type d'utilisateur : "futil_type
+                               DISPLAY "------------------------"
+                               DISPLAY "|INFORMATION UTILISATEUR|"
+                               DISPLAY "------------------------"
+                               DISPLAY "Nom : "
+                               DISPLAY futil_nom
+                               DISPLAY "Prenom : "
+                               DISPLAY futil_prenom
+                               DISPLAY "Mail : "
+                               DISPLAY futil_mail
+                               DISPLAY "Telephone : "
+                               DISPLAY futil_tel
+                               DISPLAY "Login : "
+                               DISPLAY futil_login
+                               DISPLAY "Type d'utilisateur : "
+                               IF futil_type = 1 THEN
+                                   DISPLAY "Administrateur"
+                               ELSE
+                                   DISPLAY "Membre"
+                               END-IF
+                           END-IF
                       END-READ
                   END-PERFORM
            END-START
@@ -1336,6 +1416,9 @@
       *          son login
       *-----------------------------------------------------------------
            rechercherUtilisateurLogin.
+           DISPLAY "--------------------------------------------------"
+           DISPLAY "|       RECHERCHER UTILISATEUR AVEC SON LOGIN    |"
+           DISPLAY "--------------------------------------------------"
            DISPLAY "Veuillez saisir le login de la personne souhaitee :"
            ACCEPT login
            OPEN INPUT futilisateur
@@ -1344,6 +1427,9 @@
                    DISPLAY "Utilisateur non trouve"
                NOT INVALID KEY
                    IF login = futil_login THEN
+                       DISPLAY "------------------------"
+                       DISPLAY "|INFORMATION UTILISATEUR|"
+                       DISPLAY "------------------------"
                        DISPLAY "Nom : "
                        DISPLAY futil_nom
                        DISPLAY "Prenom :"
@@ -1403,13 +1489,19 @@
            IF suppression_ok IS equal 0 THEN
               OPEN I-O futilisateur
       ** faire la suppression de l'utilisateur
+      ** et revenir à la page de connexion
                READ futilisateur
                INVALID key
-                   DISPLAY"Impossible de supprime ce compte"
+                   DISPLAY "Impossible de supprime ce compte"
                NOT INVALID KEY
                    DELETE futilisateur RECORD
-                   DISPLAY "Utilisateur supprime"
-                   MOVE 0 TO fermeAppli
+                   DISPLAY "-------------------------"
+                   DISPLAY "|  Utilisateur supprime  |"
+                   DISPLAY "-------------------------"
+                   DISPLAY "-----------------------------------------------"
+                   DISPLAY "|           VOUS AVEZ ETE DECONNECTE          |"
+                   DISPLAY "-----------------------------------------------"
+                   PERFORM accueil
                END-READ
               CLOSE futilisateur
            END-IF.
@@ -1439,7 +1531,9 @@
                CLOSE futilisateur
                CLOSE fevenement.
 
-
+      *-----------------------------------------------------------------
+      *          Procedure permettant de supprimer des evenements
+      *-----------------------------------------------------------------
           supprimerEvent.
            MOVE 0 TO verif_event
            MOVE 0 TO retour
