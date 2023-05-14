@@ -177,6 +177,7 @@
        77 formaStat PIC A(20).
        77 moisStat PIC 9(2).
        77 nbPartStat PIC 9(3).
+       77 longHeure PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -507,11 +508,11 @@
       *-----------------------------------------------------------------
       *     ACCEPT WS-CURRENT-DATE-DATA FROM DATE
       *     DISPLAY WS-CURRENT-DATE
+           *> KIWIZ MP
+
            DISPLAY "-----------------------------------------------"
            DISPLAY "|         BIENVENUE SUR L'APPLICATION         |"
            DISPLAY "-----------------------------------------------"
-
-
            PERFORM accueil
             STOP RUN.
       *-----------------------------------------------------------------
@@ -790,9 +791,7 @@
                    DISPLAY "7 - Archiver evenement passe"
                END-IF
                DISPLAY "0 - Deconnexion"
-               DISPLAY "Fermer appli "fermeAppli
                ACCEPT fermeAppli
-               DISPLAY "Fermer appli "fermeAppli
 
 
                EVALUATE fermeAppli
@@ -1307,7 +1306,7 @@
 
 
       *-----------------------------------------------------------------
-      *          Procedure permettant d'afficher les evenement
+      *          Procedure permettant d'afficher les evenements
       *-----------------------------------------------------------------
            afficheEvent.
            DISPLAY"--------------------------------------------"
@@ -1320,16 +1319,16 @@
                    READ fevenement NEXT
       *             MOVE 1 TO Fin
                    AT END
-                       PERFORM gestionEvenement
+      *                 PERFORM gestionEvenement KIWIZ pas utile
                        MOVE 1 TO Fin
                    NOT AT END
-                   IF fevent_dateJour>=WS-CURRENT-DAY
-                       AND fevent_dateMois>= WS-CURRENT-MONTH
-                       AND fevent_dateAnnee >= WS-CURRENT-YEAR
-                       DISPLAY "Nom : "fevent_nom
-                       DISPLAY "Type : "fevent_type
-                       DISPLAY"----------"
-                    END-IF
+                       IF fevent_dateJour>=WS-CURRENT-DAY
+                           AND fevent_dateMois>= WS-CURRENT-MONTH
+                           AND fevent_dateAnnee >= WS-CURRENT-YEAR
+                               DISPLAY "Nom : "fevent_nom
+                               DISPLAY "Type : "fevent_type
+                               DISPLAY"----------"
+                       END-IF
                END-READ
                END-PERFORM
                CLOSE fevenement.
@@ -1454,7 +1453,7 @@
                       AT    END
                            MOVE 1 TO Fin
                       NOT AT END
-                           DISPLAY "Nom trouvee, a present"
+                           DISPLAY "Nom trouve, a present"
                            DISPLAY "Veuillez saisir son prenom"
                            ACCEPT prenom
                            IF prenom = futil_prenom THEN
@@ -1623,8 +1622,8 @@
 
            PERFORM afficheEvent
            MOVE 0 TO verif_event
-           PERFORM UNTIL verif_event EQUAL 1 OR retour = 1
-               PERFORM verif_event
+           PERFORM UNTIL verif_event = 1 OR retour = 1
+               PERFORM verif_permission
            END-PERFORM
            IF retour = 1 THEN
                PERFORM menuUtilisateur
@@ -1705,7 +1704,7 @@
            END-IF
 
            IF retour = 1 THEN
-               PERFORM menuUtilisateur
+               DISPLAY "Retour au menu"
            ELSE
       * l'évènement existe, on peut le supprimer mais on supprime ses participations avant
       * suppression des participants :
@@ -2001,17 +2000,18 @@
            PERFORM WITH TEST AFTER UNTIL verif_event = 1 OR retour = 1
                DISPLAY "Saisissez le nom de l'evenement a traiter : "
                ACCEPT fevent_nom
-
                OPEN INPUT fevenement
-               READ fevenement NEXT
+               READ fevenement
                    INVALID KEY
+                       DISPLAY "invalide" fevent_nom
+                       DISPLAY fevent_type
                        DISPLAY "Saisie invalide"
                    NOT INVALID KEY
-
+                       DISPLAY fevent_nom
+                       DISPLAY fevent_type
                        IF fevent_loginOrga = loginSaved THEN
                            MOVE 1 TO verif_event
                        ELSE
-
                            OPEN INPUT futilisateur
                            MOVE loginSaved TO futil_login
                            READ futilisateur
@@ -2028,6 +2028,8 @@
                CLOSE fevenement
                IF verif_event = 0 THEN
                    DISPLAY "Voulez-vous revenir en arriere ?"
+                   DISPLAY "0 - Non"
+                   DISPLAY "1 - Oui"
                    ACCEPT retour
                END-IF
            END-PERFORM
@@ -2160,23 +2162,24 @@
       *          Procedure verifiant le format horaire
       *          La variable verifiee est heureEvent
       ******************************************************************
-       verifHeure.
-           MOVE 1 TO estValideHeure
-           IF LENGTH(heureEvent) NOT EQUAL 5
-               MOVE 0 TO estValideHeure
-           ELSE
-               IF NOT NUMERIC(heureEvent(1:2))
-                   MOVE 0 TO estValideHeure
-               ELSE
-                   IF heureEvent(3:1) NOT EQUAL 'h' THEN
-                       MOVE 0 TO estValideHeure
-                   ELSE
-                       IF NOT NUMERIC(heureEvent(4:2))
-                           MOVE 0 TO estValideHeure
-                       END-IF
-                   END-IF
-               END-IF
-           END-IF.
+       *> verifHeure.
+           *> MOVE 1 TO estValideHeure
+           *> COMPUTE longHeure = FUNCTION LENGTH (heureEvent)
+           *> IF longHeure <> 5 THEN
+               *> MOVE 0 TO estValideHeure
+           *> ELSE
+               *> IF NOT NUMERIC(heureEvent(1:2)) THEN
+                   *> MOVE 0 TO estValideHeure
+               *> ELSE
+                   *> IF heureEvent(3:1) <> 'h' THEN
+                       *> MOVE 0 TO estValideHeure
+                   *> ELSE
+                       *> IF NOT NUMERIC(heureEvent(4:2))
+                           *> MOVE 0 TO estValideHeure
+                       *> END-IF
+                   *> END-IF
+               *> END-IF
+           *> END-IF.
 
       *-----------------------------------------------------------------
       *          Procedure calculant le nombre de participations
