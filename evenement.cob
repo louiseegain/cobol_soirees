@@ -68,14 +68,14 @@
 
        FD fevenement.
        01 tamp_fevent.
-           02 fevent_nom PIC A(20).
+           02 fevent_nom PIC X(50).
            02 fevent_type PIC A(20).
            02 fevent_dateJour PIC 9(2).
            02 fevent_dateMois PIC 9(2).
            02 fevent_dateAnnee PIC 9(2).
            02 fevent_loginOrga PIC X(30).
            02 fevent_description PIC X(50).
-           02 fevent_adresse PIC X(30).
+           02 fevent_adresse PIC X(100).
            02 fevent_seuil PIC 9(3).
            02 fevent_heure PIC X(5).
 
@@ -224,12 +224,12 @@
            MOVE "LORET" TO futil_nom
            MOVE "Mathias" TO futil_prenom
            MOVE "mathias.loret@gmail.com" TO futil_mail
-           MOVE 0635451225 TO futil_tel
+           MOVE "0635451225" TO futil_tel
            MOVE 1 TO futil_type
            MOVE "MIAGE" TO futil_formation
            MOVE 14 TO futil_naissanceJour
            MOVE 06 TO futil_naissanceMois
-           MOVE 2002 TO futil_naissanceAnnee
+           MOVE 02 TO futil_naissanceAnnee
 
            OPEN I-O futilisateur
            WRITE tamp_futi
@@ -248,12 +248,12 @@
             MOVE "EGAIN" TO futil_nom
             MOVE "Louise" TO futil_prenom
             MOVE "louise.egain@gmail.com" TO futil_mail
-            MOVE 0770029252 TO futil_tel
+            MOVE "0770029252" TO futil_tel
             MOVE 1 TO futil_type
             MOVE "IFSI" TO futil_formation
             MOVE 26 TO futil_naissanceJour
             MOVE 09 TO futil_naissanceMois
-            MOVE 2001 TO futil_naissanceAnnee
+            MOVE 01 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -272,12 +272,12 @@
             MOVE "MERLET" TO futil_nom
             MOVE "Thomas" TO futil_prenom
             MOVE "thomas.merlet@gmail.com" TO futil_mail
-            MOVE 0789654111 TO futil_tel
+            MOVE "0789654111" TO futil_tel
             MOVE 1 TO futil_type
             MOVE "Commerce" TO futil_formation
             MOVE 25 TO futil_naissanceJour
             MOVE 12 TO futil_naissanceMois
-            MOVE 1997 TO futil_naissanceAnnee
+            MOVE 99 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -297,12 +297,12 @@
             MOVE "LEAU" TO futil_nom
             MOVE "Camille" TO futil_prenom
             MOVE "camille.leau@gmail.com" TO futil_mail
-            MOVE 0632154569 TO futil_tel
+            MOVE "0632154569" TO futil_tel
             MOVE 1 TO futil_type
             MOVE "art" TO futil_formation
             MOVE 02 TO futil_naissanceJour
             MOVE 10 TO futil_naissanceMois
-            MOVE 2000 TO futil_naissanceAnnee
+            MOVE 00 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -321,12 +321,12 @@
             MOVE "LE DOURNER" TO futil_nom
             MOVE "Swann" TO futil_prenom
             MOVE "swann.ledourner@gmail.com" TO futil_mail
-            MOVE 0745197635 TO futil_tel
+            MOVE "0745197635" TO futil_tel
             MOVE 0 TO futil_type
             MOVE "MIAGE" TO futil_formation
             MOVE 21 TO futil_naissanceJour
             MOVE 12 TO futil_naissanceMois
-            MOVE 1996 TO futil_naissanceAnnee
+            MOVE 96 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -345,12 +345,12 @@
             MOVE "COSQUER" TO futil_nom
             MOVE "Kevin" TO futil_prenom
             MOVE "kevin.cosquer@gmail.com" TO futil_mail
-            MOVE 0645879311 TO futil_tel
+            MOVE "0645879311" TO futil_tel
             MOVE 0 TO futil_type
             MOVE "IFSI" TO futil_formation
             MOVE 23 TO futil_naissanceJour
             MOVE 04 TO futil_naissanceMois
-            MOVE 2001 TO futil_naissanceAnnee
+            MOVE 01 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -369,12 +369,12 @@
             MOVE "KOC" TO futil_nom
             MOVE "Gamze" TO futil_prenom
             MOVE "gamze.koc@gmail.com" TO futil_mail
-            MOVE 0785460116 TO futil_tel
+            MOVE "0785460116" TO futil_tel
             MOVE 0 TO futil_type
             MOVE "Commerce" TO futil_formation
             MOVE 28 TO futil_naissanceJour
             MOVE 03 TO futil_naissanceMois
-            MOVE 2002 TO futil_naissanceAnnee
+            MOVE 02 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -394,12 +394,12 @@
             MOVE "LE BERRE" TO futil_nom
             MOVE "Thibault" TO futil_prenom
             MOVE "thibault.leberre@gmail.com" TO futil_mail
-            MOVE 0725242923 TO futil_tel
+            MOVE "0725242923" TO futil_tel
             MOVE 0 TO futil_type
             MOVE "art" TO futil_formation
             MOVE 08 TO futil_naissanceJour
             MOVE 08 TO futil_naissanceMois
-            MOVE 2001 TO futil_naissanceAnnee
+            MOVE 01 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -417,7 +417,7 @@
            MOVE "Soiree" TO fevent_type
            MOVE 21 TO fevent_dateJour
            MOVE 06 TO fevent_dateMois
-           MOVE 2023 TO fevent_dateAnnee
+           MOVE 23 TO fevent_dateAnnee
            MOVE "mloret" TO fevent_loginOrga
            MOVE "Soiree de fin d'annee" TO fevent_description
            MOVE "2 rue de la liberte, 35000 Rennes" TO fevent_adresse
@@ -440,10 +440,10 @@
            MOVE "Escape Game" TO fevent_type
            MOVE 15 TO fevent_dateJour
            MOVE 07 TO fevent_dateMois
-           MOVE 2023 TO fevent_dateAnnee
+           MOVE 23 TO fevent_dateAnnee
            MOVE "legain" TO fevent_loginOrga
-           MOVE "Pour se terrifier en cette
-           belle periode" TO fevent_description
+           MOVE "Pour se terrifier en cette belle periode" TO fevent_des
+      -    cription
            MOVE "Les loges, 44140 Montbert" TO fevent_adresse
            MOVE 6 TO fevent_seuil
            MOVE "21h00" TO fevent_heure
@@ -464,7 +464,7 @@
            MOVE "Soiree" TO fevent_type
            MOVE 02 TO fevent_dateJour
            MOVE 06 TO fevent_dateMois
-           MOVE 2023 TO fevent_dateAnnee
+           MOVE 23 TO fevent_dateAnnee
            MOVE "tmerlet" TO fevent_loginOrga
            MOVE "Afterwork de fin d'annee" TO fevent_description
            MOVE "9 Rue Bon Secours, 44000 Nantes" TO fevent_adresse
@@ -487,7 +487,7 @@
            MOVE "Karting" TO fevent_type
            MOVE 21 TO fevent_dateJour
            MOVE 09 TO fevent_dateMois
-           MOVE 2023 TO fevent_dateAnnee
+           MOVE 23 TO fevent_dateAnnee
            MOVE "cleau" TO fevent_loginOrga
            MOVE "Karting de rentree" TO fevent_description
            MOVE "19 Rte des Naudieres, 44880 Sautron" TO fevent_adresse
@@ -605,10 +605,10 @@
                ACCEPT futil_naissanceMois
            END-PERFORM
            DISPLAY "ANNEE (sur 2 chiffres,inferieur a l'annee courante:"
-           PERFORM WITH TEST AFTER UNTIL
-               futil_naissanceAnnee<=2023
+        *>    PERFORM WITH TEST AFTER UNTIL
+        *>        futil_naissanceAnnee<=2023
                ACCEPT futil_naissanceAnnee
-           END-PERFORM
+        *>    END-PERFORM
 
       **verification que le login n'existe pas deja
            MOVE 0 TO verif_login_ok
@@ -868,7 +868,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"| RECHERCHER UN EVENEMENT OU UN UTILISATEUR |"
            DISPLAY"--------------------------------------------"
-               DISPLAY "Rechercher un évènement : "
+               DISPLAY "Rechercher un ï¿½vï¿½nement : "
                DISPLAY "1 - Par son nom"
                DISPLAY "2 - Par son organisateur"
                DISPLAY "Recherche un utilisateur :"
@@ -1012,7 +1012,7 @@
            .
 
       *-----------------------------------------------------------------
-      *      Procedure permettant à l'administrateur de rechercher un
+      *      Procedure permettant ï¿½ l'administrateur de rechercher un
       *      utilisateur membre afin de lui donner ou enlever les droits admin
       *-----------------------------------------------------------------
        modifierProfilAdmin.
@@ -1076,7 +1076,7 @@
                    DISPLAY futil_prenom
                    DISPLAY "Mail : "
                    DISPLAY futil_mail
-                   DISPLAY "Téléphone : "
+                   DISPLAY "Tï¿½lï¿½phone : "
                    DISPLAY futil_tel
                    DISPLAY "Formation : "
                    DISPLAY futil_formation
@@ -1374,12 +1374,12 @@
            END-PERFORM
 
            IF valideInscription = 1 THEN
-      * On vérifie dans un premier temps qu'il reste de la place dans l'evenment
+      * On vï¿½rifie dans un premier temps qu'il reste de la place dans l'evenment
            PERFORM compte_nb_part
            IF fevent_seuil - nbParticipants <= 0 THEN
                DISPLAY "Evenement complet"
            ELSE
-      * S'il reste de la place on saisie les valeurs pour inscrire l'utilisateur à l'évènement
+      * S'il reste de la place on saisie les valeurs pour inscrire l'utilisateur ï¿½ l'ï¿½vï¿½nement
              MOVE "attente" TO fpart_etat
              MOVE loginSaved TO fpart_login
              MOVE nomSaved TO fpart_nomEvent
@@ -1572,7 +1572,7 @@
            IF suppression_ok IS equal 0 THEN
               OPEN I-O futilisateur
       ** faire la suppression de l'utilisateur
-      ** et revenir à la page de connexion
+      ** et revenir ï¿½ la page de connexion
                READ futilisateur
                INVALID key
                    DISPLAY "Impossible de supprime ce compte"
@@ -1713,11 +1713,11 @@
            IF retour = 1 THEN
                DISPLAY "Retour au menu"
            ELSE
-      *    l'évènement existe, on peut le supprimer mais on supprime ses
+      *    l'ï¿½vï¿½nement existe, on peut le supprimer mais on supprime ses
       *    participants avant :
 
-               DISPLAY "Suppression des participations liees a
-     -     l'evenement"
+               DISPLAY "Suppression des participations liees a"
+      -     "l'evenement"
                OPEN I-O fparticipant
                MOVE 0 TO fin_boucle
                MOVE fevent_nom TO fpart_nomEvent
@@ -1783,7 +1783,7 @@
            .
 
        afficherStats.
-      * Affiche le nombre d'évènements présents sur toute la plateforme
+      * Affiche le nombre d'ï¿½vï¿½nements prï¿½sents sur toute la plateforme
            MOVE 0 TO nbEvents
            MOVE 0 TO nbEventArchivables
            MOVE 0 TO nbUtils
@@ -2190,7 +2190,7 @@
 
       *-----------------------------------------------------------------
       *          Procedure calculant le nombre de participations
-      *           d'etudiants d'une formation F à  un evenement
+      *           d'etudiants d'une formation F ï¿½  un evenement
       *                            de type T
       *-----------------------------------------------------------------
        statFormaMois.
