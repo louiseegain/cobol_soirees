@@ -178,6 +178,8 @@
        77 moisStat PIC 9(2).
        77 nbPartStat PIC 9(3).
        77 longHeure PIC 9(1).
+       77 erreurCompte PIC 9(1).
+       77 verif_mdp_ok PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -544,11 +546,11 @@
 
                EVALUATE choix
                WHEN 1
-                   DISPLAY "-------------------------------------------"
-                   DISPLAY "|         Connexion a un compte           |"
-                   DISPLAY "-------------------------------------------"
                    PERFORM connexion
-                   PERFORM menuUtilisateur
+                   IF erreurCompte = 0 THEN
+      * KIWIZ ici bug potentiel si probleme connexion
+                       PERFORM menuUtilisateur
+                   END-IF
                WHEN 2
                    DISPLAY "-------------------------------------------"
                    DISPLAY "|         Creation d'un compte            |"
@@ -625,12 +627,13 @@
                END-IF
            END-PERFORM
 
-           MOVE 0 TO verif
-           PERFORM UNTIL verif EQUAL 1
+           MOVE 0 TO verif_mdp_ok
+           *> KIWIZ var verif deja utilisee dans boucle connexion donc pb apres
+           PERFORM UNTIL verif_mdp_ok EQUAL 1
                DISPLAY "Entrer votre mot de passe :"
                ACCEPT futil_mdp
                IF futil_mdp NOT EQUAL SPACE THEN
-                   MOVE 1 TO verif
+                   MOVE 1 TO verif_mdp_ok
                ELSE
                    DISPLAY "le mot de passe ne peut pas etre vide"
                END-IF
@@ -640,6 +643,7 @@
            WRITE tamp_futi
                INVALID KEY
                    DISPLAY "compte non cree : un probleme est survenu"
+                   MOVE 1 to erreurCompte
                NOT INVALID KEY
                    DISPLAY "compte cree"
            END-WRITE.
@@ -734,6 +738,9 @@
            MOVE SPACE TO futil_login
            MOVE 0 TO verif
            PERFORM UNTIL verif EQUAL 1
+               DISPLAY "-------------------------------------------"
+               DISPLAY "|        Connexion a votre compte         |"
+               DISPLAY "-------------------------------------------"
                DISPLAY "Entrer votre login :"
                ACCEPT login
                MOVE login TO loginSaved
@@ -1706,11 +1713,11 @@
            IF retour = 1 THEN
                DISPLAY "Retour au menu"
            ELSE
-      * l'évènement existe, on peut le supprimer mais on supprime ses participations avant
-      * suppression des participants :
+      *    l'évènement existe, on peut le supprimer mais on supprime ses
+      *    participants avant :
 
                DISPLAY "Suppression des participations liees a
-       -   l'evenement"
+     -     l'evenement"
                OPEN I-O fparticipant
                MOVE 0 TO fin_boucle
                MOVE fevent_nom TO fpart_nomEvent
