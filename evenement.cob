@@ -594,13 +594,14 @@
            DISPLAY "Entrer le nom de votre formation :"
            ACCEPT futil_formation
            DISPLAY "Entrer votre date de naissance :"
-           DISPLAY "JOUR (entre 1 et 31): "
-            PERFORM WITH TEST AFTER UNTIL futil_naissanceJour>0 AND
+           PERFORM WITH TEST AFTER UNTIL futil_naissanceJour>0 AND
                futil_naissanceJour<=31
+           DISPLAY "JOUR (entre 1 et 31): "
                ACCEPT futil_naissanceJour
            END-PERFORM
-           DISPLAY "MOIS (entre 1 et 12): "
+           
            PERFORM WITH TEST AFTER UNTIL futil_naissanceMois>0 AND
+               DISPLAY "MOIS (entre 1 et 12): "
                futil_naissanceMois<=12
                ACCEPT futil_naissanceMois
            END-PERFORM
@@ -609,6 +610,7 @@
         *>        futil_naissanceAnnee<=2023
                ACCEPT futil_naissanceAnnee
         *>    END-PERFORM
+           MOVE 0 TO futil_type 
 
       **verification que le login n'existe pas deja
            MOVE 0 TO verif_login_ok
@@ -628,7 +630,6 @@
            END-PERFORM
 
            MOVE 0 TO verif_mdp_ok
-           *> KIWIZ var verif deja utilisee dans boucle connexion donc pb apres
            PERFORM UNTIL verif_mdp_ok EQUAL 1
                DISPLAY "Entrer votre mot de passe :"
                ACCEPT futil_mdp
@@ -868,7 +869,7 @@
            DISPLAY"--------------------------------------------"
            DISPLAY"| RECHERCHER UN EVENEMENT OU UN UTILISATEUR |"
            DISPLAY"--------------------------------------------"
-               DISPLAY "Rechercher un �v�nement : "
+               DISPLAY "Rechercher un evenement : "
                DISPLAY "1 - Par son nom"
                DISPLAY "2 - Par son organisateur"
                DISPLAY "Recherche un utilisateur :"
@@ -1076,7 +1077,7 @@
                    DISPLAY futil_prenom
                    DISPLAY "Mail : "
                    DISPLAY futil_mail
-                   DISPLAY "T�l�phone : "
+                   DISPLAY "Telephone : "
                    DISPLAY futil_tel
                    DISPLAY "Formation : "
                    DISPLAY futil_formation
@@ -1116,7 +1117,7 @@
            OPEN INPUT futilisateur
            MOVE 0 TO Fin
            PERFORM WITH TEST AFTER UNTIL Fin = 1
-               READ futilisateur NEXT
+               READ futilisateur 
                    AT END
                        MOVE 1 TO Fin
                    NOT AT END
@@ -1374,7 +1375,7 @@
            END-PERFORM
 
            IF valideInscription = 1 THEN
-      * On v�rifie dans un premier temps qu'il reste de la place dans l'evenment
+      * On verifie dans un premier temps qu'il reste de la place dans l'evenment
            PERFORM compte_nb_part
            IF fevent_seuil - nbParticipants <= 0 THEN
                DISPLAY "Evenement complet"
@@ -1713,7 +1714,7 @@
            IF retour = 1 THEN
                DISPLAY "Retour au menu"
            ELSE
-      *    l'�v�nement existe, on peut le supprimer mais on supprime ses
+      *    l'evenement existe, on peut le supprimer mais on supprime ses
       *    participants avant :
 
                DISPLAY "Suppression des participations liees a"
