@@ -180,6 +180,7 @@
        77 longHeure PIC 9(1).
        77 erreurCompte PIC 9(1).
        77 verif_mdp_ok PIC 9(1).
+       77 annee PIC 9(4).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -516,13 +517,14 @@
            DISPLAY "|         BIENVENUE SUR L'APPLICATION         |"
            DISPLAY "-----------------------------------------------"
            PERFORM accueil
-            STOP RUN.
+           STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
 
            ACCEPT WS-CURRENT-DATE-DATA FROM DATE
-           DISPLAY WS-CURRENT-DATE.
+           DISPLAY WS-CURRENT-DATE
+           .
 
       *-----------------------------------------------------------------
       *          Procedure de connexion a l'application
@@ -599,18 +601,19 @@
            DISPLAY "JOUR (entre 1 et 31): "
                ACCEPT futil_naissanceJour
            END-PERFORM
-           
+
            PERFORM WITH TEST AFTER UNTIL futil_naissanceMois>0 AND
-               DISPLAY "MOIS (entre 1 et 12): "
                futil_naissanceMois<=12
+               DISPLAY "MOIS (entre 1 et 12): "
                ACCEPT futil_naissanceMois
            END-PERFORM
-           DISPLAY "ANNEE (sur 2 chiffres,inferieur a l'annee courante:"
-        *>    PERFORM WITH TEST AFTER UNTIL
-        *>        futil_naissanceAnnee<=2023
+
+            PERFORM WITH TEST AFTER UNTIL
+                futil_naissanceAnnee<=2023
+                DISPLAY "ANNEE :"
                ACCEPT futil_naissanceAnnee
-        *>    END-PERFORM
-           MOVE 0 TO futil_type 
+            END-PERFORM
+           MOVE 0 TO futil_type
 
       **verification que le login n'existe pas deja
            MOVE 0 TO verif_login_ok
@@ -738,6 +741,7 @@
            MOVE SPACE TO futil_mdp
            MOVE SPACE TO futil_login
            MOVE 0 TO verif
+
            PERFORM UNTIL verif EQUAL 1
                DISPLAY "-------------------------------------------"
                DISPLAY "|        Connexion a votre compte         |"
@@ -748,6 +752,8 @@
                DISPLAY "Entrer votre mot de passe :"
                ACCEPT mdp
 
+      ** Lors de la connexion on vérifie que le login et le mot de passe
+      ** ne soient pas vide
                IF mdp NOT EQUAL SPACE AND login NOT EQUAL SPACE THEN
                    MOVE login TO futil_login
                    MOVE mdp TO futil_mdp
@@ -784,6 +790,7 @@
       *-----------------------------------------------------------------
            menuUtilisateur.
            MOVE 9 TO fermeAppli
+      ** Affichage du menu principal de l'utilisateur
            PERFORM WITH TEST AFTER UNTIL fermeAppli =0
            DISPLAY"--------------------------------------------"
            DISPLAY"|             MENU PRINCIPAL                |"
@@ -801,7 +808,8 @@
                DISPLAY "0 - Deconnexion"
                ACCEPT fermeAppli
 
-
+      ** Evaluation du choix en fonction de sa reponse il va être amener
+      ** sur un sous-menu
                EVALUATE fermeAppli
                    WHEN 1 PERFORM etatInscription
                    WHEN 2 PERFORM gererProfil
@@ -1117,7 +1125,7 @@
            OPEN INPUT futilisateur
            MOVE 0 TO Fin
            PERFORM WITH TEST AFTER UNTIL Fin = 1
-               READ futilisateur 
+               READ futilisateur
                    AT END
                        MOVE 1 TO Fin
                    NOT AT END
