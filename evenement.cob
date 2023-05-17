@@ -180,6 +180,7 @@
        77 longHeure PIC 9(1).
        77 erreurCompte PIC 9(1).
        77 verif_mdp_ok PIC 9(1).
+       77 annee PIC 9(4).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -517,13 +518,14 @@
            DISPLAY "|    BIENVENUE SUR L'APPLICATION      |"
            DISPLAY "|_____________________________________|"
            PERFORM accueil
-            STOP RUN.
+           STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
 
            ACCEPT WS-CURRENT-DATE-DATA FROM DATE
-           DISPLAY WS-CURRENT-DATE.
+           DISPLAY WS-CURRENT-DATE
+           .
 
       *-----------------------------------------------------------------
       *          Procedure de connexion a l'application
@@ -604,16 +606,17 @@
                ACCEPT futil_naissanceJour
            END-PERFORM
 
-           PERFORM WITH TEST AFTER UNTIL futil_naissanceMois > 0 AND
-               futil_naissanceMois <= 12
+           PERFORM WITH TEST AFTER UNTIL futil_naissanceMois>0 AND
+               futil_naissanceMois<=12
                DISPLAY "MOIS (entre 1 et 12): "
                ACCEPT futil_naissanceMois
            END-PERFORM
-           DISPLAY "ANNEE (sur 2 chiffres,inferieur a l'annee courante:"
-        *>    PERFORM WITH TEST AFTER UNTIL
-        *>        futil_naissanceAnnee<=2023
+
+            PERFORM WITH TEST AFTER UNTIL
+                futil_naissanceAnnee<=2023
+                DISPLAY "ANNEE :"
                ACCEPT futil_naissanceAnnee
-        *>    END-PERFORM
+            END-PERFORM
            MOVE 0 TO futil_type
 
       **verification que le login n'existe pas deja
@@ -771,6 +774,7 @@
            MOVE SPACE TO futil_mdp
            MOVE SPACE TO futil_login
            MOVE 0 TO verif
+
            PERFORM UNTIL verif EQUAL 1
                DISPLAY " _____________________________________ "
                DISPLAY "|                                     |"
@@ -784,6 +788,8 @@
                ACCEPT mdp
                DISPLAY "|_____________________________________|"
 
+      ** Lors de la connexion on v�rifie que le login et le mot de passe
+      ** ne soient pas vide
                IF mdp NOT EQUAL SPACE AND login NOT EQUAL SPACE THEN
                    MOVE login TO futil_login
                    OPEN INPUT futilisateur
@@ -836,6 +842,7 @@
       *-----------------------------------------------------------------
            menuUtilisateur.
            MOVE 9 TO fermeAppli
+      ** Affichage du menu principal de l'utilisateur
            PERFORM WITH TEST AFTER UNTIL fermeAppli =0
            DISPLAY " _____________________________________ "
            DISPLAY "|                                     |"
