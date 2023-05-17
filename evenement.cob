@@ -505,6 +505,31 @@
                   DISPLAY "E4 : ",cr_fevent
               END-IF
            CLOSE fevenement
+           
+           
+      * Evenement 5
+           MOVE "Visite musee" TO fevent_nom
+           MOVE "musee" TO fevent_type
+           MOVE 21 TO fevent_dateJour
+           MOVE 03 TO fevent_dateMois
+           MOVE 23 TO fevent_dateAnnee
+           MOVE "cleau" TO fevent_loginOrga
+           MOVE "Une visite au musee" TO fevent_description
+           MOVE "19 Rte du jardin, 44100 Nantes" TO fevent_adresse
+           MOVE 30 TO fevent_seuil
+           MOVE "20h00" TO fevent_heure
+
+           OPEN I-O fevenement
+              WRITE tamp_fevent
+              END-WRITE
+              IF cr_fevent = 35
+                  DISPLAY "Echec d'insertion"
+              ELSE
+                  DISPLAY "Insertion reussie"
+                  DISPLAY "E5 : ",cr_fevent
+              END-IF
+           CLOSE fevenement
+
 
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
@@ -1343,7 +1368,6 @@
                END-READ
                END-PERFORM
                CLOSE fevenement.
-               DISPLAY "KIWIZ FIN afficheEvent"
 
       *-----------------------------------------------------------------
       *          Procedure permettant de s'inscrire a un evenement
@@ -2083,16 +2107,17 @@
       *          des evenements passes
       *-----------------------------------------------------------------
        archivageEvent.
+      * KIWIZ fix this function
            DISPLAY"--------------------------------------------"
            DISPLAY"|               ARCHIVAGE                   |"
            DISPLAY"--------------------------------------------"
 
+           PERFORM afficheEvent
            OPEN I-O fevenement
            MOVE 0 TO fin_boucle
-           PERFORM afficheEvent
-           MOVE 0 TO fin_boucle
+
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
-               READ fevenement
+               READ fevenement NEXT
                    AT END
                        MOVE 1 TO fin_boucle
                    NOT AT END
@@ -2105,8 +2130,7 @@
                                DISPLAY "-------------------------------"
                            END-IF
                END-READ
-           END-PERFORM
-           DISPLAY "KIWIZ apres boucle"
+           END-PERFORM  
            MOVE 0 TO fin_boucle
            MOVE 0 TO retour
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1 OR retour = 1
@@ -2184,8 +2208,8 @@
            *> ELSE
                *> IF NOT NUMERIC(heureEvent(1:2)) THEN
                    *> MOVE 0 TO estValideHeure
-               *> ELSE
-                   *> IF heureEvent(3:1) <> 'h' THEN
+               *> ELSE 
+           *> IF heureEvent(3:1) <> 'h' THEN
                        *> MOVE 0 TO estValideHeure
                    *> ELSE
                        *> IF NOT NUMERIC(heureEvent(4:2))
