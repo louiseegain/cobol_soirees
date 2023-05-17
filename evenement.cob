@@ -512,9 +512,10 @@
       *     DISPLAY WS-CURRENT-DATE
            *> KIWIZ MP
 
-           DISPLAY "-----------------------------------------------"
-           DISPLAY "|         BIENVENUE SUR L'APPLICATION         |"
-           DISPLAY "-----------------------------------------------"
+           DISPLAY " _____________________________________"
+           DISPLAY "|                                     |"
+           DISPLAY "|    BIENVENUE SUR L'APPLICATION      |"
+           DISPLAY "|_____________________________________|"
            PERFORM accueil
             STOP RUN.
       *-----------------------------------------------------------------
@@ -534,11 +535,11 @@
       *         DISPLAY "Annee : "WS-CURRENT-YEAR
       *         DISPLAY "Mois : "WS-CURRENT-MONTH
       *         DISPLAY "Jour : "WS-CURRENT-DAY
-               DISPLAY "-----------------------------------------------"
-               DISPLAY "|  1 - Me connecter a mon compte              |"
-               DISPLAY "|  2 - Creer mon compte                       |"
-               DISPLAY "|  0 - Quitter                                |"
-               DISPLAY "-----------------------------------------------"
+               DISPLAY "|                                     |"
+               DISPLAY "|  1 - Me connecter a mon compte      |"
+               DISPLAY "|  2 - Creer mon compte               |"
+               DISPLAY "|  0 - Quitter                        |"
+               DISPLAY "|_____________________________________|"
       *         DISPLAY "choix :" choix
                DISPLAY "Taper votre choix :"
                ACCEPT choix
@@ -552,12 +553,11 @@
                        PERFORM menuUtilisateur
                    END-IF
                WHEN 2
-                   DISPLAY "-------------------------------------------"
-                   DISPLAY "|         Creation d'un compte            |"
-                   DISPLAY "-------------------------------------------"
                    PERFORM creation_compte
                WHEN 0
-                   DISPLAY "Merci et a bientot"
+                   DISPLAY "|                                     |"
+                   DISPLAY "|         Merci et a bientot          |"
+                   DISPLAY "|_____________________________________|"
                END-EVALUATE
            END-PERFORM
            .
@@ -567,6 +567,10 @@
       *          Procedure permettant de creer son compte utilisateur
       *-----------------------------------------------------------------
        creation_compte.
+           DISPLAY " _____________________________________ "
+           DISPLAY "|                                     |"
+           DISPLAY "|         CREATION DE COMPTE          |"
+           DISPLAY "|_____________________________________|"
 
       ** ouverture du fichier
            OPEN I-O futilisateur
@@ -599,10 +603,10 @@
            DISPLAY "JOUR (entre 1 et 31): "
                ACCEPT futil_naissanceJour
            END-PERFORM
-           
-           PERFORM WITH TEST AFTER UNTIL futil_naissanceMois>0 AND
+
+           PERFORM WITH TEST AFTER UNTIL futil_naissanceMois > 0 AND
+               futil_naissanceMois <= 12
                DISPLAY "MOIS (entre 1 et 12): "
-               futil_naissanceMois<=12
                ACCEPT futil_naissanceMois
            END-PERFORM
            DISPLAY "ANNEE (sur 2 chiffres,inferieur a l'annee courante:"
@@ -610,7 +614,7 @@
         *>        futil_naissanceAnnee<=2023
                ACCEPT futil_naissanceAnnee
         *>    END-PERFORM
-           MOVE 0 TO futil_type 
+           MOVE 0 TO futil_type
 
       **verification que le login n'existe pas deja
            MOVE 0 TO verif_login_ok
@@ -625,7 +629,14 @@
                            DISPLAY "ce login existe deja!"
                    ENd-READ
                ELSE
-                   DISPLAY "le login ne peut pas etre vide"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|     Le login ne peut pas      |"
+                   DISPLAY "|           etre vide !         |"
+                   DISPLAY "|_______________________________|"
                END-IF
            END-PERFORM
 
@@ -636,17 +647,39 @@
                IF futil_mdp NOT EQUAL SPACE THEN
                    MOVE 1 TO verif_mdp_ok
                ELSE
-                   DISPLAY "le mot de passe ne peut pas etre vide"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|  Le mot de passe ne peut pas  |"
+                   DISPLAY "|           etre vide !         |"
+                   DISPLAY "|_______________________________|"
                END-IF
            END-PERFORM
 
       * on insere les informations dans le fichier
            WRITE tamp_futi
                INVALID KEY
-                   DISPLAY "compte non cree : un probleme est survenu"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|   Un probleme est survenu     |"
+                   DISPLAY "|                               |"
+                   DISPLAY "|     Le compte n'a pas pu      |"
+                   DISPLAY "|           etre cree !         |"
+                   DISPLAY "|_______________________________|"
                    MOVE 1 to erreurCompte
                NOT INVALID KEY
-                   DISPLAY "compte cree"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|          INFORMATION          |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|          compte cree !        |"
+                   DISPLAY "|_______________________________|"
            END-WRITE.
                DISPLAY cr_futil
            CLOSE futilisateur.
@@ -739,38 +772,57 @@
            MOVE SPACE TO futil_login
            MOVE 0 TO verif
            PERFORM UNTIL verif EQUAL 1
-               DISPLAY "-------------------------------------------"
-               DISPLAY "|        Connexion a votre compte         |"
-               DISPLAY "-------------------------------------------"
-               DISPLAY "Entrer votre login :"
+               DISPLAY " _____________________________________ "
+               DISPLAY "|                                     |"
+               DISPLAY "|             CONNEXION               |"
+               DISPLAY "|_____________________________________|"
+
+               DISPLAY "|  Entrer votre login :               |"
                ACCEPT login
                MOVE login TO loginSaved
-               DISPLAY "Entrer votre mot de passe :"
+               DISPLAY "|  Entrer votre mot de passe :        |"
                ACCEPT mdp
+               DISPLAY "|_____________________________________|"
 
                IF mdp NOT EQUAL SPACE AND login NOT EQUAL SPACE THEN
                    MOVE login TO futil_login
-                   MOVE mdp TO futil_mdp
                    OPEN INPUT futilisateur
                    READ futilisateur
                        INVALID KEY
-                           DISPLAY "---------------------"
-                           DISPLAY "| /!\ ATTENTION /!\ |"
-                           DISPLAY "| Compte inexistant |"
-                           DISPLAY "---------------------"
-                           DISPLAY "Veuillez creer votre compte : "
+                           DISPLAY " _______________________________ "
+                           DISPLAY "|                               |"
+                           DISPLAY "|   /!\       ERREUR       /!\  |"
+                           DISPLAY "|_______________________________|"
+                           DISPLAY "|                               |"
+                           DISPLAY "|        Compte inexistant      |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|      Veuillez en creer un     |"
+                           DISPLAY "|_______________________________|"
                            PERFORM creation_compte
                        NOT INVALID KEY
                            IF futil_mdp EQUAL mdp THEN
                                MOVE 1 TO verif
                            ELSE
-                               DISPLAY "Erreur de mot de passe"
+                           DISPLAY " _______________________________ "
+                           DISPLAY "|                               |"
+                           DISPLAY "|   /!\       ERREUR       /!\  |"
+                           DISPLAY "|_______________________________|"
+                           DISPLAY "|                               |"
+                           DISPLAY "|     Mot de passe incorrecte   |"
+                           DISPLAY "|_______________________________|"
                            END-IF
                    END-READ
                    CLOSE futilisateur
 
                ELSE
-                   DISPLAY "Mot de passe et login ne peuvent etre vide"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|  Le login ou le mot de passe  |"
+                   DISPLAY "|     ne peuvent etre vident    |"
+                   DISPLAY "|_______________________________|"
                END-IF
 
            END-PERFORM
@@ -785,44 +837,91 @@
            menuUtilisateur.
            MOVE 9 TO fermeAppli
            PERFORM WITH TEST AFTER UNTIL fermeAppli =0
-           DISPLAY"--------------------------------------------"
-           DISPLAY"|             MENU PRINCIPAL                |"
-           DISPLAY"--------------------------------------------"
-               DISPLAY "Que souhaitez-vous faire ?"
-               DISPLAY "1 - Verifier etat des inscriptions"
-               DISPLAY "2 - Gerer votre profil"
-               DISPLAY "3 - Rechercher un evenement ou un utilisateur"
-               DISPLAY "4 - Gestion d'evenement (creation, modif, etc)"
-               IF futil_type=1 THEN
-                   DISPLAY "5 - Afficher les statistiques"
-                   DISPLAY "6 - Modifier le type d'utilisateur"
-                   DISPLAY "7 - Archiver evenement passe"
-               END-IF
-               DISPLAY "0 - Deconnexion"
-               ACCEPT fermeAppli
+           DISPLAY " _____________________________________ "
+           DISPLAY "|                                     |"
+           DISPLAY "|            MENU PRINCIPAL           |"
+           DISPLAY "|_____________________________________|"
+           DISPLAY "|                                     |"
+           DISPLAY "|     Que souhaitez-vous faire ?      |"
+           DISPLAY "|                                     |"
+           DISPLAY "|  1 - Gerer votre profil             |"
+           DISPLAY "|  2 - Gerer les evenements           |"
+           DISPLAY "|  3 - Rechercher un evenement        |"
+           DISPLAY "|  4 - Recherche un utilisateur       |"
 
+           IF futil_type = 1 THEN
+               DISPLAY "|                                     |"
+               DISPLAY "|-------------------------------------|"
+               DISPLAY "|                                     |"
+               DISPLAY "|  5 - Afficher les statistiques      |"
+               DISPLAY "|  6 - Gerer les utilisateurs         |"
+               DISPLAY "|  7 - Archiver un evenement passe    |"
+           END-IF
 
-               EVALUATE fermeAppli
-                   WHEN 1 PERFORM etatInscription
-                   WHEN 2 PERFORM gererProfil
-                   WHEN 3 PERFORM rechercherEvent
-                   WHEN 4 PERFORM gestionEvenement
-                   WHEN 5
+           DISPLAY "|                                     |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
+           DISPLAY "|  0 - Deconnexion                    |"
+           DISPLAY "|_____________________________________|"
+           DISPLAY " "
+           DISPLAY "Votre choix :"
+
+           ACCEPT fermeAppli
+
+           EVALUATE fermeAppli
+               WHEN 1 PERFORM gererProfil
+               WHEN 2 PERFORM gestionEvenement
+               WHEN 3 PERFORM rechercherEvent
+
+               WHEN 5
                        IF futil_type=1
                        THEN PERFORM afficheStatistique
-                       ELSE DISPLAY "Non autorise"
+                       ELSE
+                           DISPLAY " _______________________________ "
+                           DISPLAY "|                               |"
+                           DISPLAY "|   /!\   NON AUTORISE   /!\    |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|-------------------------------|"
+                           DISPLAY "|                               |"
+                           DISPLAY "|       Vous n'etes pas         |"
+                           DISPLAY "|      autorise a acceder       |"
+                           DISPLAY "|      a cette ressource        |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|_______________________________|"
                            PERFORM menuUtilisateur
                        END-IF
                    WHEN 6
                       IF futil_type = 1
                            THEN PERFORM modifierProfilAdmin
-                      ELSE DISPLAY "Non autorise"
+                      ELSE
+                           DISPLAY " _______________________________"
+                           DISPLAY "|                               |"
+                           DISPLAY "|   /!\   NON AUTORISE   /!\    |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|-------------------------------|"
+                           DISPLAY "|                               |"
+                           DISPLAY "|       Vous n'etes pas         |"
+                           DISPLAY "|     autorise a acceder        |"
+                           DISPLAY "|      a cette ressource        |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|_______________________________|"
                            PERFORM menuUtilisateur
                        END-IF
                    WHEN 7
                        IF futil_type = 1
                            THEN PERFORM archivageEvent
-                       ELSE DISPLAY "Non autorise"
+                       ELSE
+                           DISPLAY " _______________________________"
+                           DISPLAY "|                               |"
+                           DISPLAY "|   /!\   NON AUTORISE   /!\    |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|-------------------------------|"
+                           DISPLAY "|                               |"
+                           DISPLAY "|       Vous n'etes pas         |"
+                           DISPLAY "|      autorise a acceder       |"
+                           DISPLAY "|      a cette ressource        |"
+                           DISPLAY "|                               |"
+                           DISPLAY "|_______________________________|"
                            PERFORM menuUtilisateur
                       END-IF
                END-EVALUATE
@@ -1117,7 +1216,7 @@
            OPEN INPUT futilisateur
            MOVE 0 TO Fin
            PERFORM WITH TEST AFTER UNTIL Fin = 1
-               READ futilisateur 
+               READ futilisateur
                    AT END
                        MOVE 1 TO Fin
                    NOT AT END
