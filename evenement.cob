@@ -180,6 +180,7 @@
        77 longHeure PIC 9(1).
        77 erreurCompte PIC 9(1).
        77 verif_mdp_ok PIC 9(1).
+       77 verifDateOk PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -1260,21 +1261,26 @@
            END-PERFORM
            DISPLAY "Saisir le type d'evenement"
            ACCEPT typeEvent
-           DISPLAY "Saisir la date de l'evenement"
-           DISPLAY "JOUR : "
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateJour>0 AND fevent_dateJour<=31
-               ACCEPT fevent_dateJour
-           END-PERFORM
-           DISPLAY "MOIS : "
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateMois>0 AND fevent_dateMois<=12
-               ACCEPT fevent_dateMois
-           END-PERFORM
-           DISPLAY "ANNEE : "
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateAnnee>=WS-CURRENT-YEAR
-               ACCEPT fevent_dateAnnee
+           
+           MOVE 0 TO dateComparee
+           PERFORM WITH TEST AFTER UNTIL dateComparee = 2              
+               DISPLAY "Saisir la date de l'evenement"
+               DISPLAY "JOUR : "
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateJour>0 AND fevent_dateJour<=31
+                   ACCEPT fevent_dateJour
+               END-PERFORM
+               DISPLAY "MOIS : "
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateMois>0 AND fevent_dateMois<=12
+                   ACCEPT fevent_dateMois
+               END-PERFORM
+               DISPLAY "ANNEE : "
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateAnnee>=WS-CURRENT-YEAR
+                   ACCEPT fevent_dateAnnee
+               END-PERFORM
+               PERFORM comparer_date
            END-PERFORM
            DISPLAY "Veuillez decrire votre evenement"
            DISPLAY "Format : maximum 50 caracteres"
@@ -1368,7 +1374,7 @@
                    END-READ
            END-START
            END-PERFORM
-
+      * KIWIZ CHECKER INDENTATION ET IF/END-IF DIT QUE DEJA EVENT QUAND PAS
            IF valideInscription = 1 THEN
       * On verifie dans un premier temps qu'il reste de la place dans l'evenment
            PERFORM compte_nb_part
@@ -1545,7 +1551,7 @@
            MOVE futil_login TO fevent_loginOrga
            START fevenement, KEY IS = fevent_loginOrga
                NOT INVALID KEY
-                   MOVE 1 TO suppression_ok
+               4    MOVE 1 TO suppression_ok
                    DISPLAY "Impossible de supprimer cet utilisateur"
                    DISPLAY "Il organise un evenement"
            END-START
@@ -1830,7 +1836,7 @@
            DISPLAY "Nombre d'utilisateurs : ", nbUtils
            DISPLAY "Nombre d'evenements archives : ", nbEventArchives.
       
-      *    KIWIZ erreur ici, stop sans revenir au menu
+      
       *-----------------------------------------------------------------
       *          Compare la date d'un evenement avec la date actuelle
       *           0 - meme date
@@ -1864,7 +1870,9 @@
                    END-IF
                END-IF
            END-IF.
-
+      *-----------------------------------------------------------------
+      *          Permet a l'utilisateur de modifier un evenement
+      *-----------------------------------------------------------------
        modifierEvent.
       * Permet la modification d'un evenement
            PERFORM afficheEvent
