@@ -1140,6 +1140,7 @@
       *      Procedure permettant de supprimer les evenements passes
       *      et de les archiver dans le fichier fhistorique
       *-----------------------------------------------------------------
+      * KIWIZ remove si inutile
            supprimerEventPasse.
            DISPLAY"--------------------------------------------"
            DISPLAY"|       SUPPRIMER EVENEMENT PASSE          |"
@@ -1342,6 +1343,7 @@
                END-READ
                END-PERFORM
                CLOSE fevenement.
+               DISPLAY "KIWIZ FIN afficheEvent"
 
       *-----------------------------------------------------------------
       *          Procedure permettant de s'inscrire a un evenement
@@ -1551,7 +1553,7 @@
            MOVE futil_login TO fevent_loginOrga
            START fevenement, KEY IS = fevent_loginOrga
                NOT INVALID KEY
-               4    MOVE 1 TO suppression_ok
+                   MOVE 1 TO suppression_ok
                    DISPLAY "Impossible de supprimer cet utilisateur"
                    DISPLAY "Il organise un evenement"
            END-START
@@ -2088,22 +2090,23 @@
            OPEN I-O fevenement
            MOVE 0 TO fin_boucle
            PERFORM afficheEvent
+           MOVE 0 TO fin_boucle
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
                READ fevenement
                    AT END
                        MOVE 1 TO fin_boucle
                    NOT AT END
                        PERFORM comparer_date
-                       IF dateComparee = 1 THEN
-                           DISPLAY "-----------------------------------"
-                           DISPLAY "Nom : "fevent_nom
-                           DISPLAY "Date : "fevent_dateJour"/"
+                           IF dateComparee = 1 THEN
+                               DISPLAY "-------------------------------"
+                               DISPLAY "Nom : "fevent_nom
+                               DISPLAY "Date : "fevent_dateJour"/"
       -                     fevent_dateMois"/"fevent_dateAnnee
-                           DISPLAY "-----------------------------------"
-                       END-IF
+                               DISPLAY "-------------------------------"
+                           END-IF
                END-READ
            END-PERFORM
-
+           DISPLAY "KIWIZ apres boucle"
            MOVE 0 TO fin_boucle
            MOVE 0 TO retour
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1 OR retour = 1
