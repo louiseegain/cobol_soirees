@@ -872,6 +872,7 @@
                WHEN 1 PERFORM gererProfil
                WHEN 2 PERFORM gestionEvenement
                WHEN 3 PERFORM rechercherEvent
+               WHEN 4 PERFORM rechercherUtil
 
                WHEN 5
                        IF futil_type=1
@@ -936,18 +937,20 @@
            gererProfil.
            MOVE 9 TO choixProfil
            PERFORM WITH TEST AFTER UNTIL choixProfil =0
-           DISPLAY"--------------------------------------------"
-           DISPLAY"|           GESTION DU PROFIL              |"
-           DISPLAY"--------------------------------------------"
-               DISPLAY "Que souhaitez-vous faire dans votre"
-               DISPLAY" profil ?"
-               DISPLAY "1 - Modifier votre profil "
-               DISPLAY "2 - Supprimer votre profil "
-               DISPLAY "3 - Consulter votre profil"
-               DISPLAY "0 - Revenir au menu precedent"
-               DISPLAY "choix : "choixProfil
-               ACCEPT choixProfil
-               DISPLAY "choix : "choixProfil
+           DISPLAY " _____________________________________"
+           DISPLAY "|                                     |"
+           DISPLAY "|         GESTION DU PROFIL           |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
+           DISPLAY "|  1 - Modifier votre profil          |"
+           DISPLAY "|  2 - Supprimer votre profil         |"
+           DISPLAY "|  3 - Consulter votre profil         |"
+           DISPLAY "|                                     |"
+           DISPLAY "|  0 - Revenir au menu precedent      |"
+           DISPLAY "|_____________________________________|"
+      **         DISPLAY "choix : "choixProfil
+      **         ACCEPT choixProfil
+      **         DISPLAY "choix : "choixProfil
 
            EVALUATE choixProfil
                WHEN 1 PERFORM modifierUtilisateur
@@ -960,37 +963,71 @@
 
 
       *-----------------------------------------------------------------
-      *      Procedure gerant le menu de recherche d'un evenement ou
-      *      d'un utilisateur
+      *      Procedure gerant le menu de recherche d'un evenement
       *-----------------------------------------------------------------
            rechercherEvent.
            PERFORM WITH TEST AFTER UNTIL choixEvent =0
-           DISPLAY"--------------------------------------------"
-           DISPLAY"| RECHERCHER UN EVENEMENT OU UN UTILISATEUR |"
-           DISPLAY"--------------------------------------------"
-               DISPLAY "Rechercher un evenement : "
-               DISPLAY "1 - Par son nom"
-               DISPLAY "2 - Par son organisateur"
-               DISPLAY "Recherche un utilisateur :"
-               DISPLAY "3 - Par son nom"
-               DISPLAY "4 - Par son login"
-               DISPLAY "5 - Afficher tous les organisateurs"
-               DISPLAY "6 - Afficher tous les utilisateurs"
-               DISPLAY "0 - Revenir au menu precedent"
-               ACCEPT choixEvent
+           DISPLAY " _____________________________________"
+           DISPLAY "|                                     |"
+           DISPLAY "|             RECHERCHER              |"
+           DISPLAY "|            UN EVENEMENT             |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
+           DISPLAY "|        Rechercher un evenement      |"
+           DISPLAY "|                                     |"
+           DISPLAY "|  1 - Par son nom                    |"
+           DISPLAY "|  2 - Par son organisateur           |"
+           DISPLAY "|                                     |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
+           DISPLAY "|  0 - Revenir au menu precedent      |"
+           DISPLAY "|_____________________________________|"
+           ACCEPT choixEvent
 
            EVALUATE choixEvent
               WHEN 1 PERFORM rechercherNom
       *        WHEN 2 PERFORM rechercherType
-              WHEN 3 PERFORM rechercherUtilisateurNom
-              WHEN 4 PERFORM rechercherUtilisateurLogin
-              WHEN 5 PERFORM affichage_organisateur
-              WHEN 6 PERFORM consulterUtilisateurs
               WHEN 0 PERFORM menuUtilisateur
            END-EVALUATE
 
            END-PERFORM
            .
+      *-----------------------------------------------------------------
+      *      Procedure gerant le menu de recherche d'un utilisateur
+      *-----------------------------------------------------------------
+           rechercherUtil.
+           PERFORM WITH TEST AFTER UNTIL choixEvent =0
+           DISPLAY " _____________________________________"
+           DISPLAY "|                                     |"
+           DISPLAY "|             RECHERCHER              |"
+           DISPLAY "|           UN UTILISATEUR            |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
+           DISPLAY "|  1 - Par son nom                    |"
+           DISPLAY "|  2 - Par son login                  |"
+           DISPLAY "|  3 - Afficher tous les organisateurs|"
+           DISPLAY "|  4 - Afficher tous les utilisateurs |"
+           DISPLAY "|                                     |"
+           DISPLAY "|  0 - Revenir au menu precedent      |"
+           DISPLAY "|_____________________________________|"
+           ACCEPT choixEvent
+
+           EVALUATE choixEvent
+              WHEN 1 PERFORM rechercherUtilisateurNom
+              WHEN 2 PERFORM rechercherUtilisateurLogin
+              WHEN 3 PERFORM affichage_organisateur
+              WHEN 4 PERFORM consulterUtilisateurs
+              WHEN 0 PERFORM menuUtilisateur
+           END-EVALUATE
+
+           END-PERFORM
+           .
+
+
+
+
+
+
 
 
       *-----------------------------------------------------------------
@@ -999,17 +1036,21 @@
       *-----------------------------------------------------------------
            gestionEvenement.
            PERFORM WITH TEST AFTER UNTIL choix =0
-           DISPLAY"--------------------------------------------"
-           DISPLAY"|           GESTION D'EVENEMENT            |"
-           DISPLAY"--------------------------------------------"
-               DISPLAY "1 - Creer un evenement"
-               DISPLAY "2 - Modifier un evenement"
-               DISPLAY "3 - Supprimer un evenement"
-               DISPLAY "4 - Afficher evenements"
-               DISPLAY "0 - Revenir au menu precedent"
+               DISPLAY " _____________________________________"
+               DISPLAY "|                                     |"
+               DISPLAY "|         GESTION D'EVENEMENT         |"
+               DISPLAY "|-------------------------------------|"
+               DISPLAY "|                                     |"
+               DISPLAY "|  1 - Creer un evenement             |"
+               DISPLAY "|  2 - Modifier un evenement          |"
+               DISPLAY "|  3 - Supprimer un evenement         |"
+               DISPLAY "|  4 - Afficher evenements            |"
+               DISPLAY "|                                     |"
+               DISPLAY "|  0 - Revenir au menu precedent      |"
+               DISPLAY "|_____________________________________|"
                ACCEPT choix
 
-            EVALUATE choix
+               EVALUATE choix
                 WHEN 1 PERFORM creerEvent
                 WHEN 2 PERFORM modifierEvent
                 WHEN 3 PERFORM supprimerEvent
@@ -1027,18 +1068,23 @@
       *-----------------------------------------------------------------
            afficheStatistique.
            PERFORM WITH TEST AFTER UNTIL choixStat =0
-           DISPLAY"--------------------------------------------"
-           DISPLAY"|       AFFICHAGE DES STATISTIQUES         |"
-           DISPLAY"--------------------------------------------"
-               DISPLAY "1 - Afficher statistiques generales"
-               DISPLAY "2 - Statistique selon formation et mois"
-               DISPLAY "0 - Revenir au menu precedent"
+               DISPLAY " _____________________________________"
+               DISPLAY "|                                     |"
+               DISPLAY "|       AFFICHAGE DES STATISTIQUES    |"
+               DISPLAY "|-------------------------------------|"
+               DISPLAY "|                                     |"
+               DISPLAY "|  1 - Statistiques generales         |"
+               DISPLAY "|  2 - Statistique selon formation    |"
+               DISPLAY "|      et mois                        |"
+               DISPLAY "|                                     |"
+               DISPLAY "|  0 - Revenir au menu precedent      |"
+               DISPLAY "|_____________________________________|"
                ACCEPT choixStat
 
                EVALUATE choixStat
                WHEN 1 PERFORM afficherStats
-      *         WHEN 2 PERFORM statFormaMois
-                WHEN 0 PERFORM menuUtilisateur
+      *        WHEN 2 PERFORM statFormaMois
+               WHEN 0 PERFORM menuUtilisateur
                END-EVALUATE
            END-PERFORM
            .
@@ -1050,19 +1096,27 @@
            OPEN I-O futilisateur
            MOVE 9 TO choixUtil
            PERFORM WITH TEST AFTER UNTIL choixUtil =0
-           DISPLAY"--------------------------------------------"
-           DISPLAY"|    MODIFIER MON PROFIL UTILISATEUR       |"
-           DISPLAY"--------------------------------------------"
-               DISPLAY "Que voulez-vous modifier ?"
-               DISPLAY "1 - Nom "
-               DISPLAY "2 - Prenom "
-               DISPLAY "3 - Mail "
-               DISPLAY "4 - Telephone "
-               DISPLAY "5 - Formation"
+               DISPLAY " _____________________________________ "
+               DISPLAY "|                                     |"
+               DISPLAY "|   MODIFIER MON PROFIL UTILISATEUR   |"
+               DISPLAY "|-------------------------------------|"
+               DISPLAY "|                                     |"
+               DISPLAY "| Que voulez-vous modifier ?          |"
+               DISPLAY "|                                     |"
+               DISPLAY "|  1 - Nom                            |"
+               DISPLAY "|  2 - Prenom                         |"
+               DISPLAY "|  3 - Mail                           |"
+               DISPLAY "|  4 - Telephone                      |"
+               DISPLAY "|  5 - Formation                      |"
+               DISPLAY "|  6 - Type utilisateur               |"
+
                IF futil_type=1
-                   DISPLAY "6 - Type d'utilisateur : "futil_type
+                   DISPLAY "|  6 - Type utilisateur               |"
                END-IF
-               DISPLAY "0 - Revenir au menu precedent"
+               DISPLAY "|                                     |"
+               DISPLAY "|  0 - Revenir au menu precedent      |"
+               DISPLAY "|_____________________________________|"
+
                DISPLAY "choix util "choixUtil
                ACCEPT choixUtil
                DISPLAY "choix util " choixUtil
@@ -1117,26 +1171,51 @@
       *-----------------------------------------------------------------
        modifierProfilAdmin.
            PERFORM consulterUtilisateurs
-           DISPLAY "----------------------------"
-           DISPLAY "|MODIFIER TYPE D'UTILISATEUR|"
-           DISPLAY "----------------------------"
-           DISPLAY "Quel utilisateur souhaitez-vous modifier ?"
-           DISPLAY "Veuillez saisir son login"
+           DISPLAY " _____________________________________"
+           DISPLAY "|                                     |"
+           DISPLAY "|    MODIFIER TYPE D'UTILISATEUR      |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
+           DISPLAY "|           Quel utilisateur          |"
+           DISPLAY "|       souhaitez-vous modifier ?     |"
+           DISPLAY "|_____________________________________|"
+
+           DISPLAY "Veuillez saisir son login :"
            ACCEPT futil_login
            READ futilisateur
            INVALID KEY
-               DISPLAY "Erreur dans la saisie du login"
-               DISPLAY "Veuillez reessayer"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|  Saisie du login incorrecte   |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY" "
+                   DISPLAY "Veuillez reessayer :"
            NOT INVALID KEY
-               DISPLAY "La seule modification possible sur le"
-               DISPLAY "profil est le type d'utilisateur"
-               DISPLAY "Etes-vous sur de vouloir le modifier ?"
-               DISPLAY "1 = Oui, 0 = Non"
+
+               DISPLAY " _______________________________ "
+               DISPLAY "|                               |"
+               DISPLAY "|          INFORMATION          |"
+               DISPLAY "|_______________________________|"
+               DISPLAY "|                               |"
+               DISPLAY "|     La seule modification     |"
+               DISPLAY "|      possible est le type     |"
+               DISPLAY "|         d'utilisateur         |"
+               DISPLAY "|_______________________________|"
+               DISPLAY "|                               |"
+               DISPLAY "|   Etes-vous sur de vouloir    |"
+               DISPLAY "|         le modifier ?         |"
+               DISPLAY "|                               |"
+               DISPLAY "|  1 - Oui                      |"
+               DISPLAY "|  2 - Non                      |"
+               DISPLAY "|_______________________________|"
+
                ACCEPT reponse
                IF reponse = 1 THEN
                    DISPLAY "Veuillez saisir le nouveau type"
-                   DISPLAY "d'utilisateur"
-                   DISPLAY "1 = Admin, 0 = Membre"
+                   DISPLAY "d'utilisateur ( 1 = Admin, 0 = Membre ) :"
                    ACCEPT futil_type
                    PERFORM modifUtil
                ELSE
@@ -1152,49 +1231,69 @@
        REWRITE tamp_futi
                IF cr_futil = 00 THEN
                    DISPLAY "Modification reussie"
+               DISPLAY " _______________________________ "
+               DISPLAY "|                               |"
+               DISPLAY "|          INFORMATION          |"
+               DISPLAY "|_______________________________|"
+               DISPLAY "|                               |"
+               DISPLAY "|    Modification reussie !     |"
+               DISPLAY "|_______________________________|"
                ELSE
-                   DISPLAY "Echec de modification"
-                   DISPLAY "Reessayer ulterieurement"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|     Echec de modification     |"
+                   DISPLAY "|                               |"
+                   DISPLAY "|   Reesayer ulterieurement     |"
+                   DISPLAY "|_______________________________|"
                END-IF.
       *-----------------------------------------------------------------
       *      Procedure permettant de consulter son profil utilisateur
       *      Par mesure de securite le mot de passe n'est pas affiche
       *-----------------------------------------------------------------
            consulterProfil.
-           DISPLAY"--------------------------------------------"
-           DISPLAY"|   CONSULTER MON PROFIL UTILISATEUR       |"
-           DISPLAY"--------------------------------------------"
+           DISPLAY " _____________________________________ "
+           DISPLAY "|                                     |"
+           DISPLAY "|  CONSULTER MON PROFIL UTILISATEUR   |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
            OPEN INPUT futilisateur
            MOVE loginSaved TO futil_login
            READ futilisateur
                INVALID KEY
-                   DISPLAY "Compte inexistant"
+                   DISPLAY "|  /!\    Compte inexistant     /!\   |"
+                   DISPLAY "|_____________________________________|"
+
                NOT INVALID KEY
-                   DISPLAY "Nom :"
-                   DISPLAY futil_nom
-                   DISPLAY "Prenom :"
-                   DISPLAY futil_prenom
-                   DISPLAY "Mail : "
-                   DISPLAY futil_mail
-                   DISPLAY "Telephone : "
-                   DISPLAY futil_tel
-                   DISPLAY "Formation : "
-                   DISPLAY futil_formation
-                   DISPLAY "Login : "
-                   DISPLAY futil_login
-                   DISPLAY "Type d'utilisateur :"
+                   DISPLAY "|  Nom : " futil_nom
+                   DISPLAY "| Prenom : " futil_prenom
+                   DISPLAY "| Mail : " futil_mail
+                   DISPLAY "| Telephone : " futil_tel
+                   DISPLAY "| Formation : " futil_formation
+                   DISPLAY "| Login : " futil_login
+                   DISPLAY "| Type d'utilisateur :"
                    IF futil_type=1
-                       DISPLAY "Administrateur"
+                       DISPLAY "|   Administrateur"
                    ELSE
-                       DISPLAY "Membre"
+                       DISPLAY "|   Membre"
                    END-IF
-                   DISPLAY "Date de naissance : "
-                   DISPLAY futil_naissanceJour"/"futil_naissanceMois"/"
+                   DISPLAY "| Date de naissance : "
+                   DISPLAY "|   " futil_naissanceJour"/"
+                       futil_naissanceMois"/"
       -              futil_naissanceAnnee
-                   DISPLAY "---------"
-                   DISPLAY "Une erreur sur votre profil ?"
-                   DISPLAY "Souhaitez-vous la modifier ?"
-                   DISPLAY "1 = Oui, 0 = Non"
+                       DISPLAY "|-------------------------------------|"
+                       DISPLAY "|                                     |"
+                       DISPLAY "|     Une erreur sur votre profil ?   |"
+                       DISPLAY "|                                     |"
+                       DISPLAY "|-------------------------------------|"
+                       DISPLAY "|                                     |"
+                       DISPLAY "|    Souhaitez-vous la modifier ?     |"
+                       DISPLAY "|                                     |"
+                       DISPLAY "|  1 - Oui                            |"
+                       DISPLAY "|  0 - Oui                            |"
+                       DISPLAY "|_____________________________________|"
                    ACCEPT erreurProfil
                    IF erreurProfil = 1
                        PERFORM modifierUtilisateur
