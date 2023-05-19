@@ -110,6 +110,7 @@
        77 estValideEvenementResultat PIC 9(1).
        77 estValideEvenementResultatHisto PIC 9(1).
        77 loginSaved PIC X(30).
+       77 typeSaved PIC 9(1).
        77 adresseEvent PIC X(100).
        77 descriptionEvent PIC X(250).
        77 loginOrga PIC X(30).
@@ -508,9 +509,9 @@
       * Evenement 5
            MOVE "Paintball" TO fevent_nom
            MOVE "Paintball" TO fevent_type
-           MOVE 31 TO fevent_dateJour
-           MOVE 07 TO fevent_dateMois
-           MOVE 2023 TO fevent_dateAnnee
+           MOVE 01 TO fevent_dateJour
+           MOVE 02 TO fevent_dateMois
+           MOVE 2020 TO fevent_dateAnnee
            MOVE "cleau" TO fevent_loginOrga
            MOVE "Karting de rentree" TO fevent_description
            MOVE "19 Rte des Naudieres, 44880 Sautron" TO fevent_adresse
@@ -531,22 +532,16 @@
       *-----------------------------------------------------------------
       *                  PROGRAMME PRINCIPAL
       *-----------------------------------------------------------------
-      *     ACCEPT WS-CURRENT-DATE-DATA FROM DATE
-      *     DISPLAY WS-CURRENT-DATE
-
            DISPLAY " _____________________________________"
            DISPLAY "|                                     |"
            DISPLAY "|    BIENVENUE SUR L'APPLICATION      |"
            DISPLAY "|_____________________________________|"
+           MOVE FUNCTION CURRENT-DATE to WS-CURRENT-DATE-DATA
            PERFORM accueil
            STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
       *-----------------------------------------------------------------
-
-           ACCEPT WS-CURRENT-DATE-DATA FROM DATE
-           DISPLAY WS-CURRENT-DATE
-           .
 
       *-----------------------------------------------------------------
       *          Procedure de connexion a l'application
@@ -564,16 +559,13 @@
                DISPLAY "|  2 - Creer mon compte               |"
                DISPLAY "|  0 - Quitter                        |"
                DISPLAY "|_____________________________________|"
-      *         DISPLAY "choix :" choix
                DISPLAY "Taper votre choix :"
                ACCEPT choix
-      *         DISPLAY "choix :" choix
 
                EVALUATE choix
                WHEN 1
                    PERFORM connexion
                    IF erreurCompte = 0 THEN
-      * KIWIZ ici bug potentiel si probleme connexion
                        PERFORM menuUtilisateur
                    END-IF
                WHEN 2
@@ -806,13 +798,12 @@
 
                DISPLAY "|  Entrer votre login :               |"
                ACCEPT login
-               MOVE login TO loginSaved
                DISPLAY "|  Entrer votre mot de passe :        |"
                ACCEPT mdp
                DISPLAY "|_____________________________________|"
 
-      ** Lors de la connexion on v�rifie que le login et le mot de passe
-      ** ne soient pas vide
+      ** Lors de la connexion on verifie que le login et le mot de passe
+      ** ne soient pas vides
                IF mdp NOT EQUAL SPACE AND login NOT EQUAL SPACE THEN
                    MOVE login TO futil_login
                    OPEN INPUT futilisateur
@@ -830,6 +821,8 @@
                            PERFORM creation_compte
                        NOT INVALID KEY
                            IF futil_mdp EQUAL mdp THEN
+                               MOVE login TO loginSaved
+                               MOVE futil_type TO typeSaved
                                MOVE 1 TO verif
                            ELSE
                            DISPLAY " _______________________________ "
@@ -879,7 +872,7 @@
            DISPLAY "|  3 - Rechercher un evenement        |"
            DISPLAY "|  4 - Recherche un utilisateur       |"
            DISPLAY "|  5 - Afficher etat des inscriptions |"
-           IF futil_type = 1 THEN
+           IF typeSaved = 1 THEN
                DISPLAY "|                                     |"
                DISPLAY "|-------------------------------------|"
                DISPLAY "|                                     |"
@@ -905,7 +898,7 @@
                WHEN 4 PERFORM rechercherUtil
                WHEN 5 PERFORM etatInscription
                WHEN 6
-                       IF futil_type=1
+                       IF typeSaved=1
                        THEN PERFORM afficheStatistique
                        ELSE
                            DISPLAY " _______________________________ "
@@ -922,7 +915,7 @@
                            PERFORM menuUtilisateur
                        END-IF
                WHEN 7
-                      IF futil_type = 1
+                      IF typeSaved = 1
                            THEN PERFORM modifierProfilAdmin
                       ELSE
                            DISPLAY " _______________________________"
@@ -939,7 +932,7 @@
                            PERFORM menuUtilisateur
                        END-IF
                WHEN 8
-                       IF futil_type = 1
+                       IF typeSaved = 1
                            THEN PERFORM archivageEvent
                        ELSE
                            DISPLAY " _______________________________"
@@ -1209,8 +1202,9 @@
 
            DISPLAY "Veuillez saisir son login :"
            ACCEPT futil_login
+           OPEN I-O futilisateur
            READ futilisateur
-           INVALID KEY
+               INVALID KEY
                    DISPLAY " _______________________________ "
                    DISPLAY "|                               |"
                    DISPLAY "|   /!\       ERREUR       /!\  |"
@@ -1220,35 +1214,34 @@
                    DISPLAY "|_______________________________|"
                    DISPLAY" "
                    DISPLAY "Veuillez reessayer :"
-           NOT INVALID KEY
-
-               DISPLAY " _______________________________ "
-               DISPLAY "|                               |"
-               DISPLAY "|          INFORMATION          |"
-               DISPLAY "|_______________________________|"
-               DISPLAY "|                               |"
-               DISPLAY "|     La seule modification     |"
-               DISPLAY "|      possible est le type     |"
-               DISPLAY "|         d'utilisateur         |"
-               DISPLAY "|_______________________________|"
-               DISPLAY "|                               |"
-               DISPLAY "|   Etes-vous sur de vouloir    |"
-               DISPLAY "|         le modifier ?         |"
-               DISPLAY "|                               |"
-               DISPLAY "|  1 - Oui                      |"
-               DISPLAY "|  2 - Non                      |"
-               DISPLAY "|_______________________________|"
-
-               ACCEPT reponse
-               IF reponse = 1 THEN
-                   DISPLAY "Veuillez saisir le nouveau type"
-                   DISPLAY "d'utilisateur ( 1 = Admin, 0 = Membre ) :"
-                   ACCEPT futil_type
-                   PERFORM modifUtil
-               ELSE
-                   PERFORM menuUtilisateur
-               END-IF
+               NOT INVALID KEY
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|          INFORMATION          |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|     La seule modification     |"
+                   DISPLAY "|      possible est le type     |"
+                   DISPLAY "|         d'utilisateur         |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|   Etes-vous sur de vouloir    |"
+                   DISPLAY "|         le modifier ?         |"
+                   DISPLAY "|                               |"
+                   DISPLAY "|  1 - Oui                      |"
+                   DISPLAY "|  2 - Non                      |"
+                   DISPLAY "|_______________________________|"
+                   ACCEPT reponse
+                   IF reponse = 1 THEN
+                       DISPLAY "Veuillez saisir le nouveau type"
+                       DISPLAY "d'utilisateur (1 = Admin, 0 = Membre) :"
+                       ACCEPT futil_type
+                       PERFORM modifUtil
+                   END-IF
+                   CLOSE futilisateur
+           END-READ
            .
+
       ******************************************************************
       *    Fonction parallele :
       *    Fonction qui permet d'eviter du doublon de code sur la modification
@@ -1257,7 +1250,6 @@
        modifUtil.
            REWRITE tamp_futi
                IF cr_futil = 00 THEN
-                   DISPLAY "Modification reussie"
                DISPLAY " _______________________________ "
                DISPLAY "|                               |"
                DISPLAY "|          INFORMATION          |"
@@ -1589,55 +1581,102 @@
       *          Procedure permettant de s'inscrire a un evenement
       *-----------------------------------------------------------------
         inscriptionEvent.
+           MOVE 0 TO Fin 
+           MOVE 1 TO valideInscription
+           MOVE 0 TO nbParticipants
+
            OPEN I-O fparticipant
-      * On verifie dans un premier temps qu'il n'est pas deja inscrit a un evenement ou fait une demande
+      * On verifie dans un premier temps qu'il n'est pas deja inscrit a 
+      * un evenement ou fait une demande
            MOVE loginSaved TO fpart_login
            PERFORM WITH TEST AFTER UNTIL Fin = 1
-           START fparticipant, KEY IS = fpart_login
-               INVALID KEY
-                   MOVE 1 TO Fin
-               NOT INVALID KEY
-                   READ fparticipant NEXT
-                       AT END
-                           MOVE 1 TO Fin
-                       NOT AT END
-                       IF fpart_etat ="attente"
-                           OR fpart_etat = "acceptee" THEN
-                               IF fevent_dateJour=dateJour
-                                  AND fevent_dateMois = dateMois
-                                 AND fevent_dateAnnee = dateAnnee THEN
-                                 MOVE 0 TO valideInscription
-                                ELSE
-                                    MOVE 1 TO valideInscription
+               START fparticipant, KEY IS = fpart_login
+                   INVALID KEY
+                       MOVE 1 TO Fin
+                   NOT INVALID KEY
+                       ADD 1 TO nbParticipants
+                       READ fparticipant NEXT
+                           AT END
+                               MOVE 1 TO Fin
+                           NOT AT END
+                           IF fpart_etat ="attente" THEN
+                               PERFORM comparer_date
+                                   IF dateComparee = 0 THEN
+                                       MOVE 0 TO valideInscription
+                                       MOVE 1 TO Fin
+                                   END-IF
+                            END-IF
+                            IF fevent_nom = fpart_nomEvent THEN
+                                IF fpart_etat = "acceptee" THEN
+                                    DISPLAY " ________________________"
+                                    DISPLAY "|                        |"
+                                    DISPLAY "| Vous etes deja inscrit |"
+                                    DISPLAY "|     A cet evenement    |"
+                                    DISPLAY "|________________________|"
                                 END-IF
-                       ELSE
-                           MOVE 1 TO valideInscription
-                       END-IF
-                   END-READ
-           END-START
+                                IF fpart_etat = "attente" THEN
+                                    DISPLAY " ________________________"
+                                    DISPLAY "|                        |"
+                                    DISPLAY "|   Vous avez deja une   |"
+                                    DISPLAY "|   demande pour cet cet |"
+                                    DISPLAY "|        evenement       |"
+                                    DISPLAY "|________________________|"
+                                END-IF
+                                IF fpart_etat = "refusee" THEN
+                                    DISPLAY " ________________________"
+                                    DISPLAY "|                        |"
+                                    DISPLAY "|   Votre demande a ete  |"
+                                    DISPLAY "|    refusee pour cet    |"
+                                    DISPLAY "|        evenement       |"
+                                    DISPLAY "|________________________|"
+                                END-IF
+                                MOVE 0 TO valideInscription
+                            END-IF
+                       END-READ
+               END-START
            END-PERFORM
+           
 
            IF valideInscription = 1 THEN
       * On verifie dans un premier temps qu'il reste de la place dans l'evenment
-           PERFORM compte_nb_part
-           IF fevent_seuil - nbParticipants <= 0 THEN
-               DISPLAY "Evenement complet"
-           ELSE
-      * S'il reste de la place on saisie les valeurs pour inscrire l'utilisateur a l'evenement
-             MOVE "attente" TO fpart_etat
-             MOVE loginSaved TO fpart_login
-             MOVE nomSaved TO fpart_nomEvent
-             WRITE tamp_fpart
-             END-WRITE
-             IF cr_fpart =00 THEN
-                 DISPLAY "Demande d'inscription validee"
-                 DISPLAY "L'organisateur va verifier votre demande"
-             ELSE
-                 DISPLAY "Echec de demande d'inscription"
-                 DISPLAY "Veuillez reessayer ulterieurement"
-             END-IF
-      *    KIWIZ fix this function
-           ELSE DISPLAY "Vous avez deja un evenement de prevu"
+               IF fevent_seuil - nbParticipants <= 0 THEN
+                   DISPLAY "Evenement complet"
+                   DISPLAY "________________________"
+                   DISPLAY "|                        |"
+                   DISPLAY "|   Cet evenement est    |"
+                   DISPLAY "|         complet        |"
+                   DISPLAY "|________________________|"
+               END-IF
+           END-IF
+
+           IF valideInscription = 1 THEN    
+      * S'il reste de la place on saisit les valeurs pour inscrire l'utilisateur
+      * a l'evenement
+               MOVE "attente" TO fpart_etat
+               MOVE loginSaved TO fpart_login
+               MOVE nomSaved TO fpart_nomEvent
+               WRITE tamp_fpart
+               END-WRITE
+               IF cr_fpart =00 THEN
+               DISPLAY " _______________________________ "
+               DISPLAY "|                               |"
+               DISPLAY "|          INFORMATION          |"
+               DISPLAY "|_______________________________|"
+               DISPLAY "|                               |"
+               DISPLAY "|      Inscription reussie !    |"
+               DISPLAY "|      l'organisateur va        |"
+               DISPLAY "|      examiner votre demande   |"
+               DISPLAY "|_______________________________|"
+               ELSE
+               DISPLAY " _______________________________ "
+               DISPLAY "|                               |"
+               DISPLAY "|          INFORMATION          |"
+               DISPLAY "|_______________________________|"
+               DISPLAY "|                               |"
+               DISPLAY "|      Echec de la demande      |"
+               DISPLAY "|         d'inscription         |"
+               DISPLAY "|_______________________________|"
+               END-IF
            END-IF
            CLOSE fparticipant.
 
@@ -1899,7 +1938,7 @@
 
                            DISPLAY "| Nom :"futil_nom
                            DISPLAY "| Prenom : "futil_prenom
-                               DISPLAY futil_login
+                           DISPLAY "| Login : "futil_login
                        END-START
                    END-READ
                END-PERFORM
@@ -2056,7 +2095,8 @@
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
                            DISPLAY "|   Erreur dans la suppression  |"
-                           DISPLAY "|         des participants      |"
+                           DISPLAY "|   des participants peut etre  |"
+                           DISPLAY "|   pas de participants ?       |"
                            DISPLAY "|_______________________________|"
                NOT INVALID KEY
                    PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
@@ -2179,10 +2219,12 @@
            DISPLAY "|                                    |"
            DISPLAY "|       STATISTIQUES GLOBALES        |"
            DISPLAY "|------------------------------------|"
-           DISPLAY "| Nombre d'evenements : ", nbEvents
-           DISPLAY "| Archivables : ", nbEventArchivables
-           DISPLAY "| Nombre d'utilisateurs : ", nbUtils
-           DISPLAY "| Nombre d'evenements archives : ", nbEventArchives
+           DISPLAY "| Nombre d'evenements : ", nbEvents"          |"
+           DISPLAY "| Archivables : ", nbEventArchivables "
+      -    "     |" 
+           DISPLAY "| Nombre d'utilisateurs : ", nbUtils "       |"
+           DISPLAY "| Nombre d'evenements archives : ", nbEventArchives"
+      -    " |" 
            DISPLAY "|____________________________________|".
 
 
@@ -2494,11 +2536,10 @@
                PERFORM compte_nb_part
                MOVE nbParticipants TO fhisto_participants
       * Ecriture du nouvel element dans fhistorique :
-           WRITE tamp_fevent
+           WRITE tamp_fhisto
                INVALID KEY
                    DISPLAY "Erreur lecture fhistorique"
                NOT INVALID KEY
-                   DISPLAY "Archivage reussi"
                    MOVE 1 TO autoSupprEvent
                    PERFORM supprimerEvent
                    MOVE 0 TO autoSupprEvent
@@ -2517,6 +2558,7 @@
 
            OPEN I-O fevenement
            MOVE 0 TO fin_boucle
+           MOVE 0 TO retour
 
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
                READ fevenement
@@ -2529,21 +2571,23 @@
                            DISPLAY "| Nom : "fevent_nom
                            DISPLAY "| Date : "fevent_dateJour"/"
       -                     fevent_dateMois"/"fevent_dateAnnee
-
                        END-IF
                END-READ
            END-PERFORM
            DISPLAY "|                                    |"
            DISPLAY "|____________________________________|"
+           
            MOVE 0 TO fin_boucle
-           MOVE 0 TO retour
+           
+           CLOSE fevenement
+           OPEN I-O fevenement
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1 OR retour = 1
                DISPLAY "Saissisez le nom de l'event a archiver :"
                ACCEPT fevent_nom
                READ fevenement
-                   AT END
+                   INVALID KEY
                        MOVE 1 TO fin_boucle
-                   NOT AT END
+                   NOT INVALID KEY
                        PERFORM comparer_date
                        IF dateComparee = 1 THEN
                            PERFORM archiver_event
@@ -2555,15 +2599,13 @@
                            DISPLAY "|                               |"
                            DISPLAY "| L'evenement n'est pas termine |"
                            DISPLAY "|_______________________________|"
-                       END-IF
-                       DISPLAY "Retourner au menu precedent ?"
-                       DISPLAY "0 - Non 1 - Oui"
-                       ACCEPT retour
+                       END-IF        
                END-READ
-           END-PERFORM
-           IF retour = 1 THEN
-               PERFORM menuUtilisateur
-           END-IF.
+               DISPLAY "Retourner au menu precedent ?"
+               DISPLAY "0 - Non 1 - Oui"
+               ACCEPT retour
+           END-PERFORM 
+           .
 
        tout_archiver.
            OPEN INPUT fevenement
@@ -2589,15 +2631,6 @@
            MOVE 0 TO fin_boucle
            OPEN INPUT fparticipant
            START fparticipant, KEY IS = fpart_nomEvent
-               INVALID KEY
-                           DISPLAY " _______________________________ "
-                           DISPLAY "|                               |"
-                           DISPLAY "|   /!\       ERREUR       /!\  |"
-                           DISPLAY "|_______________________________|"
-                           DISPLAY "|                               |"
-                           DISPLAY "|     Erreur de comptage des    |"
-                           DISPLAY "|         participants          |"
-                           DISPLAY "|_______________________________|"
                NOT INVALID KEY
                    PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
                        READ fparticipant NEXT
