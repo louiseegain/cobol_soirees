@@ -955,7 +955,7 @@
            DISPLAY "|  0 - Revenir au menu precedent      |"
            DISPLAY "|_____________________________________|"
       **         DISPLAY "choix : "choixProfil
-      **         ACCEPT choixProfil
+                 ACCEPT choixProfil
       **         DISPLAY "choix : "choixProfil
 
            EVALUATE choixProfil
@@ -2033,7 +2033,7 @@
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
                            DISPLAY "|   Erreur dans la suppression  |"
-                           DISPLAY "|         du participant        |"
+                           DISPLAY "|         des participants      |"
                            DISPLAY "|_______________________________|"
                NOT INVALID KEY
                    PERFORM WITH TEST AFTER UNTIL fin_boucle = 1
@@ -2241,7 +2241,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|    Modification reussie !     |"
                            DISPLAY "|_______________________________|"
                        ELSE
                            DISPLAY " _______________________________ "
@@ -2423,12 +2423,9 @@
                READ fevenement
                    INVALID KEY
                        DISPLAY "invalide" fevent_nom
-                       DISPLAY fevent_type
                        DISPLAY "Saisie invalide"
 
                    NOT INVALID KEY
-                       DISPLAY fevent_nom
-                       DISPLAY fevent_type
                        IF fevent_loginOrga = loginSaved THEN
                            MOVE 1 TO verif_event
                        ELSE
