@@ -533,7 +533,6 @@
       *-----------------------------------------------------------------
       *     ACCEPT WS-CURRENT-DATE-DATA FROM DATE
       *     DISPLAY WS-CURRENT-DATE
-           *> KIWIZ MP
 
            DISPLAY " _____________________________________"
            DISPLAY "|                                     |"
@@ -864,7 +863,7 @@
       *      Procedure gerant le menu d'un utilisateur pouvant devenir
       *      organisateur d'un ou plusieurs evenement s'il en cre
       *-----------------------------------------------------------------
-           menuUtilisateur.
+       menuUtilisateur.
            MOVE 9 TO fermeAppli
       ** Affichage du menu principal de l'utilisateur
            PERFORM WITH TEST AFTER UNTIL fermeAppli =0
@@ -965,7 +964,7 @@
       *      Procedure gerant le menu de gestion de son profil
       *      Afficher / Modifier / Supprimer
       *-----------------------------------------------------------------v
-           gererProfil.
+       gererProfil.
            MOVE 9 TO choixProfil
            PERFORM WITH TEST AFTER UNTIL choixProfil =0
            DISPLAY " _____________________________________"
@@ -996,7 +995,7 @@
       *-----------------------------------------------------------------
       *      Procedure gerant le menu de recherche d'un evenement
       *-----------------------------------------------------------------
-           rechercherEvent.
+       rechercherEvent.
            PERFORM WITH TEST AFTER UNTIL choixEvent =0
            DISPLAY " _____________________________________"
            DISPLAY "|                                     |"
@@ -1026,7 +1025,7 @@
       *-----------------------------------------------------------------
       *      Procedure gerant le menu de recherche d'un utilisateur
       *-----------------------------------------------------------------
-           rechercherUtil.
+       rechercherUtil.
            PERFORM WITH TEST AFTER UNTIL choixEvent =0
            DISPLAY " _____________________________________"
            DISPLAY "|                                     |"
@@ -1065,7 +1064,7 @@
       *      Procedure gerant le menu des evenements
       *      creation / Modification / suppression / consultation
       *-----------------------------------------------------------------
-           gestionEvenement.
+       gestionEvenement.
            PERFORM WITH TEST AFTER UNTIL choix =0
                DISPLAY " _____________________________________"
                DISPLAY "|                                     |"
@@ -1097,7 +1096,7 @@
       *      Procedure permettant d'afficher les statistiques de
       *      l'application
       *-----------------------------------------------------------------
-           afficheStatistique.
+       afficheStatistique.
            PERFORM WITH TEST AFTER UNTIL choixStat =0
                DISPLAY " _____________________________________"
                DISPLAY "|                                     |"
@@ -1123,7 +1122,7 @@
       *-----------------------------------------------------------------
       * Procedure permettant de modifier son profil utilisateur
       *-----------------------------------------------------------------
-           modifierUtilisateur.
+       modifierUtilisateur.
            OPEN I-O futilisateur
            MOVE 9 TO choixUtil
            PERFORM WITH TEST AFTER UNTIL choixUtil =0
@@ -1259,7 +1258,7 @@
       *    d'un element dans le fichier futilisateurs
       ******************************************************************
        modifUtil.
-       REWRITE tamp_futi
+           REWRITE tamp_futi
                IF cr_futil = 00 THEN
                    DISPLAY "Modification reussie"
                DISPLAY " _______________________________ "
@@ -1284,7 +1283,7 @@
       *      Procedure permettant de consulter son profil utilisateur
       *      Par mesure de securite le mot de passe n'est pas affiche
       *-----------------------------------------------------------------
-           consulterProfil.
+       consulterProfil.
            DISPLAY " _____________________________________ "
            DISPLAY "|                                     |"
            DISPLAY "|  CONSULTER MON PROFIL UTILISATEUR   |"
@@ -1340,7 +1339,7 @@
       *      Procedure permettant d'afficher tous les utilisateurs
       *      presents dans l'application. Qu'ils soient membres ou admin
       *-----------------------------------------------------------------
-           consulterUtilisateurs.
+       consulterUtilisateurs.
            DISPLAY " -------------------------------------"
            DISPLAY "|                                     |"
            DISPLAY "|   CONSULTER TOUS LES UTILISATEURS   |"
@@ -1369,19 +1368,10 @@
            CLOSE futilisateur.
 
       *-----------------------------------------------------------------
-      *      Procedure permettant de supprimer les evenements passes
-      *      et de les archiver dans le fichier fhistorique
-      *-----------------------------------------------------------------
-           supprimerEventPasse.
-
-           .
-
-
-      *-----------------------------------------------------------------
       * Procedure permettant de rechercher un evenement en fonction de
       *                        son nom
       *----------------------------------------------------------------
-           rechercherNom.
+       rechercherNom.
            PERFORM afficheEvent
            OPEN INPUT fevenement
                DISPLAY " ____________________________________ "
@@ -1455,7 +1445,7 @@
       *    Fonction qui verifie que le nom de l'evenement n'est pas deja
       *    present dans fevenement
       ******************************************************************
-           existeEvent.
+       existeEvent.
            OPEN INPUT fevenement
            READ fevenement
            INVALID KEY
@@ -1479,7 +1469,7 @@
       *    Fonction qui verifie que le nom de l'evenement n'est pas deja
       *    present dans fhistorique
       ******************************************************************
-           existeEventHisto.
+       existeEventHisto.
            OPEN INPUT fhistorique
            READ fhistorique
            INVALID KEY
@@ -1501,7 +1491,7 @@
       *----------------------------------------------------------------
       *    Fonction qui permet de creer un evenement
       *----------------------------------------------------------------
-           creerEvent.
+       creerEvent.
            DISPLAY " ____________________________________"
            DISPLAY "|                                    |"
            DISPLAY "|         CREATION EVENEMENT         |"
@@ -1567,14 +1557,12 @@
                DISPLAY cr_fevent
            END-IF
 
-           CLOSE fevenement
-           .
-
+           CLOSE fevenement.
 
       *-----------------------------------------------------------------
       *          Procedure permettant d'afficher les evenements
       *-----------------------------------------------------------------
-           afficheEvent.
+       afficheEvent.
            DISPLAY " ------------------------------------"
            DISPLAY "|                                    |"
            DISPLAY "|        AFFICHAGE EVENEMENT         |"
@@ -1586,7 +1574,6 @@
                    READ fevenement NEXT
       *             MOVE 1 TO Fin
                    AT END
-      *                 PERFORM gestionEvenement KIWIZ pas utile
                        MOVE 1 TO Fin
                    NOT AT END
                        IF fevent_dateJour>=WS-CURRENT-DAY
@@ -1605,7 +1592,7 @@
       *          Procedure permettant de s'inscrire a un evenement
       *-----------------------------------------------------------------
         inscriptionEvent.
-         OPEN I-O fparticipant
+           OPEN I-O fparticipant
       * On verifie dans un premier temps qu'il n'est pas deja inscrit a un evenement ou fait une demande
            MOVE loginSaved TO fpart_login
            PERFORM WITH TEST AFTER UNTIL Fin = 1
@@ -1652,9 +1639,9 @@
                  DISPLAY "Echec de demande d'inscription"
                  DISPLAY "Veuillez reessayer ulterieurement"
              END-IF
-          ELSE DISPLAY "Vous avez deja un evenement de prevu"
-          END-IF
-         CLOSE fparticipant.
+           ELSE DISPLAY "Vous avez deja un evenement de prevu"
+           END-IF
+           CLOSE fparticipant.
 
       *-----------------------------------------------------------------
       *          Procedure permettant de verifier l'etat des inscriptions
@@ -1706,7 +1693,7 @@
       *          Procedure permettant de rechercher un utilisateur par
       *          son nom
       *-----------------------------------------------------------------
-           rechercherUtilisateurNom.
+       rechercherUtilisateurNom.
            DISPLAY " ------------------------------------"
            DISPLAY "|                                    |"
            DISPLAY "|       RECHERCHER UTILISATEUR       |"
@@ -1769,7 +1756,7 @@
       *          Procedure permettant de rechercher un utilisateur par
       *          son login
       *-----------------------------------------------------------------
-           rechercherUtilisateurLogin.
+       rechercherUtilisateurLogin.
            DISPLAY " ------------------------------------"
            DISPLAY "|                                    |"
            DISPLAY "|       RECHERCHER UTILISATEUR       |"
@@ -1863,7 +1850,7 @@
            IF suppression_ok IS equal 0 THEN
               OPEN I-O futilisateur
       ** faire la suppression de l'utilisateur
-      ** et revenir � la page de connexion
+      ** et revenir a la page de connexion
                READ futilisateur
                INVALID key
                    DISPLAY " _______________________________ "
@@ -2054,7 +2041,7 @@
       *    participants avant :
 
                DISPLAY "Suppression des participations liees a"
-      -     "l'evenement"
+           "l'evenement"
                DISPLAY "|                                    |"
                DISPLAY "|    Suppresion des participants     |"
                DISPLAY "|         liees a l'evenement        |"
@@ -2582,7 +2569,7 @@
                PERFORM menuUtilisateur
            END-IF.
 
-           tout_archiver.
+       tout_archiver.
            OPEN INPUT fevenement
            MOVE 0 TO fin_boucle
 
