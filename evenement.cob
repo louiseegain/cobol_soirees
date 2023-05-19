@@ -54,27 +54,27 @@
        FILE SECTION.
        FD futilisateur.
        01 tamp_futi.
-           02 futil_nom PIC A(30).
-           02 futil_prenom PIC A(30).
+           02 futil_nom PIC A(40).
+           02 futil_prenom PIC A(40).
            02 futil_login PIC X(30).
-           02 futil_mdp PIC X(12).
-           02 futil_mail PIC X(30).
-           02 futil_tel PIC X(14).
+           02 futil_mdp PIC X(40).
+           02 futil_mail PIC X(40).
+           02 futil_tel PIC X(10).
            02 futil_type PIC 9(1).
-           02 futil_formation PIC A(20).
+           02 futil_formation PIC A(40).
            02 futil_naissanceJour PIC 9(2).
            02 futil_naissanceMois PIC 9(2).
-           02 futil_naissanceAnnee PIC 9(2).
+           02 futil_naissanceAnnee PIC 9(4).
 
        FD fevenement.
        01 tamp_fevent.
            02 fevent_nom PIC X(50).
-           02 fevent_type PIC A(20).
+           02 fevent_type PIC A(30).
            02 fevent_dateJour PIC 9(2).
            02 fevent_dateMois PIC 9(2).
-           02 fevent_dateAnnee PIC 9(2).
+           02 fevent_dateAnnee PIC 9(4).
            02 fevent_loginOrga PIC X(30).
-           02 fevent_description PIC X(50).
+           02 fevent_description PIC X(250).
            02 fevent_adresse PIC X(100).
            02 fevent_seuil PIC 9(3).
            02 fevent_heure PIC X(5).
@@ -83,19 +83,19 @@
        01 tamp_fpart.
            02 fpart_cle.
                03 fpart_login PIC X(30).
-               03 fpart_nomEvent PIC A(20).
-           02 fpart_etat PIC A(10).
+               03 fpart_nomEvent PIC A(50).
+           02 fpart_etat PIC A(20).
 
        FD fhistorique.
        01 tamp_fhisto.
            02 fhisto_nom PIC A(30).
-           02 fhisto_type PIC A(20).
+           02 fhisto_type PIC A(30).
            02 fhisto_dateJour PIC 9(2).
            02 fhisto_dateMois PIC 9(2).
-           02 fhisto_dateAnnee PIC 9(2).
+           02 fhisto_dateAnnee PIC 9(4).
            02 fhisto_loginOrga PIC X(30).
-           02 fhisto_description PIC X(50).
-           02 fhisto_adresse PIC X(50).
+           02 fhisto_description PIC X(250).
+           02 fhisto_adresse PIC X(100).
            02 fhisto_etat PIC A(8).
            02 fhisto_participants PIC 9(3).
       *-----------------------
@@ -106,23 +106,22 @@
        77 cr_fhisto PIC 9(2).
        77 choix PIC 9(1).
        77 nom PIC A(30).
-       77 vreTOur PIC 9(1).
+       77 vretour PIC 9(1).
        77 estValideEvenementResultat PIC 9(1).
        77 estValideEvenementResultatHisto PIC 9(1).
        77 loginSaved PIC X(30).
-       77 adresseEvent PIC X(30).
-       77 descriptionEvent PIC X(50).
+       77 adresseEvent PIC X(100).
+       77 descriptionEvent PIC X(250).
        77 loginOrga PIC X(30).
-       77 dateEvent PIC X(10).
-       77 typeEvent PIC A(20).
+       77 typeEvent PIC A(30).
        77 nomEvent PIC A(30).
-       77 etatEvent PIC A(8).
+       77 etatEvent PIC A(20).
        77 seuilEvent PIC 9(3).
        77 heureEvent PIC X(5).
        77 Fin PIC 9(1).
        01 WS-CURRENT-DATE-DATA.
           05  WS-CURRENT-DATE.
-              10  WS-CURRENT-YEAR         PIC 9(2).
+              10  WS-CURRENT-YEAR         PIC 9(4).
               10  WS-CURRENT-MONTH        PIC 9(2).
               10  WS-CURRENT-DAY          PIC 9(2).
           05  WS-CURRENT-TIME.
@@ -135,7 +134,7 @@
        77 fermeAppli PIC 9(1).
        77 verif_login pic X(30).
        77 chaine PIC X(30).
-       77 lettre PIC A(1).
+      * 77 lettre PIC A(1).
        77 I PIC 9(2).
        77 verif_arobase PIC 9(1).
        77 verif_mail_ok PIC 9(1).
@@ -143,9 +142,9 @@
        77 verif_login_ok PIC 9(1).
        77 verif PIC 9(1).
        77 termine PIC 9(1).
-       77 mdp PIC X(30).
-       77 nomSaved PIC A(30).
-       77 prenom PIC A(30).
+       77 mdp PIC X(40).
+       77 nomSaved PIC A(40).
+       77 prenom PIC A(40).
        77 fdf PIC 9(1).
        77 suppression_ok PIC 9(1).
        77 inscription PIC 9(1).
@@ -161,7 +160,7 @@
        77 reponse PIC 9(1).
        77 dateJour PIC 9(2).
        77 dateMois PIC 9(2).
-       77 dateAnnee PIC 9(2).
+       77 dateAnnee PIC 9(4).
        77 valideInscription PIC 9(1).
        77 choixGestionDemande PIC 9(1).
        77 autoSupprEvent PIC 9(1).
@@ -230,7 +229,7 @@
            MOVE "MIAGE" TO futil_formation
            MOVE 14 TO futil_naissanceJour
            MOVE 06 TO futil_naissanceMois
-           MOVE 02 TO futil_naissanceAnnee
+           MOVE 2002 TO futil_naissanceAnnee
 
            OPEN I-O futilisateur
            WRITE tamp_futi
@@ -254,7 +253,7 @@
             MOVE "IFSI" TO futil_formation
             MOVE 26 TO futil_naissanceJour
             MOVE 09 TO futil_naissanceMois
-            MOVE 01 TO futil_naissanceAnnee
+            MOVE 2001 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -278,7 +277,7 @@
             MOVE "Commerce" TO futil_formation
             MOVE 25 TO futil_naissanceJour
             MOVE 12 TO futil_naissanceMois
-            MOVE 99 TO futil_naissanceAnnee
+            MOVE 1999 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -303,7 +302,7 @@
             MOVE "art" TO futil_formation
             MOVE 02 TO futil_naissanceJour
             MOVE 10 TO futil_naissanceMois
-            MOVE 00 TO futil_naissanceAnnee
+            MOVE 2000 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -327,7 +326,7 @@
             MOVE "MIAGE" TO futil_formation
             MOVE 21 TO futil_naissanceJour
             MOVE 12 TO futil_naissanceMois
-            MOVE 96 TO futil_naissanceAnnee
+            MOVE 1996 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -351,7 +350,7 @@
             MOVE "IFSI" TO futil_formation
             MOVE 23 TO futil_naissanceJour
             MOVE 04 TO futil_naissanceMois
-            MOVE 01 TO futil_naissanceAnnee
+            MOVE 2001 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -375,7 +374,7 @@
             MOVE "Commerce" TO futil_formation
             MOVE 28 TO futil_naissanceJour
             MOVE 03 TO futil_naissanceMois
-            MOVE 02 TO futil_naissanceAnnee
+            MOVE 2002 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -400,7 +399,7 @@
             MOVE "art" TO futil_formation
             MOVE 08 TO futil_naissanceJour
             MOVE 08 TO futil_naissanceMois
-            MOVE 01 TO futil_naissanceAnnee
+            MOVE 2001 TO futil_naissanceAnnee
 
             OPEN I-O futilisateur
             WRITE tamp_futi
@@ -418,7 +417,7 @@
            MOVE "Soiree" TO fevent_type
            MOVE 21 TO fevent_dateJour
            MOVE 06 TO fevent_dateMois
-           MOVE 23 TO fevent_dateAnnee
+           MOVE 2023 TO fevent_dateAnnee
            MOVE "mloret" TO fevent_loginOrga
            MOVE "Soiree de fin d'annee" TO fevent_description
            MOVE "2 rue de la liberte, 35000 Rennes" TO fevent_adresse
@@ -441,10 +440,10 @@
            MOVE "Escape Game" TO fevent_type
            MOVE 15 TO fevent_dateJour
            MOVE 07 TO fevent_dateMois
-           MOVE 23 TO fevent_dateAnnee
+           MOVE 2023 TO fevent_dateAnnee
            MOVE "legain" TO fevent_loginOrga
-           MOVE "Pour se terrifier en cette belle periode" TO fevent_des
-      -    cription
+           MOVE "Pour se terrifier en cette belle periode" TO
+           fevent_description
            MOVE "Les loges, 44140 Montbert" TO fevent_adresse
            MOVE 6 TO fevent_seuil
            MOVE "21h00" TO fevent_heure
@@ -465,7 +464,7 @@
            MOVE "Soiree" TO fevent_type
            MOVE 02 TO fevent_dateJour
            MOVE 06 TO fevent_dateMois
-           MOVE 23 TO fevent_dateAnnee
+           MOVE 2023 TO fevent_dateAnnee
            MOVE "tmerlet" TO fevent_loginOrga
            MOVE "Afterwork de fin d'annee" TO fevent_description
            MOVE "9 Rue Bon Secours, 44000 Nantes" TO fevent_adresse
@@ -488,7 +487,30 @@
            MOVE "Karting" TO fevent_type
            MOVE 21 TO fevent_dateJour
            MOVE 09 TO fevent_dateMois
-           MOVE 23 TO fevent_dateAnnee
+           MOVE 2023 TO fevent_dateAnnee
+           MOVE "cleau" TO fevent_loginOrga
+           MOVE "Karting de rentree" TO fevent_description
+           MOVE "19 Rte des Naudieres, 44880 Sautron" TO fevent_adresse
+           MOVE 150 TO fevent_seuil
+           MOVE "20h00" TO fevent_heure
+
+           OPEN I-O fevenement
+              WRITE tamp_fevent
+              END-WRITE
+              IF cr_fevent = 35
+                  DISPLAY "Echec d'insertion"
+              ELSE
+                  DISPLAY "Insertion reussie"
+                  DISPLAY "E4 : ",cr_fevent
+              END-IF
+           CLOSE fevenement
+
+      * Evenement 5
+           MOVE "Paintball" TO fevent_nom
+           MOVE "Paintball" TO fevent_type
+           MOVE 31 TO fevent_dateJour
+           MOVE 07 TO fevent_dateMois
+           MOVE 2023 TO fevent_dateAnnee
            MOVE "cleau" TO fevent_loginOrga
            MOVE "Karting de rentree" TO fevent_description
            MOVE "19 Rte des Naudieres, 44880 Sautron" TO fevent_adresse
@@ -537,6 +559,7 @@
       *         DISPLAY "Annee : "WS-CURRENT-YEAR
       *         DISPLAY "Mois : "WS-CURRENT-MONTH
       *         DISPLAY "Jour : "WS-CURRENT-DAY
+               DISPLAY " _____________________________________"
                DISPLAY "|                                     |"
                DISPLAY "|  1 - Me connecter a mon compte      |"
                DISPLAY "|  2 - Creer mon compte               |"
@@ -557,6 +580,7 @@
                WHEN 2
                    PERFORM creation_compte
                WHEN 0
+                   DISPLAY " _____________________________________"
                    DISPLAY "|                                     |"
                    DISPLAY "|         Merci et a bientot          |"
                    DISPLAY "|_____________________________________|"
@@ -855,14 +879,14 @@
            DISPLAY "|  2 - Gerer les evenements           |"
            DISPLAY "|  3 - Rechercher un evenement        |"
            DISPLAY "|  4 - Recherche un utilisateur       |"
-
+           DISPLAY "|  5 - Afficher etat des inscriptions |"
            IF futil_type = 1 THEN
                DISPLAY "|                                     |"
                DISPLAY "|-------------------------------------|"
                DISPLAY "|                                     |"
-               DISPLAY "|  5 - Afficher les statistiques      |"
-               DISPLAY "|  6 - Gerer les utilisateurs         |"
-               DISPLAY "|  7 - Archiver un evenement passe    |"
+               DISPLAY "|  6 - Afficher les statistiques      |"
+               DISPLAY "|  7 - Gerer les utilisateurs         |"
+               DISPLAY "|  8 - Archiver un evenement passe    |"
            END-IF
 
            DISPLAY "|                                     |"
@@ -880,8 +904,8 @@
                WHEN 2 PERFORM gestionEvenement
                WHEN 3 PERFORM rechercherEvent
                WHEN 4 PERFORM rechercherUtil
-
-               WHEN 5
+               WHEN 5 PERFORM etatInscription
+               WHEN 6
                        IF futil_type=1
                        THEN PERFORM afficheStatistique
                        ELSE
@@ -898,7 +922,7 @@
                            DISPLAY "|_______________________________|"
                            PERFORM menuUtilisateur
                        END-IF
-                   WHEN 6
+               WHEN 7
                       IF futil_type = 1
                            THEN PERFORM modifierProfilAdmin
                       ELSE
@@ -915,7 +939,7 @@
                            DISPLAY "|_______________________________|"
                            PERFORM menuUtilisateur
                        END-IF
-                   WHEN 7
+               WHEN 8
                        IF futil_type = 1
                            THEN PERFORM archivageEvent
                        ELSE
@@ -956,7 +980,7 @@
            DISPLAY "|  0 - Revenir au menu precedent      |"
            DISPLAY "|_____________________________________|"
       **         DISPLAY "choix : "choixProfil
-      **         ACCEPT choixProfil
+               ACCEPT choixProfil
       **         DISPLAY "choix : "choixProfil
 
            EVALUATE choixProfil
@@ -983,7 +1007,7 @@
            DISPLAY "|        Rechercher un evenement      |"
            DISPLAY "|                                     |"
            DISPLAY "|  1 - Par son nom                    |"
-           DISPLAY "|  2 - Par son organisateur           |"
+           DISPLAY "|  2 - Par son type                   |"
            DISPLAY "|                                     |"
            DISPLAY "|-------------------------------------|"
            DISPLAY "|                                     |"
@@ -1274,7 +1298,7 @@
                    DISPLAY "|_____________________________________|"
 
                NOT INVALID KEY
-                   DISPLAY "|  Nom : " futil_nom
+                   DISPLAY "| Nom : " futil_nom
                    DISPLAY "| Prenom : " futil_prenom
                    DISPLAY "| Mail : " futil_mail
                    DISPLAY "| Telephone : " futil_tel
@@ -1299,8 +1323,9 @@
                        DISPLAY "|    Souhaitez-vous la modifier ?     |"
                        DISPLAY "|                                     |"
                        DISPLAY "|  1 - Oui                            |"
-                       DISPLAY "|  0 - Oui                            |"
+                       DISPLAY "|  0 - Non                            |"
                        DISPLAY "|_____________________________________|"
+                       DISPLAY "Taper votre choix : "
                    ACCEPT erreurProfil
                    IF erreurProfil = 1
                        PERFORM modifierUtilisateur
@@ -1483,7 +1508,7 @@
            DISPLAY "|------------------------------------|"
            PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 0
                DISPLAY "Saisir le nom de l'evenement"
-               DISPLAY"(maximum 30 caracteres)"
+               DISPLAY"(maximum 40 caracteres)"
                ACCEPT nomEvent
                PERFORM existeEvent
            END-PERFORM
@@ -1506,7 +1531,7 @@
                ACCEPT fevent_dateAnnee
            END-PERFORM
            DISPLAY "Veuillez decrire votre evenement"
-           DISPLAY "Format : maximum 50 caracteres"
+           DISPLAY "Format : maximum 250 caracteres"
            ACCEPT descriptionEvent
            DISPLAY "Veuillez saisir l'adresse de l'evenement"
            ACCEPT adresseEvent
@@ -1569,10 +1594,11 @@
                            AND fevent_dateAnnee >= WS-CURRENT-YEAR
                                DISPLAY "|  Nom : "fevent_nom
                                DISPLAY "|  Type : "fevent_type
+                               DISPLAY "| ----------"
                        END-IF
-               END-READ
+                   END-READ
                END-PERFORM
-               CLOSE fevenement.
+               CLOSE fevenement
            .
 
       *-----------------------------------------------------------------
@@ -1613,7 +1639,7 @@
            IF fevent_seuil - nbParticipants <= 0 THEN
                DISPLAY "Evenement complet"
            ELSE
-      * S'il reste de la place on saisie les valeurs pour inscrire l'utilisateur � l'�v�nement
+      * S'il reste de la place on saisie les valeurs pour inscrire l'utilisateur a l'evenement
              MOVE "attente" TO fpart_etat
              MOVE loginSaved TO fpart_login
              MOVE nomSaved TO fpart_nomEvent
@@ -1929,8 +1955,6 @@
                                MOVE 1 TO fin_boucle
                            NOT AT END
                                IF fpart_etat = 'attente' THEN
-
-
                                    DISPLAY "| demande de : " fpart_login
                                    DISPLAY "|--------------------------"
                                END-IF
@@ -2020,6 +2044,7 @@
            END-IF
 
            IF retour = 1 THEN
+               DISPLAY " ____________________________________ "
                DISPLAY "|                                    |"
                DISPLAY "|           Retour au menu           |"
                DISPLAY "|                                    |"
@@ -2254,7 +2279,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|     Modification reussie !    |"
                            DISPLAY "|_______________________________|"
                        ELSE
                            DISPLAY " _______________________________ "
@@ -2283,7 +2308,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|     Modification reussie !    |"
                            DISPLAY "|_______________________________|"
                        ELSE
                            DISPLAY " _______________________________ "
@@ -2306,7 +2331,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|     Modification reussie !    |"
                            DISPLAY "|_______________________________|"
                ELSE
                            DISPLAY " _______________________________ "
@@ -2330,7 +2355,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|     Modification reussie !    |"
                            DISPLAY "|_______________________________|"
                    ELSE
                            DISPLAY " _______________________________ "
@@ -2377,7 +2402,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|     Modification reussie !    |"
                            DISPLAY "|_______________________________|"
                        ELSE
                            DISPLAY " _______________________________ "
@@ -2403,7 +2428,7 @@
                            DISPLAY "|          INFORMATION          |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Modificationreussie !     |"
+                           DISPLAY "|     Modification reussie !    |"
                            DISPLAY "|_______________________________|"
                        ELSE
                            DISPLAY " _______________________________ "
