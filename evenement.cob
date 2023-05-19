@@ -268,7 +268,7 @@
 
       * Utilisateur 3 : administrateur
             MOVE "tmerlet" TO futil_login
-            MOVE "thomas" TO futil_mdp
+            MOVE "tmerlet" TO futil_mdp
             MOVE "MERLET" TO futil_nom
             MOVE "Thomas" TO futil_prenom
             MOVE "thomas.merlet@gmail.com" TO futil_mail
@@ -837,7 +837,7 @@
                            DISPLAY "|   /!\       ERREUR       /!\  |"
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
-                           DISPLAY "|     Mot de passe incorrecte   |"
+                           DISPLAY "|     Mot de passe incorrect    |"
                            DISPLAY "|_______________________________|"
                            END-IF
                    END-READ
@@ -850,7 +850,7 @@
                    DISPLAY "|_______________________________|"
                    DISPLAY "|                               |"
                    DISPLAY "|  Le login ou le mot de passe  |"
-                   DISPLAY "|     ne peuvent etre vident    |"
+                   DISPLAY "|     ne peuvent etre vides     |"
                    DISPLAY "|_______________________________|"
                END-IF
 
@@ -1138,7 +1138,6 @@
                DISPLAY "|  3 - Mail                           |"
                DISPLAY "|  4 - Telephone                      |"
                DISPLAY "|  5 - Formation                      |"
-               DISPLAY "|  6 - Type utilisateur               |"
 
                IF futil_type=1
                    DISPLAY "|  6 - Type utilisateur               |"
@@ -1146,10 +1145,8 @@
                DISPLAY "|                                     |"
                DISPLAY "|  0 - Revenir au menu precedent      |"
                DISPLAY "|_____________________________________|"
-
-               DISPLAY "choix util "choixUtil
+               
                ACCEPT choixUtil
-               DISPLAY "choix util " choixUtil
                EVALUATE choixUtil
                WHEN 1
                    DISPLAY "Votre ancien nom : "futil_nom
@@ -1639,6 +1636,7 @@
                  DISPLAY "Echec de demande d'inscription"
                  DISPLAY "Veuillez reessayer ulterieurement"
              END-IF
+      *    KIWIZ fix this function
            ELSE DISPLAY "Vous avez deja un evenement de prevu"
            END-IF
            CLOSE fparticipant.
