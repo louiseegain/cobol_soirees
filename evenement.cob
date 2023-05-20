@@ -187,7 +187,7 @@
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-       MAIN-LOGIC.
+       MAIN-PROCEDURE.
 
       *-----------------------------------------------------------------
       *                  CREATION DES FICHIERS
@@ -1646,6 +1646,7 @@
                DISPLAY "Veuillez saisir l'heure de debut de l'evenement"
                DISPLAY " Format : xxhxx, avec x un chiffre"
                ACCEPT heureEvent
+               PERFORM verifHeure
            END-PERFORM
            
            MOVE nomEvent TO fevent_nom
@@ -2853,12 +2854,13 @@
            END-IF
 
            IF heureEvent(1:1) = 0 OR heureEvent(1:1) = 1 THEN
-               IF heureEvent(1:1) IS NOT NUMERIC
+               IF heureEvent(1:1) IS NOT NUMERIC THEN
                    MOVE 0 TO estValideHeure
                END-IF    
            ELSE
                IF heureEvent(1:1) = 2 THEN
                    IF heureEvent(2:1) > 3 THEN
+                   DISPLAY "KIWIZ 3"
                        MOVE 0 TO estValideHeure
                    END-IF 
                END-IF
