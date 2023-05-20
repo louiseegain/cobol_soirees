@@ -1268,6 +1268,9 @@
                        DISPLAY "d'utilisateur (1 = Admin, 0 = Membre) :"
                        ACCEPT futil_type
                        PERFORM modifUtil
+                       IF futil_login = loginSaved THEN
+                           MOVE futil_type TO typeSaved 
+                       END-IF 
                    END-IF
                    CLOSE futilisateur
            END-READ
@@ -2728,7 +2731,7 @@
            .
       *-----------------------------------------------------------------
       *    Procedure permettant a l'utilisateur d'archiver tous
-      *    les evenements passes en faisant appel à la fonction archiver_event
+      *    les evenements passes en faisant appel ï¿½ la fonction archiver_event
       *-----------------------------------------------------------------
        tout_archiver.
            OPEN INPUT fevenement
