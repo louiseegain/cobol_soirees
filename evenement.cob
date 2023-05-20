@@ -558,6 +558,7 @@
                DISPLAY "|  2 - Creer mon compte               |"
                DISPLAY "|  0 - Quitter                        |"
                DISPLAY "|_____________________________________|"
+
                DISPLAY "Taper votre choix :"
                ACCEPT choix
 
@@ -1600,25 +1601,36 @@
       **aucune contrainte sur ce champ
            DISPLAY "Saisir le type d'evenement"
            ACCEPT typeEvent
-           DISPLAY "Saisir la date de l'evenement"
-           DISPLAY "JOUR : "
+
+           PERFORM WITH TEST AFTER UNTIL dateComparee = 2
+               DISPLAY "Saisir la date de l'evenement"
+               
       **on verifie que le jour est bien compris entre 1 et 31
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateJour>0 AND fevent_dateJour<=31
-               ACCEPT fevent_dateJour
-           END-PERFORM
-           DISPLAY "MOIS : "
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateJour>0 AND fevent_dateJour<=31
+                   DISPLAY "JOUR : "
+                   ACCEPT fevent_dateJour
+               END-PERFORM
+               
       **on verifie que le mois est bien compris entre 1 et 12
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateMois>0 AND fevent_dateMois<=12
-               ACCEPT fevent_dateMois
-           END-PERFORM
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateMois>0 AND fevent_dateMois<=12
+                   DISPLAY "MOIS : "
+                   ACCEPT fevent_dateMois
+               END-PERFORM
       **on verifie que l'annee est bien superieure ou egale a l'annee courante
-           DISPLAY "ANNEE : "
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateAnnee>=WS-CURRENT-YEAR
-               ACCEPT fevent_dateAnnee
-           END-PERFORM
+               
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateAnnee>=WS-CURRENT-YEAR
+                   DISPLAY "ANNEE : "
+                   ACCEPT fevent_dateAnnee
+               END-PERFORM
+               PERFORM comparer_date
+               IF dateComparee <> 2 THEN
+                   DISPLAY "Saisir une date a venir !"
+               END-IF
+           END-PERFORM 
+
            DISPLAY "Veuillez decrire votre evenement"
            DISPLAY "Format : maximum 250 caracteres"
            ACCEPT descriptionEvent
@@ -1629,11 +1641,13 @@
                DISPLAY "Veuillez saisir le nombre maximal de personne"
                ACCEPT seuilEvent
            END-PERFORM
-      **/!\ nous n'avons pas reussie a faire une verification sur le format de l'heure/!\
-           DISPLAY "Veuillez saisir l'heure de debut de l'evenement"
-           DISPLAY " Format : xxhxx, avec x un chiffre"
-           ACCEPT heureEvent
 
+           PERFORM WITH TEST AFTER UNTIL estValideHeure = 1
+               DISPLAY "Veuillez saisir l'heure de debut de l'evenement"
+               DISPLAY " Format : xxhxx, avec x un chiffre"
+               ACCEPT heureEvent
+           END-PERFORM
+           
            MOVE nomEvent TO fevent_nom
            MOVE typeEvent TO fevent_type
            MOVE loginSaved TO fevent_loginOrga
@@ -2832,24 +2846,34 @@
       *    Procedure verifiant le format horaire
       *    La variable verifiee est heureEvent
       ******************************************************************
-       *> verifHeure.
-           *> MOVE 1 TO estValideHeure
-           *> COMPUTE longHeure = FUNCTION LENGTH (heureEvent)
-           *> IF longHeure <> 5 THEN
-               *> MOVE 0 TO estValideHeure
-           *> ELSE
-               *> IF NOT NUMERIC(heureEvent(1:2)) THEN
-                   *> MOVE 0 TO estValideHeure
-               *> ELSE
-                   *> IF heureEvent(3:1) <> 'h' THEN
-                       *> MOVE 0 TO estValideHeure
-                   *> ELSE
-                       *> IF NOT NUMERIC(heureEvent(4:2))
-                           *> MOVE 0 TO estValideHeure
-                       *> END-IF
-                   *> END-IF
-               *> END-IF
-           *> END-IF.
+       verifHeure.
+           MOVE 1 TO estValideHeure
+           IF heureEvent(1:1) < 0 OR heureEvent(1:1) > 2 THEN
+               MOVE 0 TO estValideHeure
+           END-IF
+
+           IF heureEvent(1:1) = 0 OR heureEvent(1:1) = 1 THEN
+               IF heureEvent(1:1) IS NOT NUMERIC
+                   MOVE 0 TO estValideHeure
+               END-IF    
+           ELSE
+               IF heureEvent(1:1) = 2 THEN
+                   IF heureEvent(2:1) > 3 THEN
+                       MOVE 0 TO estValideHeure
+                   END-IF 
+               END-IF
+           END-IF
+
+           IF heureEvent(3:1) <> 'h' THEN
+                IF heureEvent(3:1) <> 'H' THEN
+                    MOVE 0 TO estValideHeure
+                END-IF
+           END-IF
+           
+           IF heureEvent(4:1) > 5 THEN
+               MOVE 0 TO estValideHeure
+           END-IF 
+           .
 
       *-----------------------------------------------------------------
       *    Procedure calculant le nombre de participations
