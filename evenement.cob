@@ -2860,7 +2860,6 @@
            ELSE
                IF heureEvent(1:1) = 2 THEN
                    IF heureEvent(2:1) > 3 THEN
-                   DISPLAY "KIWIZ 3"
                        MOVE 0 TO estValideHeure
                    END-IF 
                END-IF
