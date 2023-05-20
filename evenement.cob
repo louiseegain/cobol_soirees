@@ -1801,6 +1801,7 @@
            DISPLAY "|------------------------------------|"
            DISPLAY "Veuillez saisir le login de la personne souhaitee :"
            ACCEPT login
+           MOVE login to futil_login
            OPEN INPUT futilisateur
            READ futilisateur
                INVALID KEY
