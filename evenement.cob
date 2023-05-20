@@ -181,6 +181,9 @@
        77 erreurCompte PIC 9(1).
        77 verif_mdp_ok PIC 9(1).
        77 annee PIC 9(4).
+       77 verif_dot PIC 9(1).
+       77 verif_domain PIC 9(1).
+       77 valide_alpha PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -595,10 +598,11 @@
            ACCEPT futil_prenom
 
       **verification du format xxxxx@xxxx.fr ou xxxxx@xxxx.com
-           PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 0
+           MOVE 0 TO verif_mail_ok
+           PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
                DISPLAY "Entrer votre adresse mail :"
                ACCEPT futil_mail
-               PERFORM verif_mail
+               PERFORM verif_mail2
            END-PERFORM
 
       ** verification du format d'un nombre de 10 chiffres pour le tel
@@ -775,7 +779,56 @@
                END-IF
            END-IF.
 
+       verif_mail2.
+           MOVE 0 TO verif_arobase
+           MOVE 0 TO verif_dot
+           MOVE 0 TO verif_domain
+           MOVE 0 TO verif_mail_ok
+           MOVE 1 TO I
+           MOVE futil_mail TO chaine
 
+      *    Le premier caractere est une lettre
+           IF chaine(1:1) IS ALPHABETIC THEN
+               MOVE 0 TO fin_boucle      
+      *    La chaine contient un arobase : 
+               PERFORM UNTIL verif_arobase = 1 or fin_boucle = 1
+                   IF chaine(I:1) EQUAL '@' THEN
+                       MOVE 1 TO verif_arobase
+                   END-IF
+                   IF chaine(I:1) EQUAL SPACE THEN
+                       MOVE 1 TO fin_boucle
+                   END-IF
+                   ADD 1 TO I
+               END-PERFORM
+      *    Une lettre est presente apres l'arobase
+      *    Un bug peut venir du I auquel il faut ajouter 1 
+               IF chaine(I:1) IS ALPHABETIC THEN
+                   IF verif_arobase = 1 THEN
+                       MOVE 0 TO fin_boucle
+      *    On verifie la presence d'un point              
+                       PERFORM UNTIL verif_dot = 1 OR fin_boucle = 1
+                           IF chaine(I:1) EQUAL "." THEN
+                               MOVE 1 TO verif_dot
+                           END-IF
+                           IF chaine(I:1) EQUAL SPACE THEN
+                               MOVE 1 TO fin_boucle
+                           END-IF
+                           ADD 1 TO I
+                       END-PERFORM
+                       IF verif_dot = 1 THEN
+                           ADD 1 TO I
+      *    On verifie la presence d'une lettre apres le point
+                           IF chaine(I:1) IS ALPHABETIC THEN
+                               MOVE 1 TO verif_mail_ok
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF 
+           .
+
+           
+               
       ******************************************************************
       * Fonction annexe :
       *    Procedure permettant de verifier le numero de telephone
