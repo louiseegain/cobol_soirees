@@ -2308,13 +2308,15 @@
            DISPLAY "|       STATISTIQUES GLOBALES        |"
            DISPLAY "|------------------------------------|"
            DISPLAY "| Nombre d'evenements :              |"
-           DISPLAY "|   "nbEvents
+           DISPLAY "|   "nbEvents "                              |"
            DISPLAY "| Archivables :                      |"
-           DISPLAY "|   "nbEventArchivables
+           DISPLAY "|   "nbEventArchivables"
+      -    "  |"  
            DISPLAY "| Nombre d'utilisateurs :            |"
-           DISPLAY "|   "nbUtils
+           DISPLAY "|   "nbUtils"                             |"
            DISPLAY "| Nombre d'evenements archives :     |"
-           DISPLAY "|   "nbEventArchives
+           DISPLAY "|   "nb
+      -    EventArchives"                              |"
            DISPLAY "|____________________________________|"
            CLOSE fhistorique.
 
