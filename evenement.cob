@@ -13,25 +13,25 @@
       *-----------------------
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           select futilisateur assign TO "utilisateur.dat"
-           organization indexed
-           access mode is dynamic
-           record KEY IS futil_login
+           SELECT futilisateur ASSIGN TO "utilisateur.dat"
+           ORGANIZATION INDEXED
+           ACCESS MODE IS DYNAMIC
+           RECORD KEY IS futil_login
            ALTERNATE RECORD KEY IS futil_mail
            ALTERNATE RECORD KEY IS futil_tel
            ALTERNATE RECORD KEY IS futil_formation WITH DUPLICATES
            ALTERNATE RECORD KEY IS futil_nom WITH DUPLICATES
-           file status is cr_futil.
+           FILE STATUS IS cr_futil.
 
 
-           select fevenement assign TO "evenement.dat"
-           organization indexed
-           access mode is dynamic
-           record KEY IS fevent_nom
+           SELECT fevenement ASSIGN TO "evenement.dat"
+           ORGANIZATION INDEXED
+           ACCESS MODE IS DYNAMIC
+           RECORD KEY IS fevent_nom
            ALTERNATE RECORD KEY IS fevent_type WITH DUPLICATES
            ALTERNATE RECORD KEY IS fevent_dateMois WITH DUPLICATES
            ALTERNATE RECORD KEY IS fevent_loginOrga WITH DUPLICATES
-           file status is cr_fevent.
+           FILE STATUS IS cr_fevent.
 
 
            SELECT fparticipant ASSIGN TO "participant.dat"
@@ -184,7 +184,7 @@
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-       MAIN-PROCEDURE.
+       MAIN-LOGIC.
 
       *-----------------------------------------------------------------
       *                  CREATION DES FICHIERS
@@ -548,11 +548,7 @@
       *-----------------------------------------------------------------
 
        accueil.
-      *     MOVE 9 TO choix
            PERFORM WITH TEST AFTER UNTIL choix = 0
-      *         DISPLAY "Annee : "WS-CURRENT-YEAR
-      *         DISPLAY "Mois : "WS-CURRENT-MONTH
-      *         DISPLAY "Jour : "WS-CURRENT-DAY
                DISPLAY " _____________________________________"
                DISPLAY "|                                     |"
                DISPLAY "|  1 - Me connecter a mon compte      |"
@@ -615,22 +611,53 @@
            DISPLAY "Entrer le nom de votre formation :"
            ACCEPT futil_formation
            DISPLAY "Entrer votre date de naissance :"
+
+      ** on verifie que le jour de naissance est bien compris entre 1 et 31
            PERFORM WITH TEST AFTER UNTIL futil_naissanceJour>0 AND
                futil_naissanceJour<=31
            DISPLAY "JOUR (entre 1 et 31): "
                ACCEPT futil_naissanceJour
            END-PERFORM
 
+      ** on verifie que le mois de naissance est bien compris entre 1 et 12
            PERFORM WITH TEST AFTER UNTIL futil_naissanceMois>0 AND
                futil_naissanceMois<=12
                DISPLAY "MOIS (entre 1 et 12): "
                ACCEPT futil_naissanceMois
            END-PERFORM
 
+      **on verifie que l'annee de naissance est inferieur a l'annee en cours
             PERFORM WITH TEST AFTER UNTIL
-                futil_naissanceAnnee<=2023
+                futil_naissanceAnnee<=WS-CURRENT-YEAR AND
+                futil_naissanceAnnee<2006
                 DISPLAY "ANNEE :"
                ACCEPT futil_naissanceAnnee
+
+      **on verifie que l'utilisateur est majeur
+               IF futil_naissanceAnnee>2005 AND
+                   futil_naissanceAnnee<= WS-CURRENT-YEAR THEN
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|     Vous devez etre dans      |"
+                   DISPLAY "|  l'annee de votre majorite    |"
+                   DISPLAY "|     pour vous inscrire        |"
+                   DISPLAY "|_______________________________|"
+
+      ** on verifie qu'il ne met pas une annee superieure a l'anne courante
+                ELSE IF futil_naissanceAnnee > WS-CURRENT-YEAR THEN
+                    DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|   Veuillez saisir une annee   |"
+                   DISPLAY "| inferieure a l'annee courante |"
+                   DISPLAY "|     pour vous inscrire        |"
+                   DISPLAY "|_______________________________|"
+               END-IF
             END-PERFORM
            MOVE 0 TO futil_type
 
@@ -699,13 +726,14 @@
                    DISPLAY "|          compte cree !        |"
                    DISPLAY "|_______________________________|"
            END-WRITE.
-               DISPLAY cr_futil
+      *     DISPLAY cr_futil
            CLOSE futilisateur.
 
-      *-----------------------------------------------------------------
-      *         Procedure permettant de verifier le format d'une
-      *         adresse mail
-      *-----------------------------------------------------------------
+      ******************************************************************
+      * Fonction annexe :
+      *    Procedure permettant de verifier l'adresse mail
+      *    saisi par l'utilisateur
+      ******************************************************************
        verif_mail.
            MOVE 0 TO verif_arobase
            MOVE 1 TO verif_mail_ok
@@ -750,8 +778,8 @@
 
       ******************************************************************
       * Fonction annexe :
-      *          Procedure permettant de verifier le numero de telephone
-      *          saisi par l'utilisateur
+      *    Procedure permettant de verifier le numero de telephone
+      *    saisi par l'utilisateur
       ******************************************************************
        verif_tel.
            MOVE 1 TO I
@@ -795,7 +823,6 @@
                DISPLAY "|                                     |"
                DISPLAY "|             CONNEXION               |"
                DISPLAY "|_____________________________________|"
-
                DISPLAY "|  Entrer votre login :               |"
                ACCEPT login
                DISPLAY "|  Entrer votre mot de passe :        |"
@@ -891,6 +918,8 @@
 
            ACCEPT fermeAppli
 
+      **en fonction du choix saisi par l'utilisateur, il sera dirige vers
+      **le menu souhaite
            EVALUATE fermeAppli
                WHEN 1 PERFORM gererProfil
                WHEN 2 PERFORM gestionEvenement
@@ -969,6 +998,8 @@
            DISPLAY "|  2 - Supprimer votre profil         |"
            DISPLAY "|  3 - Consulter votre profil         |"
            DISPLAY "|                                     |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
            DISPLAY "|  0 - Revenir au menu precedent      |"
            DISPLAY "|_____________________________________|"
       **         DISPLAY "choix : "choixProfil
@@ -1031,6 +1062,8 @@
            DISPLAY "|  3 - Afficher tous les organisateurs|"
            DISPLAY "|  4 - Afficher tous les utilisateurs |"
            DISPLAY "|                                     |"
+           DISPLAY "|-------------------------------------|"
+           DISPLAY "|                                     |"
            DISPLAY "|  0 - Revenir au menu precedent      |"
            DISPLAY "|_____________________________________|"
            ACCEPT choixEvent
@@ -1045,13 +1078,6 @@
 
            END-PERFORM
            .
-
-
-
-
-
-
-
 
       *-----------------------------------------------------------------
       *      Procedure gerant le menu des evenements
@@ -1068,6 +1094,8 @@
                DISPLAY "|  2 - Modifier un evenement          |"
                DISPLAY "|  3 - Supprimer un evenement         |"
                DISPLAY "|  4 - Afficher evenements            |"
+               DISPLAY "|                                     |"
+               DISPLAY "|-------------------------------------|"
                DISPLAY "|                                     |"
                DISPLAY "|  0 - Revenir au menu precedent      |"
                DISPLAY "|_____________________________________|"
@@ -1098,7 +1126,9 @@
                DISPLAY "|                                     |"
                DISPLAY "|  1 - Statistiques generales         |"
                DISPLAY "|  2 - Statistique selon formation    |"
-               DISPLAY "|      et mois                        |"
+               DISPLAY "|      mois et type                   |"
+               DISPLAY "|                                     |"
+               DISPLAY "|-------------------------------------|"
                DISPLAY "|                                     |"
                DISPLAY "|  0 - Revenir au menu precedent      |"
                DISPLAY "|_____________________________________|"
@@ -1106,7 +1136,7 @@
 
                EVALUATE choixStat
                WHEN 1 PERFORM afficherStats
-      *        WHEN 2 PERFORM statFormaMois
+               WHEN 2 PERFORM statFormaMois
                WHEN 0 PERFORM menuUtilisateur
                END-EVALUATE
            END-PERFORM
@@ -1131,14 +1161,15 @@
                DISPLAY "|  3 - Mail                           |"
                DISPLAY "|  4 - Telephone                      |"
                DISPLAY "|  5 - Formation                      |"
-
                IF futil_type=1
                    DISPLAY "|  6 - Type utilisateur               |"
                END-IF
                DISPLAY "|                                     |"
+               DISPLAY "|-------------------------------------|"
+               DISPLAY "|                                     |"
                DISPLAY "|  0 - Revenir au menu precedent      |"
                DISPLAY "|_____________________________________|"
-               
+
                ACCEPT choixUtil
                EVALUATE choixUtil
                WHEN 1
@@ -1186,8 +1217,8 @@
            .
 
       *-----------------------------------------------------------------
-      *      Procedure permettant ï¿½ l'administrateur de rechercher un
-      *      utilisateur membre afin de lui donner ou enlever les droits admin
+      *    Procedure permettant a l'administrateur de rechercher un
+      *    utilisateur membre afin de lui donner ou enlever les droits admin
       *-----------------------------------------------------------------
        modifierProfilAdmin.
            PERFORM consulterUtilisateurs
@@ -1199,7 +1230,7 @@
            DISPLAY "|           Quel utilisateur          |"
            DISPLAY "|       souhaitez-vous modifier ?     |"
            DISPLAY "|_____________________________________|"
-
+           DISPLAY" "
            DISPLAY "Veuillez saisir son login :"
            ACCEPT futil_login
            OPEN I-O futilisateur
@@ -1229,7 +1260,7 @@
                    DISPLAY "|         le modifier ?         |"
                    DISPLAY "|                               |"
                    DISPLAY "|  1 - Oui                      |"
-                   DISPLAY "|  2 - Non                      |"
+                   DISPLAY "|  0 - Non                      |"
                    DISPLAY "|_______________________________|"
                    ACCEPT reponse
                    IF reponse = 1 THEN
@@ -1286,19 +1317,29 @@
                    DISPLAY "|_____________________________________|"
 
                NOT INVALID KEY
-                   DISPLAY "| Nom : " futil_nom
-                   DISPLAY "| Prenom : " futil_prenom
-                   DISPLAY "| Mail : " futil_mail
-                   DISPLAY "| Telephone : " futil_tel
-                   DISPLAY "| Formation : " futil_formation
-                   DISPLAY "| Login : " futil_login
-                   DISPLAY "| Type d'utilisateur :"
+                   DISPLAY "| Nom :                               |"
+                   DISPLAY "|   "futil_nom
+                   DISPLAY "| Prenom :                            |"
+                   DISPLAY "|   "futil_prenom
+                   DISPLAY "| Mail :                              |"
+                   DISPLAY "|   "futil_mail
+                   DISPLAY "| Telephone :                         |"
+                   DISPLAY "|   "futil_tel
+                   DISPLAY "| Formation :                         |"
+                   DISPLAY "|   "futil_formation
+                   DISPLAY "| Login :                             |"
+                   DISPLAY "|   "futil_login
+                   DISPLAY "| Type d'utilisateur :                |"
                    IF futil_type=1
                        DISPLAY "|   Administrateur"
                    ELSE
-                       DISPLAY "|   Membre"
+                       IF futil_type=2 THEN
+                               DISPLAY "|  Organisateur"
+                           ELSE
+                               DISPLAY "|  Membre"
+                       END-IF
                    END-IF
-                   DISPLAY "| Date de naissance : "
+                   DISPLAY "| Date de naissance :                 |"
                    DISPLAY "|   " futil_naissanceJour"/"
                        futil_naissanceMois"/"
       -              futil_naissanceAnnee
@@ -1314,7 +1355,7 @@
                        DISPLAY "|  0 - Non                            |"
                        DISPLAY "|_____________________________________|"
                        DISPLAY "Taper votre choix : "
-                   ACCEPT erreurProfil
+                       ACCEPT erreurProfil
                    IF erreurProfil = 1
                        PERFORM modifierUtilisateur
                    ELSE
@@ -1325,8 +1366,8 @@
 
 
       *-----------------------------------------------------------------
-      *      Procedure permettant d'afficher tous les utilisateurs
-      *      presents dans l'application. Qu'ils soient membres ou admin
+      *    Procedure permettant d'afficher tous les utilisateurs
+      *    presents dans l'application. Qu'ils soient membres ou admin
       *-----------------------------------------------------------------
        consulterUtilisateurs.
            DISPLAY " -------------------------------------"
@@ -1340,16 +1381,24 @@
                    AT END
                        MOVE 1 TO Fin
                    NOT AT END
-                       DISPLAY "| Nom :" futil_nom
-                       DISPLAY "| Prenom :" futil_prenom
-                       DISPLAY "| Mail : " futil_mail
-                       DISPLAY "| Formation : "futil_formation
-                       DISPLAY "| Login : "futil_login
-                       DISPLAY "| Type d'utilisateur : "
+                       DISPLAY "| Nom :                              |"
+                       DISPLAY "|  "futil_nom
+                       DISPLAY "| Prenom :                           |"
+                       DISPLAY "|  " futil_prenom
+                       DISPLAY "| Mail :                             |"
+                       DISPLAY "|  "futil_mail
+                       DISPLAY "| Formation :                        |"
+                       DISPLAY "|  "futil_formation
+                       DISPLAY "| Login :                            |"
+                       DISPLAY "|  "futil_login
+                       DISPLAY "| Type d'utilisateur :               |"
                        IF futil_type=1
                            DISPLAY "|  Administrateur"
                        ELSE
-                           DISPLAY "|  Membre"
+                           IF futil_type=2 THEN
+                               DISPLAY "|  Organisateur"
+                           ELSE
+                               DISPLAY "|  Membre"
                        END-IF
                        DISPLAY "|____________________________________|"
                END-READ
@@ -1388,7 +1437,7 @@
                        DISPLAY "Nom : " fevent_nom
                        DISPLAY "Type : "fevent_type
                        DISPLAY "Date : "fevent_dateJour"/"
-                       DISPLAY fevent_dateMois"/"fevent_dateAnnee
+      -                fevent_dateMois"/"fevent_dateAnnee
                        MOVE fevent_dateJour TO dateJour
                        MOVE fevent_dateMois TO dateMois
                        MOVE fevent_dateAnnee TO dateAnnee
@@ -1416,7 +1465,7 @@
                        ELSE
                         DISPLAY " ____________________________________"
                         DISPLAY "|                                    |"
-                        DISPLAY "|   Merci pour votre consulation !   |"
+                        DISPLAY "|   Merci pour votre consultation !  |"
                         DISPLAY "|____________________________________|"
                            PERFORM rechercherEvent
                        END-IF
@@ -1470,11 +1519,11 @@
                END-IF
            END-READ
 
-      *     IF cr_fevent = 00
+      *     IF cr_fhisto = 00
       *     THEN DISPLAY "Evenement trouve"
       *     ELSE DISPLAY "Evenement non trouve"
       *     END-IF
-      *     CLOSE fevenement
+           CLOSE fhistorique
            .
 
       *----------------------------------------------------------------
@@ -1485,25 +1534,30 @@
            DISPLAY "|                                    |"
            DISPLAY "|         CREATION EVENEMENT         |"
            DISPLAY "|------------------------------------|"
+      **on verifie que le nom de l'evenement est bon
            PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 0
                DISPLAY "Saisir le nom de l'evenement"
                DISPLAY"(maximum 40 caracteres)"
                ACCEPT nomEvent
                PERFORM existeEvent
            END-PERFORM
+      **aucune contrainte sur ce champ
            DISPLAY "Saisir le type d'evenement"
            ACCEPT typeEvent
            DISPLAY "Saisir la date de l'evenement"
            DISPLAY "JOUR : "
+      **on verifie que le jour est bien compris entre 1 et 31
            PERFORM WITH TEST AFTER UNTIL
                fevent_dateJour>0 AND fevent_dateJour<=31
                ACCEPT fevent_dateJour
            END-PERFORM
            DISPLAY "MOIS : "
+      **on verifie que le mois est bien compris entre 1 et 12
            PERFORM WITH TEST AFTER UNTIL
                fevent_dateMois>0 AND fevent_dateMois<=12
                ACCEPT fevent_dateMois
            END-PERFORM
+      **on verifie que l'annee est bien superieure ou egale a l'annee courante
            DISPLAY "ANNEE : "
            PERFORM WITH TEST AFTER UNTIL
                fevent_dateAnnee>=WS-CURRENT-YEAR
@@ -1514,10 +1568,12 @@
            ACCEPT descriptionEvent
            DISPLAY "Veuillez saisir l'adresse de l'evenement"
            ACCEPT adresseEvent
+      **on verifie que le seuil n'est pas de 0 et donc aucune inscription possible
            PERFORM UNTIL seuilEvent > 0
                DISPLAY "Veuillez saisir le nombre maximal de personne"
                ACCEPT seuilEvent
            END-PERFORM
+      **/!\ nous n'avons pas reussie a faire une verification sur le format de l'heure/!\
            DISPLAY "Veuillez saisir l'heure de debut de l'evenement"
            DISPLAY " Format : xxhxx, avec x un chiffre"
            ACCEPT heureEvent
@@ -1529,6 +1585,7 @@
            MOVE adresseEvent TO fevent_adresse
            MOVE seuilEvent TO fevent_seuil
            MOVE heureEvent TO fevent_heure
+           MOVE 2 TO futil_type
 
            OPEN I-O fevenement
            WRITE tamp_fevent
@@ -1549,7 +1606,7 @@
            CLOSE fevenement.
 
       *-----------------------------------------------------------------
-      *          Procedure permettant d'afficher les evenements
+      *    Procedure permettant d'afficher les evenements
       *-----------------------------------------------------------------
        afficheEvent.
            DISPLAY " ------------------------------------"
@@ -1578,15 +1635,15 @@
            .
 
       *-----------------------------------------------------------------
-      *          Procedure permettant de s'inscrire a un evenement
+      *    Procedure permettant de s'inscrire a un evenement
       *-----------------------------------------------------------------
         inscriptionEvent.
-           MOVE 0 TO Fin 
+           MOVE 0 TO Fin
            MOVE 1 TO valideInscription
            MOVE 0 TO nbParticipants
 
            OPEN I-O fparticipant
-      * On verifie dans un premier temps qu'il n'est pas deja inscrit a 
+      * On verifie dans un premier temps qu'il n'est pas deja inscrit a
       * un evenement ou fait une demande
            MOVE loginSaved TO fpart_login
            PERFORM WITH TEST AFTER UNTIL Fin = 1
@@ -1611,7 +1668,7 @@
                                     DISPLAY " ________________________"
                                     DISPLAY "|                        |"
                                     DISPLAY "| Vous etes deja inscrit |"
-                                    DISPLAY "|     A cet evenement    |"
+                                    DISPLAY "|     a cet evenement    |"
                                     DISPLAY "|________________________|"
                                 END-IF
                                 IF fpart_etat = "attente" THEN
@@ -1635,10 +1692,10 @@
                        END-READ
                END-START
            END-PERFORM
-           
+
 
            IF valideInscription = 1 THEN
-      * On verifie dans un premier temps qu'il reste de la place dans l'evenment
+      * On verifie dans un deuxieme temps qu'il reste de la place dans l'evenment
                IF fevent_seuil - nbParticipants <= 0 THEN
                    DISPLAY "Evenement complet"
                    DISPLAY "________________________"
@@ -1649,7 +1706,7 @@
                END-IF
            END-IF
 
-           IF valideInscription = 1 THEN    
+           IF valideInscription = 1 THEN
       * S'il reste de la place on saisit les valeurs pour inscrire l'utilisateur
       * a l'evenement
                MOVE "attente" TO fpart_etat
@@ -1770,16 +1827,21 @@
                         DISPLAY "|------------------------------------|"
                         DISPLAY "|      INFORMATIONS UTILISATEUR      |"
                         DISPLAY "|------------------------------------|"
-                        DISPLAY "| Nom :"futil_nom
-                        DISPLAY "| Prenom : "futil_prenom
-                        DISPLAY "| Mail : " futil_mail
-                        DISPLAY "| Telephone : "futil_tel
-                        DISPLAY "| Login : "futil_login
-                        DISPLAY "| Type d'utilisateur : "
+                        DISPLAY "| Nom :                              |"
+                        DISPLAY "|   "futil_nom
+                        DISPLAY "| Prenom :                           |"
+                        DISPLAY "|   "futil_prenom
+                        DISPLAY "| Mail :                             |"
+                        DISPLAY "|   "futil_mail
+                        DISPLAY "| Telephone :                        |"
+                        DISPLAY "|   "futil_tel
+                        DISPLAY "| Login :                            |"
+                        DISPLAY "|   "futil_login
+                        DISPLAY "| Type d'utilisateur :               |"
                         IF futil_type = 1 THEN
-                            DISPLAY "   Administrateur"
+                            DISPLAY "|   Administrateur"
                         ELSE
-                            DISPLAY "   Membre"
+                            DISPLAY "|   Membre"
                         END-IF
                         DISPLAY "|____________________________________|"
                        END-IF
@@ -1820,16 +1882,24 @@
                         DISPLAY "|------------------------------------|"
                         DISPLAY "|      INFORMATIONS UTILISATEUR      |"
                         DISPLAY "|------------------------------------|"
-                        DISPLAY "| Nom :"futil_nom
-                        DISPLAY "| Prenom : "futil_prenom
-                        DISPLAY "| Mail : " futil_mail
-                        DISPLAY "| Telephone : "futil_tel
-                        DISPLAY "| Login : "futil_login
-                        DISPLAY "| Type d'utilisateur : "
+                        DISPLAY "| Nom :                              |"
+                        DISPLAY "|   "futil_nom
+                        DISPLAY "| Prenom :                           |"
+                        DISPLAY "|   "futil_prenom
+                        DISPLAY "| Mail :                             |"
+                        DISPLAY "|   "futil_mail
+                        DISPLAY "| Telephone :                        |"
+                        DISPLAY "|   "futil_tel
+                        DISPLAY "| Login :                            |"
+                        DISPLAY "|   "futil_login
+                        DISPLAY "| Type d'utilisateur :               |"
                         IF futil_type = 1 THEN
-                            DISPLAY "   Administrateur"
-                        ELSE
-                            DISPLAY "   Membre"
+                            DISPLAY "|   Administrateur"
+                        ELSE IF futil_type=2 THEN
+                               DISPLAY "|   Organisateur"
+                             ELSE
+                               DISPLAY "|   Membre"
+                             END-IF
                         END-IF
                         DISPLAY "|____________________________________|"
                    END-IF
@@ -1905,7 +1975,7 @@
                    DISPLAY "|     Utilisateur supprime      |"
                    DISPLAY "|_______________________________|"
                    DISPLAY " "
-                   DISPLAY "-------------------------------------------"
+                   DISPLAY " ----------------------------------------- "
                    DISPLAY "|         VOUS AVEZ ETE DECONNECTE        |"
                    DISPLAY "|_________________________________________|"
                    PERFORM accueil
@@ -1930,15 +2000,20 @@
 
                PERFORM WITH TEST AFTER UNTIL fdf=0
                    READ futilisateur
-                   AT END MOVE 0 TO fdf
+                   AT END
+                       MOVE 0 TO fdf
                    not AT END
                        MOVE futil_login TO fevent_loginOrga
                        START fevenement , KEY IS = fevent_loginOrga
-                           NOT INVALID KEY
-
-                           DISPLAY "| Nom :"futil_nom
-                           DISPLAY "| Prenom : "futil_prenom
-                           DISPLAY "| Login : "futil_login
+                        NOT INVALID KEY
+                        DISPLAY "|                                    |"
+                        DISPLAY "| Nom :                              |"
+                        DISPLAY "|   "futil_nom
+                        DISPLAY "| Prenom :                           |"
+                        DISPLAY "|   "futil_prenom
+                        DISPLAY "| Login :                            |"
+                        DISPLAY "|   "futil_login
+                        DISPLAY "|--------                            |"
                        END-START
                    END-READ
                END-PERFORM
@@ -2043,7 +2118,7 @@
                         DISPLAY "|____________________________________|"
                         DISPLAY " "
                         DISPLAY "Votre choix :"
-               ACCEPT fin_boucle
+                        ACCEPT fin_boucle
                CLOSE fparticipant
            END-PERFORM
            END-IF.
@@ -2078,7 +2153,7 @@
       *    participants avant :
 
                DISPLAY "Suppression des participations liees a"
-           "l'evenement"
+      -     "l'evenement"
                DISPLAY "|                                    |"
                DISPLAY "|    Suppresion des participants     |"
                DISPLAY "|         liees a l'evenement        |"
@@ -2159,21 +2234,30 @@
                        MOVE 1 TO fin_boucle
                    NOT AT END
                        DISPLAY "|------------------------------------|"
-                       DISPLAY "| Nom : ",fevent_nom
-                       DISPLAY "| Places : ", fevent_seuil
-                       DISPLAY "| Date : "fevent_dateJour"/"
+                       DISPLAY "| Nom :                              |"
+                       DISPLAY "|   "fevent_nom
+                       DISPLAY "| Places :                           |"
+                       DISPLAY "|   "fevent_seuil
+                       DISPLAY "| Date :                             |"
+                       DISPLAY "|   "fevent_dateJour"/"
       -                fevent_dateMois"/"fevent_dateAnnee
-                       DISPLAY "| Type : ", fevent_type
-                       DISPLAY "| Description : ", fevent_description
-                       DISPLAY "| Adresse : ", fevent_adresse
+                       DISPLAY "| Type :                             |"
+                       DISPLAY "|   "fevent_type
+                       DISPLAY "| Description :                      |"
+                       DISPLAY "|   "fevent_description
+                       DISPLAY "| Adresse :                          |"
+                       DISPLAY "|   "fevent_adresse
                        DISPLAY "|------------------------------------|"
                END-PERFORM
            END-START
            CLOSE fevenement
            .
+      *-----------------------------------------------------------------
+      *    Affiche toutes les statistiques globales de l'administrateur
+      *-----------------------------------------------------------------
 
        afficherStats.
-      * Affiche le nombre d'ï¿½vï¿½nements prï¿½sents sur toute la plateforme
+      **Affiche le nombre d'evenements presents sur toute la plateforme
            MOVE 0 TO nbEvents
            MOVE 0 TO nbEventArchivables
            MOVE 0 TO nbUtils
@@ -2219,14 +2303,16 @@
            DISPLAY "|                                    |"
            DISPLAY "|       STATISTIQUES GLOBALES        |"
            DISPLAY "|------------------------------------|"
-           DISPLAY "| Nombre d'evenements : ", nbEvents"          |"
-           DISPLAY "| Archivables : ", nbEventArchivables "
-      -    "     |" 
-           DISPLAY "| Nombre d'utilisateurs : ", nbUtils "       |"
-           DISPLAY "| Nombre d'evenements archives : ", nbEventArchives"
-      -    " |" 
-           DISPLAY "|____________________________________|".
-
+           DISPLAY "| Nombre d'evenements :              |"
+           DISPLAY "|   "nbEvents
+           DISPLAY "| Archivables :                      |"
+           DISPLAY "|   "nbEventArchivables
+           DISPLAY "| Nombre d'utilisateurs :            |"
+           DISPLAY "|   "nbUtils
+           DISPLAY "| Nombre d'evenements archives :     |"
+           DISPLAY "|   "nbEventArchives
+           DISPLAY "|____________________________________|"
+           CLOSE fhistorique.
 
       *-----------------------------------------------------------------
       *          Compare la date d'un evenement avec la date actuelle
@@ -2262,6 +2348,10 @@
                END-IF
            END-IF.
 
+      *-----------------------------------------------------------------
+      *    Permet de modifier le type, la date, la description, l'adresse
+      *    le seuil ou l'heure de l'evenement
+      *-----------------------------------------------------------------
        modifierEvent.
       * Permet la modification d'un evenement
            PERFORM afficheEvent
@@ -2289,6 +2379,9 @@
            DISPLAY "| 4 - adresse                        |"
            DISPLAY "| 5 - seuil                          |"
            DISPLAY "| 6 - heure                          |"
+           DISPLAY "|                                    |"
+           DISPLAY "|------------------------------------|"
+           DISPLAY "|                                    |"
            DISPLAY "| 0 - Revenir au menu precedent      |"
            DISPLAY "|____________________________________|"
 
@@ -2307,7 +2400,6 @@
                            DISPLAY "|_______________________________|"
                            DISPLAY "|                               |"
                            DISPLAY "|     Modification reussie !    |"
-                           DISPLAY "|    Modification reussie !     |"
                            DISPLAY "|_______________________________|"
                        ELSE
                            DISPLAY " _______________________________ "
@@ -2488,9 +2580,13 @@
                OPEN INPUT fevenement
                READ fevenement
                    INVALID KEY
-                       DISPLAY "invalide" fevent_nom
-                       DISPLAY "Saisie invalide"
-
+                       DISPLAY " _______________________________ "
+                       DISPLAY "|                               |"
+                       DISPLAY "|   /!\       ERREUR       /!\  |"
+                       DISPLAY "|_______________________________|"
+                       DISPLAY "|                               |"
+                       DISPLAY "|        Saisie invalide        |"
+                       DISPLAY "|_______________________________|"
                    NOT INVALID KEY
                        IF fevent_loginOrga = loginSaved THEN
                            MOVE 1 TO verif_event
@@ -2499,7 +2595,13 @@
                            MOVE loginSaved TO futil_login
                            READ futilisateur
                                INVALID KEY
-                                   DISPLAY "Erreur lecture futilisateur"
+                           DISPLAY " _______________________________ "
+                           DISPLAY "|                               |"
+                           DISPLAY "|   /!\       ERREUR       /!\  |"
+                           DISPLAY "|_______________________________|"
+                           DISPLAY "|                               |"
+                           DISPLAY "|      Echec de la lecture      |"
+                           DISPLAY "|_______________________________|"
                                NOT INVALID KEY
       ** utilisateur admin ou organisateur
                                    IF futil_type = 1 THEN
@@ -2538,7 +2640,13 @@
       * Ecriture du nouvel element dans fhistorique :
            WRITE tamp_fhisto
                INVALID KEY
-                   DISPLAY "Erreur lecture fhistorique"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|                               |"
+                   DISPLAY "|   /!\       ERREUR       /!\  |"
+                   DISPLAY "|_______________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|      Echec de la lecture      |"
+                   DISPLAY "|_______________________________|"
                NOT INVALID KEY
                    MOVE 1 TO autoSupprEvent
                    PERFORM supprimerEvent
@@ -2548,8 +2656,8 @@
            .
 
       *-----------------------------------------------------------------
-      *          Procedure permettant a l'utilisateur d'archiver
-      *          des evenements passes
+      *    Procedure permettant a l'utilisateur d'archiver
+      *    des evenements passes
       *-----------------------------------------------------------------
        archivageEvent.
            DISPLAY " ____________________________________"
@@ -2568,21 +2676,23 @@
                        PERFORM comparer_date
                        IF dateComparee = 1 THEN
                         DISPLAY "|------------------------------------|"
-                           DISPLAY "| Nom : "fevent_nom
-                           DISPLAY "| Date : "fevent_dateJour"/"
+                        DISPLAY "| Nom :                              |"
+                        DISPLAY "|   "fevent_nom
+                        DISPLAY "| Date :                             |"
+                        DISPLAY "|   "fevent_dateJour"/"
       -                     fevent_dateMois"/"fevent_dateAnnee
                        END-IF
                END-READ
            END-PERFORM
            DISPLAY "|                                    |"
            DISPLAY "|____________________________________|"
-           
+
            MOVE 0 TO fin_boucle
-           
-           CLOSE fevenement
-           OPEN I-O fevenement
+
+      *     CLOSE fevenement
+      *     OPEN I-O fevenement
            PERFORM WITH TEST AFTER UNTIL fin_boucle = 1 OR retour = 1
-               DISPLAY "Saissisez le nom de l'event a archiver :"
+               DISPLAY "Saissisez le nom de l'evenement a archiver :"
                ACCEPT fevent_nom
                READ fevenement
                    INVALID KEY
@@ -2599,14 +2709,26 @@
                            DISPLAY "|                               |"
                            DISPLAY "| L'evenement n'est pas termine |"
                            DISPLAY "|_______________________________|"
-                       END-IF        
+                       END-IF
                END-READ
-               DISPLAY "Retourner au menu precedent ?"
-               DISPLAY "0 - Non 1 - Oui"
+               DISPLAY " ____________________________________ "
+               DISPLAY "|                                    |"
+               DISPLAY "|        Voulez-vous revenir         |"
+               DISPLAY "|        au menu precedent  ?        |"
+               DISPLAY "|                                    |"
+               DISPLAY "|------------------------------------|"
+               DISPLAY "|                                    |"
+               DISPLAY "|   0 - Non                          |"
+               DISPLAY "|   1 - Oui                          |"
+               DISPLAY "|____________________________________|"
                ACCEPT retour
-           END-PERFORM 
+           END-PERFORM
+           CLOSE fevenement
            .
-
+      *-----------------------------------------------------------------
+      *    Procedure permettant a l'utilisateur d'archiver tous
+      *    les evenements passes en faisant appel à la fonction archiver_event
+      *-----------------------------------------------------------------
        tout_archiver.
            OPEN INPUT fevenement
            MOVE 0 TO fin_boucle
@@ -2623,8 +2745,9 @@
            .
 
       ******************************************************************
-      *          Procedure comptant les participants a un evenement
-      *          fpart_nomEvent doit avoir sa valeur avant l'appel
+      *    Fonction annexe :
+      *    Fonction comptant les participants a un evenement
+      *    fpart_nomEvent doit avoir sa valeur avant l'appel
       ******************************************************************
        compte_nb_part.
            MOVE 0 TO nbParticipants
@@ -2647,8 +2770,8 @@
            .
 
       ******************************************************************
-      *          Procedure verifiant le format horaire
-      *          La variable verifiee est heureEvent
+      *    Procedure verifiant le format horaire
+      *    La variable verifiee est heureEvent
       ******************************************************************
        *> verifHeure.
            *> MOVE 1 TO estValideHeure
@@ -2670,9 +2793,8 @@
            *> END-IF.
 
       *-----------------------------------------------------------------
-      *          Procedure calculant le nombre de participations
-      *           d'etudiants d'une formation F ï¿½  un evenement
-      *                            de type T
+      *    Procedure calculant le nombre de participations
+      *    d'etudiants d'une formation F a  un evenementde type T
       *-----------------------------------------------------------------
        statFormaMois.
            DISPLAY " ____________________________________"
@@ -2681,7 +2803,6 @@
            DISPLAY "|       LE MOIS, LA FORMATION        |"
            DISPLAY "|       ET LE TYPE D'EVENEMENT       |"
            DISPLAY "|____________________________________|"
-
            DISPLAY "|                                    |"
            DISPLAY "|      AFFICHAGE DES FORMATIONS      |"
            DISPLAY "|------------------------------------|"
