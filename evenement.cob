@@ -181,6 +181,9 @@
        77 erreurCompte PIC 9(1).
        77 verif_mdp_ok PIC 9(1).
        77 annee PIC 9(4).
+       77 verif_dot PIC 9(1).
+       77 verif_domain PIC 9(1).
+       77 valide_alpha PIC 9(1).
       *-----------------------
        PROCEDURE DIVISION.
       *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -1148,10 +1151,11 @@
            ACCEPT futil_prenom
 
       **verification du format xxxxx@xxxx.fr ou xxxxx@xxxx.com
-           PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 0
+           MOVE 0 TO verif_mail_ok
+           PERFORM WITH TEST AFTER UNTIL verif_mail_ok EQUAL 1
                DISPLAY "Entrer votre adresse mail :"
                ACCEPT futil_mail
-               PERFORM verif_mail
+               PERFORM verif_mail2
            END-PERFORM
 
       ** verification du format d'un nombre de 10 chiffres pour le tel
@@ -1328,7 +1332,56 @@
                END-IF
            END-IF.
 
+       verif_mail2.
+           MOVE 0 TO verif_arobase
+           MOVE 0 TO verif_dot
+           MOVE 0 TO verif_domain
+           MOVE 0 TO verif_mail_ok
+           MOVE 1 TO I
+           MOVE futil_mail TO chaine
 
+      *    Le premier caractere est une lettre
+           IF chaine(1:1) IS ALPHABETIC THEN
+               MOVE 0 TO fin_boucle      
+      *    La chaine contient un arobase : 
+               PERFORM UNTIL verif_arobase = 1 or fin_boucle = 1
+                   IF chaine(I:1) EQUAL '@' THEN
+                       MOVE 1 TO verif_arobase
+                   END-IF
+                   IF chaine(I:1) EQUAL SPACE THEN
+                       MOVE 1 TO fin_boucle
+                   END-IF
+                   ADD 1 TO I
+               END-PERFORM
+      *    Une lettre est presente apres l'arobase
+      *    Un bug peut venir du I auquel il faut ajouter 1 
+               IF chaine(I:1) IS ALPHABETIC THEN
+                   IF verif_arobase = 1 THEN
+                       MOVE 0 TO fin_boucle
+      *    On verifie la presence d'un point              
+                       PERFORM UNTIL verif_dot = 1 OR fin_boucle = 1
+                           IF chaine(I:1) EQUAL "." THEN
+                               MOVE 1 TO verif_dot
+                           END-IF
+                           IF chaine(I:1) EQUAL SPACE THEN
+                               MOVE 1 TO fin_boucle
+                           END-IF
+                           ADD 1 TO I
+                       END-PERFORM
+                       IF verif_dot = 1 THEN
+                           ADD 1 TO I
+      *    On verifie la presence d'une lettre apres le point
+                           IF chaine(I:1) IS ALPHABETIC THEN
+                               MOVE 1 TO verif_mail_ok
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF 
+           .
+
+           
+               
       ******************************************************************
       * Fonction annexe :
       *    Procedure permettant de verifier le numero de telephone
@@ -1657,6 +1710,8 @@
                DISPLAY "|                                     |"
                DISPLAY "|-------------------------------------|"
                DISPLAY "|                                     |"
+               DISPLAY "|-------------------------------------|"
+               DISPLAY "|                                     |"
                DISPLAY "|  0 - Revenir au menu precedent      |"
                DISPLAY "|_____________________________________|"
                DISPLAY " "
@@ -1837,6 +1892,9 @@
                        DISPLAY "d'utilisateur (1 = Admin, 0 = Membre) :"
                        ACCEPT futil_type
                        PERFORM modifUtil
+                       IF futil_login = loginSaved THEN
+                           MOVE futil_type TO typeSaved 
+                       END-IF 
                    END-IF
                    CLOSE futilisateur
            END-READ
@@ -2152,6 +2210,7 @@
            DISPLAY "|de l'evenement                      |"
            DISPLAY "|Format : xxhxx, avec x un chiffre   |"
            ACCEPT heureEvent
+           PERFORM verifHeure
            DISPLAY "|____________________________________|"
 
 
@@ -2163,6 +2222,7 @@
            MOVE adresseEvent TO fevent_adresse
            MOVE seuilEvent TO fevent_seuil
            MOVE heureEvent TO fevent_heure
+           MOVE 2 TO futil_type
 
 
            WRITE tamp_fevent
@@ -2456,6 +2516,7 @@
            DISPLAY "|------------------------------------|"
            DISPLAY "Veuillez saisir le login de la personne souhaitee :"
            ACCEPT login
+           MOVE login to futil_login
            OPEN INPUT futilisateur
            READ futilisateur
                INVALID KEY
@@ -2708,7 +2769,6 @@
                         DISPLAY " "
                         DISPLAY "Votre choix :"
                         ACCEPT fin_boucle
-
            END-PERFORM
            END-IF
            CLOSE fparticipant.
@@ -2894,13 +2954,15 @@
            DISPLAY "|       STATISTIQUES GLOBALES        |"
            DISPLAY "|------------------------------------|"
            DISPLAY "| Nombre d'evenements :              |"
-           DISPLAY "|   "nbEvents
+           DISPLAY "|   "nbEvents "                              |"
            DISPLAY "| Archivables :                      |"
-           DISPLAY "|   "nbEventArchivables
+           DISPLAY "|   "nbEventArchivables"
+      -    "  |"  
            DISPLAY "| Nombre d'utilisateurs :            |"
-           DISPLAY "|   "nbUtils
+           DISPLAY "|   "nbUtils"                             |"
            DISPLAY "| Nombre d'evenements archives :     |"
-           DISPLAY "|   "nbEventArchives
+           DISPLAY "|   "nb
+      -    EventArchives"                              |"
            DISPLAY "|____________________________________|"
            CLOSE fhistorique.
 
@@ -3310,24 +3372,34 @@
       *    Procedure verifiant le format horaire
       *    La variable verifiee est heureEvent
       ******************************************************************
-       *> verifHeure.
-           *> MOVE 1 TO estValideHeure
-           *> COMPUTE longHeure = FUNCTION LENGTH (heureEvent)
-           *> IF longHeure <> 5 THEN
-               *> MOVE 0 TO estValideHeure
-           *> ELSE
-               *> IF NOT NUMERIC(heureEvent(1:2)) THEN
-                   *> MOVE 0 TO estValideHeure
-               *> ELSE
-                   *> IF heureEvent(3:1) <> 'h' THEN
-                       *> MOVE 0 TO estValideHeure
-                   *> ELSE
-                       *> IF NOT NUMERIC(heureEvent(4:2))
-                           *> MOVE 0 TO estValideHeure
-                       *> END-IF
-                   *> END-IF
-               *> END-IF
-           *> END-IF.
+       verifHeure.
+           MOVE 1 TO estValideHeure
+           IF heureEvent(1:1) < 0 OR heureEvent(1:1) > 2 THEN
+               MOVE 0 TO estValideHeure
+           END-IF
+
+           IF heureEvent(1:1) = 0 OR heureEvent(1:1) = 1 THEN
+               IF heureEvent(1:1) IS NOT NUMERIC THEN
+                   MOVE 0 TO estValideHeure
+               END-IF    
+           ELSE
+               IF heureEvent(1:1) = 2 THEN
+                   IF heureEvent(2:1) > 3 THEN
+                       MOVE 0 TO estValideHeure
+                   END-IF 
+               END-IF
+           END-IF
+
+           IF heureEvent(3:1) <> 'h' THEN
+                IF heureEvent(3:1) <> 'H' THEN
+                    MOVE 0 TO estValideHeure
+                END-IF
+           END-IF
+           
+           IF heureEvent(4:1) > 5 THEN
+               MOVE 0 TO estValideHeure
+           END-IF 
+           .
 
       *-----------------------------------------------------------------
       *    Procedure calculant le nombre de participations
