@@ -2104,7 +2104,7 @@
                      DISPLAY "|   /!\       ERREUR       /!\  |"
                      DISPLAY "|_______________________________|"
                      DISPLAY "|                               |"
-                     DISPLAY "|     Evenement non trouve      |"
+                     DISPLAY "|        Type non trouve        |"
                      DISPLAY "|                               |"
                      DISPLAY "|    Changer votre recherche    |"
                      DISPLAY "|_______________________________|"
