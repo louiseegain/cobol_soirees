@@ -2548,11 +2548,11 @@
       ** aucun.
       ** le login de l'utilisateur a supprimer doit etre dans futil_login
 
-           DISPLAY " ____________________________________"
-           DISPLAY "|                                    |"
-           DISPLAY "|         SUPPRIMER MON COMPTE       |"
-           DISPLAY "|            UTILISATEUR             |"
-           DISPLAY "|------------------------------------|"
+           DISPLAY " ________________________________"
+           DISPLAY "|                               |"
+           DISPLAY "|       SUPPRIMER MON COMPTE    |"
+           DISPLAY "|          UTILISATEUR          |"
+           DISPLAY "|_______________________________|"
            OPEN INPUT fevenement
            MOVE 1 TO fdf
            MOVE 0 TO suppression_ok
@@ -2562,11 +2562,11 @@
            START fevenement, KEY IS = fevent_loginOrga
                NOT INVALID KEY
                    MOVE 1 TO suppression_ok
-                   DISPLAY "|                                    |"
-                   DISPLAY "|    Impossible de supprimer cet     |"
-                   DISPLAY "|    utilisateur. Il organise un     |"
-                   DISPLAY "|    evenement                       |"
-                   DISPLAY "|____________________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|  Impossible de supprimer cet  |"
+                   DISPLAY "|  utilisateur. Il organise un  |"
+                   DISPLAY "|    evenement                  |"
+                   DISPLAY "|_______________________________|"
            END-START
            CLOSE fevenement
 
@@ -2578,11 +2578,11 @@
                START fparticipant , KEY IS = fpart_login
                   NOT INVALID KEY
                    MOVE 1 TO suppression_ok
-                   DISPLAY "|                                    |"
-                   DISPLAY "|    Impossible de supprimer cet     |"
-                   DISPLAY "|    utilisateur. Il est inscrit a   |"
-                   DISPLAY "|    un evenement                    |"
-                   DISPLAY "|____________________________________|"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|  Impossible de supprimer cet  |"
+                   DISPLAY "| utilisateur. Il est inscrit a |"
+                   DISPLAY "|    un evenement               |"
+                   DISPLAY "|_______________________________|"
                END-START
                CLOSE fparticipant
            END-IF
@@ -2608,9 +2608,9 @@
                    DISPLAY "|     Utilisateur supprime      |"
                    DISPLAY "|_______________________________|"
                    DISPLAY " "
-                   DISPLAY " ----------------------------------------- "
-                   DISPLAY "|         VOUS AVEZ ETE DECONNECTE        |"
-                   DISPLAY "|_________________________________________|"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|   VOUS AVEZ ETE DECONNECTE    |"
+                   DISPLAY "|_______________________________|"
                    PERFORM accueil
                END-READ
               CLOSE futilisateur
