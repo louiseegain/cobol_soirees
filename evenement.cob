@@ -1390,29 +1390,13 @@
        verif_tel.
            MOVE 1 TO I
            MOVE 1 TO verif_tel_ok
-      *     DISPLAY 'futil_tel test'
            PERFORM UNTIL futil_tel(I:1) EQUAL SPACE OR I EQUAL 11
-      *             DISPLAY 'lettre =' futil_tel(I:1)
-                   IF futil_tel(I:1)
-                   NOT EQUAL 0
-                   AND NOT EQUAL 1
-                   AND NOT EQUAL 2
-                   AND NOT EQUAL 3
-                   AND NOT EQUAL 4
-                   AND NOT EQUAL 5
-                   AND NOT EQUAL 6
-                   AND NOT EQUAL 7
-                   AND NOT EQUAL 8
-                   AND NOT EQUAL 9 THEN
-                   MOVE 0 TO verif_tel_ok
-                END-IF
+                   IF futil_tel(I:1) IS NOT NUMERIC THEN
+                       MOVE 0 TO verif_tel_ok
+                   END-IF
                 ADD 1 TO I
            END-PERFORM
-           ADD 1 TO I
-      *     DISPLAY "letttre suivante =" futil_tel(I:1)
-           IF futil_tel(I:1) NOT EQUAL SPACE THEN
-               MOVE 0 TO verif_tel_ok
-           END-IF.
+           .
 
 
 
