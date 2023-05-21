@@ -1092,7 +1092,7 @@
            DISPLAY "|    BIENVENUE SUR L'APPLICATION      |"
            DISPLAY "|_____________________________________|"
            MOVE FUNCTION CURRENT-DATE to WS-CURRENT-DATE-DATA
-           PERFORM accueil
+           PERFORM menuUtilisateur
            STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
@@ -1111,7 +1111,7 @@
                DISPLAY "|  0 - Quitter                        |"
                DISPLAY "|_____________________________________|"
                DISPLAY " "
-           	DISPLAY "Votre choix :"
+               DISPLAY "Votre choix :"
                ACCEPT choix
 
                EVALUATE choix
@@ -1342,8 +1342,8 @@
 
       *    Le premier caractere est une lettre
            IF chaine(1:1) IS ALPHABETIC THEN
-               MOVE 0 TO fin_boucle      
-      *    La chaine contient un arobase : 
+               MOVE 0 TO fin_boucle
+      *    La chaine contient un arobase :
                PERFORM UNTIL verif_arobase = 1 or fin_boucle = 1
                    IF chaine(I:1) EQUAL '@' THEN
                        MOVE 1 TO verif_arobase
@@ -1354,11 +1354,11 @@
                    ADD 1 TO I
                END-PERFORM
       *    Une lettre est presente apres l'arobase
-      *    Un bug peut venir du I auquel il faut ajouter 1 
+      *    Un bug peut venir du I auquel il faut ajouter 1
                IF chaine(I:1) IS ALPHABETIC THEN
                    IF verif_arobase = 1 THEN
                        MOVE 0 TO fin_boucle
-      *    On verifie la presence d'un point              
+      *    On verifie la presence d'un point
                        PERFORM UNTIL verif_dot = 1 OR fin_boucle = 1
                            IF chaine(I:1) EQUAL "." THEN
                                MOVE 1 TO verif_dot
@@ -1377,11 +1377,11 @@
                        END-IF
                    END-IF
                END-IF
-           END-IF 
+           END-IF
            .
 
-           
-               
+
+
       ******************************************************************
       * Fonction annexe :
       *    Procedure permettant de verifier le numero de telephone
@@ -1869,7 +1869,7 @@
                    DISPLAY "|  0 - Non                      |"
                    DISPLAY "|_______________________________|"
                    DISPLAY " "
-           	   DISPLAY "Votre choix :"
+                  DISPLAY "Votre choix :"
                    ACCEPT reponse
                    IF reponse = 1 THEN
                        DISPLAY "Veuillez saisir le nouveau type"
@@ -1877,8 +1877,8 @@
                        ACCEPT futil_type
                        PERFORM modifUtil
                        IF futil_login = loginSaved THEN
-                           MOVE futil_type TO typeSaved 
-                       END-IF 
+                           MOVE futil_type TO typeSaved
+                       END-IF
                    END-IF
                    CLOSE futilisateur
            END-READ
@@ -1966,7 +1966,7 @@
                        DISPLAY "|  0 - Non                            |"
                        DISPLAY "|_____________________________________|"
                        DISPLAY " "
-           	       DISPLAY "Votre choix :"
+                      DISPLAY "Votre choix :"
                        ACCEPT erreurProfil
                    IF erreurProfil = 1
                        PERFORM modifierUtilisateur
@@ -2070,7 +2070,7 @@
                        DISPLAY "|                                    |"
                        DISPLAY "|____________________________________|"
                        DISPLAY " "
-           	       DISPLAY "Votre choix :"
+                      DISPLAY "Votre choix :"
                        MOVE 0 TO inscription
 
                        ACCEPT inscription
@@ -2099,14 +2099,12 @@
       ******************************************************************
        existeEvent.
            OPEN INPUT fevenement
+           MOVE nomEvent to fevent_nom
            READ fevenement
            INVALID KEY
                MOVE 0 TO estValideEvenementResultat
            NOT INVALID KEY
-               IF nomEvent EQUALS fevent_nom THEN
                    MOVE 1 TO estValideEvenementResultat
-                   DISPLAY fevent_nom
-               END-IF
            END-READ
 
       *     IF cr_fevent = 00
@@ -2123,14 +2121,12 @@
       ******************************************************************
        existeEventHisto.
            OPEN INPUT fhistorique
+            MOVE nomEvent TO fhisto_nom
            READ fhistorique
            INVALID KEY
                MOVE 0 TO estValideEvenementResultatHisto
            NOT INVALID KEY
-               IF nomEvent EQUALS fhisto_nom THEN
                    MOVE 1 TO estValideEvenementResultatHisto
-                   DISPLAY fevent_nom
-               END-IF
            END-READ
 
       *     IF cr_fhisto = 00
@@ -2149,11 +2145,13 @@
            DISPLAY "|         CREATION EVENEMENT         |"
            DISPLAY "|------------------------------------|"
       **on verifie que le nom de l'evenement est bon
-           PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 1
+           PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 0
+               AND estValideEvenementResultatHisto = 0
                DISPLAY "|Saisir le nom de l'evenement        |"
                DISPLAY "|(maximum 40 caracteres)             |"
                ACCEPT nomEvent
                PERFORM existeEvent
+               PERFORM existeEventHisto
            END-PERFORM
       **aucune contrainte sur ce champ
            DISPLAY "|Saisir le type d'evenement          |"
@@ -2256,10 +2254,10 @@
                            AND fevent_dateMois>= WS-CURRENT-MONTH
                            AND fevent_dateAnnee >= WS-CURRENT-YEAR
                            DISPLAY "|Nom :                         |"
-                     	   DISPLAY "|  "fevent_nom
+                            DISPLAY "|  "fevent_nom
                            DISPLAY "|Type :                        |"
                            DISPLAY "|  "fevent_type
-           		   DISPLAY "|------------------------------|"
+                      DISPLAY "|------------------------------|"
                        END-IF
 
                    END-READ
@@ -2534,7 +2532,7 @@
                         IF futil_type = 1 THEN
                             DISPLAY "|   Administrateur"
                         ELSE
-                        	DISPLAY "|   Membre"
+                            DISPLAY "|   Membre"
                         END-IF
                         DISPLAY "|____________________________________|"
                    END-IF
@@ -2941,7 +2939,7 @@
            DISPLAY "|   "nbEvents "                              |"
            DISPLAY "| Archivables :                      |"
            DISPLAY "|   "nbEventArchivables"
-      -    "  |"  
+      -    "  |"
            DISPLAY "| Nombre d'utilisateurs :            |"
            DISPLAY "|   "nbUtils"                             |"
            DISPLAY "| Nombre d'evenements archives :     |"
@@ -3303,7 +3301,7 @@
                DISPLAY "|   1 - Oui                          |"
                DISPLAY "|____________________________________|"
                DISPLAY " "
-           	DISPLAY "Votre choix :"
+               DISPLAY "Votre choix :"
                ACCEPT retour
            END-PERFORM
            CLOSE fevenement
@@ -3365,12 +3363,12 @@
            IF heureEvent(1:1) = 0 OR heureEvent(1:1) = 1 THEN
                IF heureEvent(1:1) IS NOT NUMERIC THEN
                    MOVE 0 TO estValideHeure
-               END-IF    
+               END-IF
            ELSE
                IF heureEvent(1:1) = 2 THEN
                    IF heureEvent(2:1) > 3 THEN
                        MOVE 0 TO estValideHeure
-                   END-IF 
+                   END-IF
                END-IF
            END-IF
 
@@ -3379,10 +3377,10 @@
                     MOVE 0 TO estValideHeure
                 END-IF
            END-IF
-           
+
            IF heureEvent(4:1) > 5 THEN
                MOVE 0 TO estValideHeure
-           END-IF 
+           END-IF
            .
 
       *-----------------------------------------------------------------
@@ -3517,8 +3515,8 @@
                        MOVE 1 TO Fin
                    NOT AT END
                            DISPLAY "|Formation :                   |"
-                     	   DISPLAY "|  "futil_formation
-           		   DISPLAY "|------------------------------|"
+                            DISPLAY "|  "futil_formation
+                      DISPLAY "|------------------------------|"
                    END-READ
                END-PERFORM
                DISPLAY "|______________________________|"
