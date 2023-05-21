@@ -2026,7 +2026,7 @@
            OPEN INPUT fevenement
                DISPLAY " ____________________________________ "
                DISPLAY "|                                    |"
-               DISPLAY "|     RECHERCHER EVENEMENT PASSE     |"
+               DISPLAY "|  RECHERCHER EVENEMENT PAR LE NOM   |"
                DISPLAY "|____________________________________|"
                DISPLAY " "
                DISPLAY "Quel evenement voulez-vous rechercher ?"
