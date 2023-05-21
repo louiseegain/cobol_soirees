@@ -1634,7 +1634,7 @@
 
            EVALUATE choixEvent
               WHEN 1 PERFORM rechercherNom
-      *        WHEN 2 PERFORM rechercherType
+              WHEN 2 PERFORM rechercherType
               WHEN 0 PERFORM menuUtilisateur
            END-EVALUATE
 
@@ -2086,7 +2086,89 @@
                END-READ
            CLOSE fevenement.
 
+      *-----------------------------------------------------------------
+      * Procedure permettant de rechercher un evenement en fonction de
+      *                        son type
+      *----------------------------------------------------------------
+       rechercherType.
+           PERFORM afficheEvent
+             DISPLAY "Quel type d'evenement voulez-vous rechercher ?"
+             DISPLAY "(saisir le type)"
+             ACCEPT typeEvent
+             OPEN INPUT fevenement
+             MOVE typeEvent TO fevent_type
+             START fevenement, KEY IS = fevent_type
+                 INVALID KEY
+                     DISPLAY " _______________________________ "
+                     DISPLAY "|                               |"
+                     DISPLAY "|   /!\       ERREUR       /!\  |"
+                     DISPLAY "|_______________________________|"
+                     DISPLAY "|                               |"
+                     DISPLAY "|     Evenement non trouve      |"
+                     DISPLAY "|                               |"
+                     DISPLAY "|    Changer votre recherche    |"
+                     DISPLAY "|_______________________________|"
+                 NOT INVALID KEY
+                   PERFORM WITH TEST AFTER UNTIL Fin = 1
+                     READ    fevenement    NEXT
+                     AT    END
+                           MOVE 1 TO Fin
+                     NOT AT END
+                     DISPLAY "Voici les informations de l'evenement :"
+                     DISPLAY "Nom : " fevent_nom
+                     DISPLAY "Type : "fevent_type
+                     DISPLAY "Date : "fevent_dateJour"/"
+      -                fevent_dateMois"/"fevent_dateAnnee
+                     MOVE fevent_dateJour TO dateJour
+                     MOVE fevent_dateMois TO dateMois
+                     MOVE fevent_dateAnnee TO dateAnnee
+                     DISPLAY "Heure de debut : " fevent_heure
+                     DISPLAY "Description : " fevent_description
+                     DISPLAY "Adresse : " fevent_adresse
+                     DISPLAY "Seuil : "fevent_seuil
+                     DISPLAY "Login organisateur : " fevent_loginOrga
+                     DISPLAY " ____________________________________"
+                     DISPLAY "|                                    |"
+                     DISPLAY "|          INSCRIPTION EVENT         |"
+                     DISPLAY "|------------------------------------|"
+                     DISPLAY "|                                    |"
+                     DISPLAY "|     Voulez-vous vous inscrire a    |"
+                     DISPLAY "|         un des evenement ?         |"
+                     DISPLAY "|                                    |"
+                     DISPLAY "|  1 - Oui                           |"
+                     DISPLAY "|  2 - Non                           |"
+                     DISPLAY "|                                    |"
+                     DISPLAY "|____________________________________|"
+                     DISPLAY " "
+                     DISPLAY "Votre choix :"
+                     MOVE 0 TO inscription
 
+                     ACCEPT inscription
+                     IF inscription = 1 THEN
+                       DISPLAY "Veuillez saisir son nom :"
+                       ACCEPT nomEvent
+                       IF nomEvent = fevent_nom THEN
+                         PERFORM inscriptionEvent
+                       ELSE
+                         DISPLAY " _______________________________ "
+                         DISPLAY "|                               |"
+                         DISPLAY "|   /!\       ERREUR       /!\  |"
+                         DISPLAY "|_______________________________|"
+                         DISPLAY "|                               |"
+                         DISPLAY "|     Evenement non trouve      |"
+                         DISPLAY "|_______________________________|"
+                       END-IF
+                      ELSE
+                      DISPLAY " ____________________________________"
+                      DISPLAY "|                                    |"
+                      DISPLAY "|   Merci pour votre consultation !  |"
+                      DISPLAY "|____________________________________|"
+                         PERFORM rechercherEvent
+                     END-IF
+                     END-READ
+                   END-PERFORM
+             END-START
+           CLOSE fevenement.
 
       *-----------------------------------------------------------------
       *          Procedure permettant de creer un evenement
@@ -2547,6 +2629,7 @@
       ** l'utilisateur n'est inscrit a aucun evenement et n'en organise
       ** aucun.
       ** le login de l'utilisateur a supprimer doit etre dans futil_login
+
 
            DISPLAY " ________________________________"
            DISPLAY "|                               |"
