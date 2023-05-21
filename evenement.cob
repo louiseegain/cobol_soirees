@@ -1092,7 +1092,7 @@
            DISPLAY "|    BIENVENUE SUR L'APPLICATION      |"
            DISPLAY "|_____________________________________|"
            MOVE FUNCTION CURRENT-DATE to WS-CURRENT-DATE-DATA
-           PERFORM menuUtilisateur
+           PERFORM accueil
            STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
