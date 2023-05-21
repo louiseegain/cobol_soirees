@@ -1092,8 +1092,7 @@
            DISPLAY "|    BIENVENUE SUR L'APPLICATION      |"
            DISPLAY "|_____________________________________|"
            MOVE FUNCTION CURRENT-DATE to WS-CURRENT-DATE-DATA
-           PERFORM menuUtilisateur
-      *     PERFORM accueil
+           PERFORM accueil
            STOP RUN.
       *-----------------------------------------------------------------
       *                  FONCTIONS ET PROCEDURES
@@ -2027,7 +2026,7 @@
            OPEN INPUT fevenement
                DISPLAY " ____________________________________ "
                DISPLAY "|                                    |"
-               DISPLAY "|     RECHERCHER EVENEMENT PASSE     |"
+               DISPLAY "|  RECHERCHER EVENEMENT PAR LE NOM   |"
                DISPLAY "|____________________________________|"
                DISPLAY " "
                DISPLAY "Quel evenement voulez-vous rechercher ?"
@@ -2171,7 +2170,6 @@
              END-START
            CLOSE fevenement.
 
-
       *-----------------------------------------------------------------
       *          Procedure permettant de creer un evenement
       *-----------------------------------------------------------------
@@ -2183,20 +2181,18 @@
       ******************************************************************
        existeEvent.
            OPEN INPUT fevenement
+           MOVE nomEvent to fevent_nom
            READ fevenement
            INVALID KEY
                MOVE 0 TO estValideEvenementResultat
            NOT INVALID KEY
-               IF nomEvent EQUALS fevent_nom THEN
                    MOVE 1 TO estValideEvenementResultat
-                   DISPLAY fevent_nom
-               END-IF
            END-READ
 
-      *     IF cr_fevent = 00
-      *     THEN DISPLAY "Evenement trouve"
+           IF cr_fevent = 00
+           THEN DISPLAY "Evenement existant en cours"
       *     ELSE DISPLAY "Evenement non trouve"
-      *     END-IF
+           END-IF
            CLOSE fevenement
            .
 
@@ -2207,20 +2203,18 @@
       ******************************************************************
        existeEventHisto.
            OPEN INPUT fhistorique
+            MOVE nomEvent TO fhisto_nom
            READ fhistorique
            INVALID KEY
                MOVE 0 TO estValideEvenementResultatHisto
            NOT INVALID KEY
-               IF nomEvent EQUALS fhisto_nom THEN
                    MOVE 1 TO estValideEvenementResultatHisto
-                   DISPLAY fevent_nom
-               END-IF
            END-READ
 
-      *     IF cr_fhisto = 00
-      *     THEN DISPLAY "Evenement trouve"
+           IF cr_fhisto = 00
+           THEN DISPLAY "Evenement existant dans l'historique"
       *     ELSE DISPLAY "Evenement non trouve"
-      *     END-IF
+           END-IF
            CLOSE fhistorique
            .
 
@@ -2233,11 +2227,13 @@
            DISPLAY "|         CREATION EVENEMENT         |"
            DISPLAY "|------------------------------------|"
       **on verifie que le nom de l'evenement est bon
-           PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 1
+           PERFORM WITH TEST AFTER UNTIL estValideEvenementResultat = 0
+               AND estValideEvenementResultatHisto = 0
                DISPLAY "|Saisir le nom de l'evenement        |"
                DISPLAY "|(maximum 40 caracteres)             |"
                ACCEPT nomEvent
                PERFORM existeEvent
+               PERFORM existeEventHisto
            END-PERFORM
       **aucune contrainte sur ce champ
            DISPLAY "|Saisir le type d'evenement          |"
@@ -2634,11 +2630,12 @@
       ** aucun.
       ** le login de l'utilisateur a supprimer doit etre dans futil_login
 
-           DISPLAY " ____________________________________"
-           DISPLAY "|                                    |"
-           DISPLAY "|         SUPPRIMER MON COMPTE       |"
-           DISPLAY "|            UTILISATEUR             |"
-           DISPLAY "|------------------------------------|"
+
+           DISPLAY " ________________________________"
+           DISPLAY "|                               |"
+           DISPLAY "|       SUPPRIMER MON COMPTE    |"
+           DISPLAY "|          UTILISATEUR          |"
+           DISPLAY "|_______________________________|"
            OPEN INPUT fevenement
            MOVE 1 TO fdf
            MOVE 0 TO suppression_ok
@@ -2648,11 +2645,11 @@
            START fevenement, KEY IS = fevent_loginOrga
                NOT INVALID KEY
                    MOVE 1 TO suppression_ok
-                   DISPLAY "|                                    |"
-                   DISPLAY "|    Impossible de supprimer cet     |"
-                   DISPLAY "|    utilisateur. Il organise un     |"
-                   DISPLAY "|    evenement                       |"
-                   DISPLAY "|____________________________________|"
+                   DISPLAY "|                               |"
+                   DISPLAY "|  Impossible de supprimer cet  |"
+                   DISPLAY "|  utilisateur. Il organise un  |"
+                   DISPLAY "|    evenement                  |"
+                   DISPLAY "|_______________________________|"
            END-START
            CLOSE fevenement
 
@@ -2664,11 +2661,11 @@
                START fparticipant , KEY IS = fpart_login
                   NOT INVALID KEY
                    MOVE 1 TO suppression_ok
-                   DISPLAY "|                                    |"
-                   DISPLAY "|    Impossible de supprimer cet     |"
-                   DISPLAY "|    utilisateur. Il est inscrit a   |"
-                   DISPLAY "|    un evenement                    |"
-                   DISPLAY "|____________________________________|"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|  Impossible de supprimer cet  |"
+                   DISPLAY "| utilisateur. Il est inscrit a |"
+                   DISPLAY "|    un evenement               |"
+                   DISPLAY "|_______________________________|"
                END-START
                CLOSE fparticipant
            END-IF
@@ -2694,9 +2691,9 @@
                    DISPLAY "|     Utilisateur supprime      |"
                    DISPLAY "|_______________________________|"
                    DISPLAY " "
-                   DISPLAY " ----------------------------------------- "
-                   DISPLAY "|         VOUS AVEZ ETE DECONNECTE        |"
-                   DISPLAY "|_________________________________________|"
+                   DISPLAY " _______________________________ "
+                   DISPLAY "|   VOUS AVEZ ETE DECONNECTE    |"
+                   DISPLAY "|_______________________________|"
                    PERFORM accueil
                END-READ
               CLOSE futilisateur
