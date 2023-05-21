@@ -2107,10 +2107,10 @@
                    MOVE 1 TO estValideEvenementResultat
            END-READ
 
-      *     IF cr_fevent = 00
-      *     THEN DISPLAY "Evenement trouve"
+           IF cr_fevent = 00
+           THEN DISPLAY "Evenement existant en cours"
       *     ELSE DISPLAY "Evenement non trouve"
-      *     END-IF
+           END-IF
            CLOSE fevenement
            .
 
@@ -2129,10 +2129,10 @@
                    MOVE 1 TO estValideEvenementResultatHisto
            END-READ
 
-      *     IF cr_fhisto = 00
-      *     THEN DISPLAY "Evenement trouve"
+           IF cr_fhisto = 00
+           THEN DISPLAY "Evenement existant dans l'historique"
       *     ELSE DISPLAY "Evenement non trouve"
-      *     END-IF
+           END-IF
            CLOSE fhistorique
            .
 
