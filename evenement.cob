@@ -3464,6 +3464,9 @@
            IF heureEvent(4:1) > 5 THEN
                MOVE 0 TO estValideHeure
            END-IF
+           IF heureEvent(5:1) IS NOT NUMERIC THEN
+            MOVE 0 TO estValideHeure
+           END-IF
            .
 
       *-----------------------------------------------------------------
