@@ -1889,9 +1889,13 @@
                   DISPLAY "Votre choix :"
                    ACCEPT reponse
                    IF reponse = 1 THEN
+                       MOVE 0 TO fin_boucle
+                       PERFORM WITH TEST AFTER UNTIL futil_type = 0 or 
+                       futil_type = 1
                        DISPLAY "Veuillez saisir le nouveau type"
                        DISPLAY "d'utilisateur (1 = Admin, 0 = Membre) :"
                        ACCEPT futil_type
+                       END-PERFORM
                        PERFORM modifUtil
                        IF futil_login = loginSaved THEN
                            MOVE futil_type TO typeSaved
@@ -2299,6 +2303,15 @@
                    ACCEPT fevent_dateAnnee
                END-PERFORM
                PERFORM comparer_date
+               IF dateComparee <> 2 THEN
+                     DISPLAY " _______________________________ "
+                     DISPLAY "|                               |"
+                     DISPLAY "|   /!\       ERREUR       /!\  |"
+                     DISPLAY "|_______________________________|"
+                     DISPLAY "|                               |"
+                     DISPLAY "|  Saisissez une date a venir   |"
+                     DISPLAY "|_______________________________|"
+               END-IF
            END-PERFORM
            DISPLAY "|Veuillez decrire votre evenement    |"
            DISPLAY "|Format : maximum 250 caracteres     |"
@@ -2312,7 +2325,6 @@
                DISPLAY "|de personne                         |"
                ACCEPT seuilEvent
            END-PERFORM
-      **/!\ nous n'avons pas reussie a faire une verification sur le format de l'heure/!\
            PERFORM WITH TEST AFTER UNTIL estValideHeure = 1
                DISPLAY "|Veuillez saisir l'heure de debut    |"
                DISPLAY "|de l'evenement                      |"
@@ -2324,7 +2336,6 @@
 
            OPEN I-O fevenement
            MOVE nomEvent TO fevent_nom
-           MOVE typeEvent TO fevent_type
            MOVE loginSaved TO fevent_loginOrga
            MOVE descriptionEvent TO fevent_description
            MOVE adresseEvent TO fevent_adresse
@@ -2543,7 +2554,7 @@
                        END-IF
                        END-IF
                    END-READ
-               END-PERFORM
+              END-PERFORM
            END-START
            CLOSE fparticipant.
       *-----------------------------------------------------------------
