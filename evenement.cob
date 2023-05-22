@@ -2239,23 +2239,27 @@
            DISPLAY "|Saisir le type d'evenement          |"
            ACCEPT fevent_type
            DISPLAY "|Saisir la date de l'evenement       |"
-           DISPLAY "|JOUR :                              |"
+
+           PERFORM WITH TEST AFTER UNTIL dateComparee = 2
       **on verifie que le jour est bien compris entre 1 et 31
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateJour>0 AND fevent_dateJour<=31
-               ACCEPT fevent_dateJour
-           END-PERFORM
-           DISPLAY "|MOIS :                              |"
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateJour>0 AND fevent_dateJour<=31
+                   DISPLAY "|JOUR :                              |"
+                   ACCEPT fevent_dateJour
+               END-PERFORM
       **on verifie que le mois est bien compris entre 1 et 12
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateMois>0 AND fevent_dateMois<=12
-               ACCEPT fevent_dateMois
-           END-PERFORM
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateMois>0 AND fevent_dateMois<=12
+                   DISPLAY "|MOIS :                              |"
+                   ACCEPT fevent_dateMois
+               END-PERFORM
       **on verifie que l'annee est bien superieure ou egale a l'annee courante
-           DISPLAY "|ANNEE :                             |"
-           PERFORM WITH TEST AFTER UNTIL
-               fevent_dateAnnee>=WS-CURRENT-YEAR
-               ACCEPT fevent_dateAnnee
+               PERFORM WITH TEST AFTER UNTIL
+                   fevent_dateAnnee>=WS-CURRENT-YEAR
+                   DISPLAY "|ANNEE :                             |"
+                   ACCEPT fevent_dateAnnee
+               END-PERFORM
+               PERFORM comparer_date
            END-PERFORM
            DISPLAY "|Veuillez decrire votre evenement    |"
            DISPLAY "|Format : maximum 250 caracteres     |"
