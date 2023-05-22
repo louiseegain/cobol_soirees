@@ -2045,19 +2045,30 @@
                        DISPLAY "|    Changer votre recherche    |"
                        DISPLAY "|_______________________________|"
                    NOT INVALID KEY
-                       DISPLAY "Voici les informations de l'evenement :"
-                       DISPLAY "Nom : " fevent_nom
-                       DISPLAY "Type : "fevent_type
-                       DISPLAY "Date : "fevent_dateJour"/"
-      -                fevent_dateMois"/"fevent_dateAnnee
+                       DISPLAY " ______________________________"
+                       DISPLAY "|    Voici les informations de |"
+                       DISPLAY "|         l'evenement :        |"
+                       DISPLAY "| Nom :                        |" 
+                       DISPLAY "|   "fevent_nom
+                       DISPLAY "| Type :                       |" 
+                       DISPLAY "|   "fevent_type
+                       DISPLAY "| Date :                       |" 
+                       DISPLAY "|   "fevent_dateJour"/"
+      -    fevent_dateMois"/"fevent_dateAnnee
                        MOVE fevent_dateJour TO dateJour
                        MOVE fevent_dateMois TO dateMois
                        MOVE fevent_dateAnnee TO dateAnnee
-                       DISPLAY "Heure de debut : " fevent_heure
-                       DISPLAY "Description : " fevent_description
-                       DISPLAY "Adresse : " fevent_adresse
-                       DISPLAY "Seuil : "fevent_seuil
-                       DISPLAY "Login organisateur : " fevent_loginOrga
+                       DISPLAY "| Heure de debut :             |"
+                       DISPLAY "|   "fevent_heure
+                       DISPLAY "| Description :                |"
+                       DISPLAY "|   "fevent_description
+                       DISPLAY "| Adresse :                    |"
+                       DISPLAY "|   "fevent_adresse
+                       DISPLAY "| Seuil :                      |" 
+                       DISPLAY "|   "fevent_seuil
+                       DISPLAY "| Login organisateur :         |"
+                       DISPLAY "|   "fevent_loginOrga
+                       DISPLAY "|______________________________|"
                        DISPLAY " ____________________________________"
                        DISPLAY "|                                    |"
                        DISPLAY "|          INSCRIPTION EVENT         |"
