@@ -2365,7 +2365,7 @@
       * On verifie dans un premier temps qu'il n'est pas deja inscrit a
       * un evenement ou fait une demande
            MOVE loginSaved TO fpart_login
-           PERFORM WITH TEST AFTER UNTIL Fin = 1
+      *    PERFORM WITH TEST AFTER UNTIL Fin = 1
                START fparticipant, KEY IS = fpart_login
                    INVALID KEY
                        MOVE 1 TO Fin
@@ -2375,9 +2375,11 @@
                            AT END
                                MOVE 1 TO Fin
                            NOT AT END
-                           IF fpart_etat ="attente" THEN
+                           IF fpart_etat ="acceptee" THEN
                                PERFORM comparer_date
                                    IF dateComparee = 0 THEN
+      * On a deja une inscription a la meme date donc on ne peut pas 
+      * s'inscrire.   
                                        MOVE 0 TO valideInscription
                                        MOVE 1 TO Fin
                                    END-IF
@@ -2390,6 +2392,7 @@
                                     DISPLAY "|     a cet evenement    |"
                                     DISPLAY "|________________________|"
                                 END-IF
+                                
                                 IF fpart_etat = "attente" THEN
                                     DISPLAY " ________________________"
                                     DISPLAY "|                        |"
@@ -2410,7 +2413,7 @@
                             END-IF
                        END-READ
                END-START
-           END-PERFORM
+      *     END-PERFORM
 
 
            IF valideInscription = 1 THEN
