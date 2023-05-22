@@ -1793,7 +1793,7 @@
                        DISPLAY "Votre ancienne adresse mail: "futil_mail
                        DISPLAY "Entrer votre nouvelle adresse mail:"
                        ACCEPT futil_mail
-                       PERFORM verif_mail
+                       PERFORM verif_mail2
                        PERFORM modifUtil
                    END-PERFORM
                WHEN 4
@@ -2270,13 +2270,14 @@
                ACCEPT seuilEvent
            END-PERFORM
       **/!\ nous n'avons pas reussie a faire une verification sur le format de l'heure/!\
-           DISPLAY "|Veuillez saisir l'heure de debut    |"
-           DISPLAY "|de l'evenement                      |"
-           DISPLAY "|Format : xxhxx, avec x un chiffre   |"
-           ACCEPT heureEvent
-           PERFORM verifHeure
-           DISPLAY "|____________________________________|"
-
+           PERFORM WITH TEST AFTER UNTIL estValideHeure = 1
+               DISPLAY "|Veuillez saisir l'heure de debut    |"
+               DISPLAY "|de l'evenement                      |"
+               DISPLAY "|Format : xxhxx, avec x un chiffre   |"
+               ACCEPT heureEvent
+               PERFORM verifHeure
+               DISPLAY "|____________________________________|"
+           END-PERFORM
 
            OPEN I-O fevenement
            MOVE nomEvent TO fevent_nom
@@ -3460,7 +3461,6 @@
                     MOVE 0 TO estValideHeure
                 END-IF
            END-IF
-
            IF heureEvent(4:1) > 5 THEN
                MOVE 0 TO estValideHeure
            END-IF
